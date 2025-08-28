@@ -6,11 +6,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <link rel="stylesheet" href="algol_styles.css">
-    <script src="componentes.js" defer></script>
+    <script src="scripts/components/buttons.js" defer></script>
+    <script src="scripts/components/inputs.js" defer></script>
+    <script src="scripts/components.js" defer></script>
 </head>
 
 <body>
-    <div id="app-container" style="display:none">
+    <div id="app-container">
         <header>
             <h1>Catálogo de Componentes</h1>
         </header>
@@ -27,7 +29,7 @@
                 cumque! Lorem ipsum dolor sit amet consectetur adipisicing elit. Quasi nemo eum illo iusto quaerat,
                 eligendi
                 vero id aperiam debitis sapiente, ea quis nostrum nihil et ut vitae amet inventore temporibus.</p>
-            <section class="section-bubble">
+            <section class="algol_section-bubble">
                 <h2>Tipografia</h2>
                 <div class="group">
                     <h1>Título Principal H1</h1>
@@ -41,9 +43,9 @@
                 </div>
             </section>
 
-            <div class="section-bubble">
+            <div class="algol_section-bubble">
                 <h2>Botões</h2>
-                <div class="layout layout-2cols">
+                <div class="algol_layout algol_layout-2cols">
                     <algol-btn-primary position="right">Botão Primário</algol-btn-primary>
                     <algol-btn-secondary position="center">Botão Secundário</algol-btn-secondary>
                     <algol-btn-outline position="all">Botão Outline</algol-btn-outline>
@@ -58,11 +60,11 @@
                 </div>
             </div>
 
-            <div class="section-bubble">
+            <div class="algol_section-bubble">
                 <h2>Elementos de Formulário</h2>
                 <form>
-                    <div class="layout">
-                        <algol-input-text position="all">Input text Estilizado</algol-input-text>
+                    <div class="algol_layout">
+                        <algol-input-text position="all"></algol-input-text>
                         <algol-input-email position="all">Input email Estilizado</algol-input-email>
                         <algol-input-password position="all">Input password Estilizado</algol-input-password>
                         <algol-input-number position="all">Input number Estilizado</algol-input-number>
@@ -70,12 +72,12 @@
                         
                         
 
-                        <div class="component-group">
+                        <div class="algol_component-group">
                             <label for="textarea-texto">Área de Texto</label>
                             <textarea id="textarea-texto" class="input-padrao" rows="4" placeholder="Escreva sua mensagem aqui..."></textarea>
                         </div>
 
-                        <div class="component-group">
+                        <div class="algol_component-group">
                             <label for="select-opcoes">Seletor de Opções</label>
                             <select id="select-opcoes" class="select-padrao">
                                 <option value="">Selecione uma opção</option>
@@ -85,7 +87,7 @@
                             </select>
                         </div>
 
-                        <div class="component-group">
+                        <div class="algol_component-group">
                             <label>Caixas de Seleção (Checkboxes)</label>
                             <div>
                                 <input type="checkbox" id="checkbox1" class="checkbox-padrao" checked>
@@ -97,7 +99,7 @@
                             </div>
                         </div>
 
-                        <div class="component-group">
+                        <div class="algol_component-group">
                             <label>Botões de Rádio (Radios)</label>
                             <div>
                                 <input type="radio" id="radio1" name="radio-group" class="radio-padrao" checked>
@@ -109,22 +111,22 @@
                             </div>
                         </div>
 
-                        <div class="component-group">
+                        <div class="algol_component-group">
                             <label for="input-range">Slider de Range</label>
                             <input type="range" id="input-range" class="range-padrao" min="0" max="100" value="50">
                         </div>
 
-                        <div class="component-group">
+                        <div class="algol_component-group">
                             <label for="input-color">Seletor de Cor</label>
                             <input type="color" id="input-color" class="color-padrao" value="#3498db">
                         </div>
 
-                        <div class="component-group">
+                        <div class="algol_component-group">
                             <label for="input-date">Seletor de Data</label>
                             <input type="date" id="input-date" class="date-padrao">
                         </div>
 
-                        <div class="component-group">
+                        <div class="algol_component-group">
                             <label for="input-file">Seletor de Arquivo</label>
                             <input type="file" id="input-file" class="file-padrao">
                         </div>
@@ -134,7 +136,7 @@
 
             <div class="section-separator">
                 <h2>Listas e Tabelas</h2>
-                <div class="component-group">
+                <div class="algol_component-group">
                     <h3>Lista Não Ordenada</h3>
                     <ul>
                         <li>Item 1</li>
@@ -181,7 +183,7 @@
 
             <div class="section-separator">
                 <h2>Alertas e Mensagens</h2>
-                <div class="component-group">
+                <div class="algol_component-group">
                     <div class="alerta alerta-sucesso">Sucesso! A operação foi concluída com sucesso.</div>
                     <div class="alerta alerta-info">Informação: Esta é uma mensagem informativa.</div>
                     <div class="alerta alerta-aviso">Aviso! Atenção para este alerta.</div>
@@ -191,7 +193,7 @@
 
             <div class="section-separator">
                 <h2>Carregadores (Spinners)</h2>
-                <div class="component-group" style="display: flex; gap: 20px; align-items: center;">
+                <div class="algol_component-group" style="display: flex; gap: 20px; align-items: center;">
                     <div class="spinner"></div>
                     <p>O spinner de carregamento irá aparecer aqui. Você pode estilizar a cor e o tamanho dele via CSS.
                     </p>

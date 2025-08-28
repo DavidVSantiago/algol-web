@@ -43,7 +43,7 @@ h1,h2,h3,h4,h5,h6{
     font-weight: 600;
 }
 /* Groups **************************************************************** */
-.section-bubble {
+.algol_section-bubble {
     margin-top: 2vw;
     padding: 1vw;
     background-color: #121821;
@@ -109,7 +109,7 @@ h1,h2,h3,h4,h5,h6{
 }
 
 /* Layouts **************************************************************** */
-.layout {
+.algol_layout {
     display: grid;
     grid-template-columns: 1fr;
     align-items: center;
@@ -118,13 +118,13 @@ h1,h2,h3,h4,h5,h6{
     padding: 0.5vw;
     
 }
-.layout-2cols {
+.algol_layout-2cols {
     grid-template-columns: 1fr 1fr;
 }
 
 /* components **************************************************************** */
 
-.btn {
+.algol_btn {
     display: inline-flex;
     align-items: center;
     width: fit-content;
@@ -138,88 +138,88 @@ h1,h2,h3,h4,h5,h6{
     font-size: 1.2vw;
     padding: 0.8vw 1.1vw;
 }
-.btn:active {
+.algol_btn:active {
     color: #ddd;
 }
-.btn:disabled,.btn:disabled:hover,.btn:disabled:active {
+.algol_btn:disabled,.algol_btn:disabled:hover,.algol_btn:disabled:active {
     background-color: #777d86;
     color: #aaa;
 }
-.btn-primary {
+.algol_btn-primary {
     background-color: #3b82f6;
 }
-.btn-primary:hover {
+.algol_btn-primary:hover {
     background-color: #3674d6;
 }
-.btn-success {
+.algol_btn-success {
     background-color: #2ebe50;
 }
-.btn-success:hover {
+.algol_btn-success:hover {
     background-color: #29a746;
 }
-.btn-secondary {
+.algol_btn-secondary {
     background-color: #334155;
 }
-.btn-secondary:hover {
+.algol_btn-secondary:hover {
     background-color: #293444;
 }
-.btn-danger {
+.algol_btn-danger {
     background-color: #dc3545;
 }
-.btn-danger:hover {
+.algol_btn-danger:hover {
     background-color: #c22f3d;
 }
-.btn-warning {
+.algol_btn-warning {
     background-color: #e4ac07;
 }
-.btn-warning:hover {
+.algol_btn-warning:hover {
     background-color: #ca9907;
 }
-.btn-info {
+.algol_btn-info {
     background-color: #17a2b8;
 }
-.btn-info:hover {
+.algol_btn-info:hover {
     background-color: #148c9e;
 }
-.btn-outline {
+.algol_btn-outline {
     background-color: #0000;
     border: solid 0.2vw #3b82f6;
 }
-.btn-outline:hover {
+.algol_btn-outline:hover {
     border-color: #2857a3;
 }
-.btn-link {
+.algol_btn-link {
     background-color: #0000;
     color: #3b82f6;
     text-decoration: underline;
     padding: 0.5vw 1vw;
 }
-.btn-link:hover {
+.algol_btn-link:hover {
     color: #3674d6;
 }
-.btn-link:active {
+.algol_btn-link:active {
     color: #fff;
 }
-.btn-big{
+.algol_btn-big{
     font-size: 1.3vw;
     padding: 1vw 1.3vw;
 }
-.btn-small{
+.algol_btn-small{
     font-size: 1.1vw;
     padding: 0.5vw 0.8vw;
 }
 
 /* comportamento dos componentes ************************************ */
-.algol-position-left{
+.algol_position-left{
     justify-self: left;
 }
-.algol-position-center{
+.algol_position-center{
     justify-self: center;
 }
-.algol-position-right{
+.algol_position-right{
     justify-self: right;
 }
-.algol-position-all{
+.algol_position-all{
     justify-self: stretch;
 }
 
