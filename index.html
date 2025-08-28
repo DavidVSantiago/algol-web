@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="algol_styles.css">
+    <script src="componentes.js" defer></script>
+</head>
+
+<body>
+    <div id="app-container" style="display:none">
+        <header>
+            <h1>Catálogo de Componentes</h1>
+        </header>
+        <nav>
+            <h2>Navegação</h2>
+        </nav>
+
+        <main>
+            <p>Use esta página para testar e estilizar os componentes do seu framework CSS.</p>
+            <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Doloremque deserunt recusandae iusto facilis
+                iste
+                nemo libero magnam quo? Temporibus ut earum cum voluptatem natus corporis dolores numquam perspiciatis,
+                ea
+                cumque! Lorem ipsum dolor sit amet consectetur adipisicing elit. Quasi nemo eum illo iusto quaerat,
+                eligendi
+                vero id aperiam debitis sapiente, ea quis nostrum nihil et ut vitae amet inventore temporibus.</p>
+            <section class="section-bubble">
+                <h2>Tipografia</h2>
+                <div class="group">
+                    <h1>Título Principal H1</h1>
+                    <h2>Título Secundário H2</h2>
+                    <h3>Título H3</h3>
+                    <h4>Título H4</h4>
+                    <h5>Título H5</h5>
+                    <h6>Título H6</h6>
+                    <p>Este é um parágrafo de texto para você testar a fonte, o espaçamento entre linhas e as cores. É aqui que a mágica acontece.</p>
+                    <p><strong>Texto em negrito</strong> e <em>texto em itálico</em>.</p>
+                </div>
+            </section>
+
+            <div class="section-bubble">
+                <h2>Botões</h2>
+                <div class="layout layout-2cols">
+                    <algol-btn-primary position="right">Botão Primário</algol-btn-primary>
+                    <algol-btn-secondary position="center">Botão Secundário</algol-btn-secondary>
+                    <algol-btn-outline position="all">Botão Outline</algol-btn-outline>
+                    <algol-btn-success>Botão Success</algol-btn-success>
+                    <algol-btn-danger>Botão Danger</algol-btn-danger>
+                    <algol-btn-warning>Botão Warning</algol-btn-warning>
+                    <algol-btn-info>Botão Info</algol-btn-info>
+                    <algol-btn-link>Botão de Link</algol-btn-link>
+                    <algol-btn-primary disabled>Botão Primário</algol-btn-primary>
+                    <algol-btn-primary size="small" >Pequeno</algol-btn-primary>
+                    <algol-btn-primary size="big">Grande</algol-btn-primary>
+                </div>
+            </div>
+
+            <div class="section-bubble">
+                <h2>Elementos de Formulário</h2>
+                <form>
+                    <div class="layout">
+                        <algol-input-text position="all">Input text Estilizado</algol-input-text>
+                        <algol-input-email position="all">Input email Estilizado</algol-input-email>
+                        <algol-input-password position="all">Input password Estilizado</algol-input-password>
+                        <algol-input-number position="all">Input number Estilizado</algol-input-number>
+                        <algol-input-number>Input number Estilizado</algol-input-number>
+                        
+                        
+
+                        <div class="component-group">
+                            <label for="textarea-texto">Área de Texto</label>
+                            <textarea id="textarea-texto" class="input-padrao" rows="4" placeholder="Escreva sua mensagem aqui..."></textarea>
+                        </div>
+
+                        <div class="component-group">
+                            <label for="select-opcoes">Seletor de Opções</label>
+                            <select id="select-opcoes" class="select-padrao">
+                                <option value="">Selecione uma opção</option>
+                                <option value="opcao1">Opção 1</option>
+                                <option value="opcao2">Opção 2</option>
+                                <option value="opcao3">Opção 3</option>
+                            </select>
+                        </div>
+
+                        <div class="component-group">
+                            <label>Caixas de Seleção (Checkboxes)</label>
+                            <div>
+                                <input type="checkbox" id="checkbox1" class="checkbox-padrao" checked>
+                                <label for="checkbox1">Opção 1</label>
+                            </div>
+                            <div>
+                                <input type="checkbox" id="checkbox2" class="checkbox-padrao">
+                                <label for="checkbox2">Opção 2</label>
+                            </div>
+                        </div>
+
+                        <div class="component-group">
+                            <label>Botões de Rádio (Radios)</label>
+                            <div>
+                                <input type="radio" id="radio1" name="radio-group" class="radio-padrao" checked>
+                                <label for="radio1">Opção A</label>
+                            </div>
+                            <div>
+                                <input type="radio" id="radio2" name="radio-group" class="radio-padrao">
+                                <label for="radio2">Opção B</label>
+                            </div>
+                        </div>
+
+                        <div class="component-group">
+                            <label for="input-range">Slider de Range</label>
+                            <input type="range" id="input-range" class="range-padrao" min="0" max="100" value="50">
+                        </div>
+
+                        <div class="component-group">
+                            <label for="input-color">Seletor de Cor</label>
+                            <input type="color" id="input-color" class="color-padrao" value="#3498db">
+                        </div>
+
+                        <div class="component-group">
+                            <label for="input-date">Seletor de Data</label>
+                            <input type="date" id="input-date" class="date-padrao">
+                        </div>
+
+                        <div class="component-group">
+                            <label for="input-file">Seletor de Arquivo</label>
+                            <input type="file" id="input-file" class="file-padrao">
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <div class="section-separator">
+                <h2>Listas e Tabelas</h2>
+                <div class="component-group">
+                    <h3>Lista Não Ordenada</h3>
+                    <ul>
+                        <li>Item 1</li>
+                        <li>Item 2</li>
+                        <li>Item 3</li>
+                    </ul>
+
+                    <h3>Lista Ordenada</h3>
+                    <ol>
+                        <li>Primeiro Item</li>
+                        <li>Segundo Item</li>
+                        <li>Terceiro Item</li>
+                    </ol>
+
+                    <h3>Tabela</h3>
+                    <table class="tabela-padrao">
+                        <thead>
+                            <tr>
+                                <th>Nome</th>
+                                <th>Idade</th>
+                                <th>Cidade</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>João</td>
+                                <td>30</td>
+                                <td>São Paulo</td>
+                            </tr>
+                            <tr>
+                                <td>Maria</td>
+                                <td>25</td>
+                                <td>Rio de Janeiro</td>
+                            </tr>
+                            <tr class="tabela-destaque">
+                                <td>Carlos</td>
+                                <td>45</td>
+                                <td>Belo Horizonte</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="section-separator">
+                <h2>Alertas e Mensagens</h2>
+                <div class="component-group">
+                    <div class="alerta alerta-sucesso">Sucesso! A operação foi concluída com sucesso.</div>
+                    <div class="alerta alerta-info">Informação: Esta é uma mensagem informativa.</div>
+                    <div class="alerta alerta-aviso">Aviso! Atenção para este alerta.</div>
+                    <div class="alerta alerta-erro">Erro: Ocorreu um problema, tente novamente.</div>
+                </div>
+            </div>
+
+            <div class="section-separator">
+                <h2>Carregadores (Spinners)</h2>
+                <div class="component-group" style="display: flex; gap: 20px; align-items: center;">
+                    <div class="spinner"></div>
+                    <p>O spinner de carregamento irá aparecer aqui. Você pode estilizar a cor e o tamanho dele via CSS.
+                    </p>
+                </div>
+            </div>
+        </main>
+    </div>
+</body>
+
+</html>
