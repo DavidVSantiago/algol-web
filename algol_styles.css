@@ -72,6 +72,9 @@ h1,h2,h3,h4,h5,h6{
             outline: none;
             font-size: 1.1vw;
         }
+        .algol_input:disabled{
+            background: #373e46;
+        }
         /* input number estilizado */
         .algol_input-container {
             display: flex; /* Alinha o input e os botões */
@@ -96,6 +99,9 @@ h1,h2,h3,h4,h5,h6{
                     cursor: pointer;
                     font-size: 1vw;
                     padding: 0;
+                }
+                algol_spinner-up:disabled,.algol_spinner-down:disabled{
+                    color: #606b75;
                 }
                 .algol_spinner-up{
                     border-bottom: solid 0.1vw #ccc;

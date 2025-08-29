@@ -64,14 +64,12 @@
                 <h2>Elementos de Formulário</h2>
                 <form>
                     <div class="algol_layout">
-                        <algol-input-text position="all"></algol-input-text>
-                        <algol-input-email position="all">Input email Estilizado</algol-input-email>
-                        <algol-input-password position="all">Input password Estilizado</algol-input-password>
-                        <algol-input-number position="all">Input number Estilizado</algol-input-number>
-                        <algol-input-number>Input number Estilizado</algol-input-number>
-                        
-                        
-
+                        <algol-input-text position="center" placeholder="Descreva..." label="Input text Estilizado" disabled></algol-input-text>
+                        <algol-input-email position="right" label="Input email Estilizado"></algol-input-email>
+                        <algol-input-password position="all" label="Input password Estilizado"></algol-input-password>
+                        <algol-input-number position="all" label="Input number Estilizado" min="50" max="60"></algol-input-number>
+                        <algol-input-number label="Disabled" disabled></algol-input-number>
+      
                         <div class="algol_component-group">
                             <label for="textarea-texto">Área de Texto</label>
                             <textarea id="textarea-texto" class="input-padrao" rows="4" placeholder="Escreva sua mensagem aqui..."></textarea>

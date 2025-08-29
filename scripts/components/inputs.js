@@ -1,3 +1,11 @@
+/** classe base para inputs
+ * atributos gerais:
+ * - label -> define o rótulo do form. se não existir o form não possuirá rótulo
+ * - placeholder ->
+ * - position ->
+ * - value ->
+ * - disabled ->
+ */
 class Input extends HTMLElement {
     constructor() {
         super();
@@ -9,15 +17,11 @@ class Input extends HTMLElement {
     // ****************************************************************************
     // Métodos
     // ****************************************************************************
-    
+
     /** Faz a construção interna do compoenente */
     _init(type = 'text') {
         // cria o componente <label>
         const label = document.createElement('label');
-        // movimenta o conteúdo da tag pesonalizada para dentro do <label>
-        const frag = document.createDocumentFragment();
-        while (this.firstChild) frag.appendChild(this.firstChild);
-        if (frag.childNodes.length) label.appendChild(frag);
 
         // cria o componente <input>
         const input = document.createElement('input');
@@ -32,45 +36,51 @@ class Input extends HTMLElement {
         group.appendChild(label);
         group.appendChild(input);
 
+        this.appendChild(group);// coloca os elementos dentro da tag
+
         // guarda referências
         this._rootEl = group;
         this._labelEl = label;
         this._inputEl = input;
-
-        // Encaminhar eventos do input para o host (input/change) de forma composta:
-        // re-dispatch para garantir consistência de bubbles/composed (em light DOM não é estritamente necessário,
-        // porém facilita quem escuta diretamente no custom element).
-        input.addEventListener('input', (e) => {
-            this.setAttribute('value', input.value); // atualiza atributo 'value' no host
-            // propaga evento 'input' a partir do host (composed e bubbles)
-            this.dispatchEvent(new Event('input', { bubbles: true, composed: true }));
+    }
+    _initEvents() {
+        // Eventos input/change (mantêm valor atualizado)
+        this._inputEl.addEventListener('input', (e) => {
+            this.setAttribute('value', this._inputEl.value); // atualiza atributo 'value' no host
+            this.dispatchEvent(new Event('input', { bubbles: true, composed: true })); // propaga evento 'input' a partir do host (composed e bubbles)
         });
-        input.addEventListener('change', (e) => {
-            this.setAttribute('value', input.value); // atualiza atributo 'value' no host
-            this.dispatchEvent(new Event('change', { bubbles: true, composed: true }));
+        this._inputEl.addEventListener('change', (e) => {
+            this.setAttribute('value', this._inputEl.value); // atualiza atributo 'value' no host
+            this.dispatchEvent(new Event('change', { bubbles: true, composed: true })); // propaga evento 'input' a partir do host (composed e bubbles)
         });
-
-        // substitui o conteúdo do host pelo componente interno
-        this.appendChild(group);
     }
 
     _applyAttributes() {
-        // label: prioriza o conteúdo movido (se houver), senão atributo 'label', senão padrão
-        if (!(this._labelEl && this._labelEl.childNodes.length > 0)) {
-            const labelAttr = this.getAttribute('label') || this.textContent || 'label';
-            this._labelEl.textContent = labelAttr;
+        // trata do atrituto 'label'
+        const label = this.getAttribute('label');
+        if (label && label != '') { // existe o atributo label e ele não está vazio
+            this._labelEl.textContent = label;
+            // se o label não estiver inserido no componente, insere ele antes do input
+            if (!this._labelEl.parentNode) this._rootEl.insertBefore(this._labelEl, this._inputEl)
+        } else { // não existe o atributo label
+            // se o label estiver inserido no compoenente, remove-o
+            if (this._labelEl.parentNode) this._rootEl.removeChild(this._labelEl);
         }
-        
-        // placeholder/value/disabled
-        if (this.hasAttribute('placeholder')) this._inputEl.placeholder = this.getAttribute('placeholder');
-        if (this.hasAttribute('value')) this._inputEl.value = this.getAttribute('value');
-        this._inputEl.disabled = this.hasAttribute('disabled');
 
-        // posição: adiciona classes no host para manter compatibilidade com seu CSS atual
+        // trata do atrituto 'placeholder'
+        if (this.hasAttribute('placeholder')) this._inputEl.placeholder = this.getAttribute('placeholder');
+
+        // trata do atrituto 'value'
+        if (this.hasAttribute('value')) this._inputEl.value = this.getAttribute('value');
+
+        // trata do atrituto 'position'
         const positions = ['left', 'center', 'right', 'all'];
-        this.classList.remove(...positions.map(p => `algol-position-${p}`));
+        this.classList.remove(...positions.map(p => `algol_position-${p}`));
         const pos = this.getAttribute('position');
-        if (positions.includes(pos)) this.classList.add(`algol-position-${pos}`);
+        if (positions.includes(pos)) this.classList.add(`algol_position-${pos}`);
+
+        // trata do atrituto 'disabled'
+        if (this.hasAttribute('disabled')) this._inputEl.disabled = true;
     }
 
     // ****************************************************************************
@@ -89,7 +99,10 @@ class Input extends HTMLElement {
 
     /** invocado automaticamente quando o componente é inserido no DOM ou movido para outro local. */
     connectedCallback() {
-        if (!this._rootEl) this._init(); // cria a estrutura apenas uma vez
+        if (!this._rootEl) { // cria a estrutura apenas uma vez
+            this._init();
+            this._initEvents();
+        }
         this._applyAttributes();
     }
 
@@ -106,20 +119,21 @@ class Input extends HTMLElement {
 
 class InputText extends Input {
     constructor() { super(); }
-    connectedCallback() { if (!this._rootEl) this._init('text'); super.connectedCallback(); }
+    connectedCallback() { if (!this._rootEl) { this._init('text'); this._initEvents(); } super.connectedCallback(); }
 }
 class InputEmail extends Input {
     constructor() { super(); }
-    connectedCallback() { if (!this._rootEl) this._init('email'); super.connectedCallback(); }
+    connectedCallback() { if (!this._rootEl) { this._init('email'); this._initEvents(); } super.connectedCallback(); }
 }
 class InputPassword extends Input {
     constructor() { super(); }
-    connectedCallback() { if (!this._rootEl) this._init('password'); super.connectedCallback(); }
+    connectedCallback() { if (!this._rootEl) { this._init('password'); this._initEvents(); } super.connectedCallback(); }
 }
 
 /* === InputNumber: inclui botões de spinner e validação de min/max === */
-
 class InputNumber extends Input {
+
+    // sobrescreve os atributos observados
     static observedAttributes = ['value', 'min', 'max', 'disabled', 'position', 'label'];
 
     constructor() {
@@ -130,61 +144,50 @@ class InputNumber extends Input {
         this._max = null;
     }
 
-    connectedCallback() {
-        if (!this._rootEl) this._initNumber();
-        this._applyAttributes(); // aplica min/max/position/label/value
-        // garante que listeners sejam adicionados (se necessário)
-        this._attachSpinnerListeners();
-    }
+    // ****************************************************************************
+    // Métodos
+    // ****************************************************************************
 
     // cria estrutura específica para number (com botões up/down)
-    _initNumber() {
-        // cria label e move conteúdo do host para o label, como em Input._init
-        const label = document.createElement('label');
-        const frag = document.createDocumentFragment();
-        while (this.firstChild) frag.appendChild(this.firstChild);
-        if (frag.childNodes.length) label.appendChild(frag);
+    _init() {
+        super._init();
 
-        const input = document.createElement('input');
-        input.type = 'number';
-        input.className = 'algol_input';
-
-        // container e botões
+        // container para agrupar o input e o spinner
         const inputContainer = document.createElement('div');
         inputContainer.className = 'algol_input-container';
-        inputContainer.appendChild(input);
 
+        // cria o componente do spinner dos botões
         const spinner = document.createElement('div');
         spinner.className = 'algol_spinner-buttons';
         const up = document.createElement('div'); up.className = 'algol_spinner-up'; up.textContent = '▲';
         const down = document.createElement('div'); down.className = 'algol_spinner-down'; down.textContent = '▼';
         spinner.appendChild(up); spinner.appendChild(down);
+
+        // adiciona o input e o spinner  
+        inputContainer.appendChild(this._inputEl);
         inputContainer.appendChild(spinner);
 
-        const group = document.createElement('div');
-        group.className = 'algol_component-group';
-        group.appendChild(label);
-        group.appendChild(inputContainer);
+        this._rootEl.appendChild(inputContainer);
 
         // guarda referências
-        this._rootEl = group;
-        this._labelEl = label;
-        this._inputEl = input;
         this._btnUp = up;
         this._btnDown = down;
+    }
 
-        // input events -> reflete atributo value e re-dispatch
-        input.addEventListener('input', () => {
-            this.setAttribute('value', input.value);
-            this.dispatchEvent(new Event('input', { bubbles: true, composed: true }));
-        });
-        input.addEventListener('change', () => {
-            this._clamp();
-            this.setAttribute('value', input.value);
-            this.dispatchEvent(new Event('change', { bubbles: true, composed: true }));
-        });
+    _removeEvents() {
+        this._btnUp.removeEventListener('click', listener);
+        this._btnDown.removeEventListener('click', listener);
+        this._inputEl.removeEventListener('keydown', listener);
+    }
 
-        this.appendChild(group);
+    _initEvents() {
+        this._btnUp.addEventListener('click', () => { this._step(1); console.log('+'); });
+        this._btnDown.addEventListener('click', () => { this._step(-1); console.log('-'); });
+        // validação teclado simples (setas)
+        this._inputEl.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowUp') { e.preventDefault(); this._step(1); }
+            if (e.key === 'ArrowDown') { e.preventDefault(); this._step(-1); }
+        });
     }
 
     _applyAttributes() {
@@ -202,11 +205,15 @@ class InputNumber extends Input {
         else this._inputEl.removeAttribute('max');
 
         if (this.hasAttribute('value')) this._inputEl.value = this.getAttribute('value');
+
         // aplica disabled ao input e botões
-        const dis = this.hasAttribute('disabled');
-        this._inputEl.disabled = dis;
-        if (this._btnUp) this._btnUp.style.pointerEvents = dis ? 'none' : '';
-        if (this._btnDown) this._btnDown.style.pointerEvents = dis ? 'none' : '';
+        if (this.disabled) {
+            this._inputEl.disabled;
+            this._btnUp.style.color = 'gray';
+            this._btnDown.style.color = 'gray';
+            this._btnUp.style.pointerEvents = 'none';
+            this._btnDown.style.pointerEvents = 'none';
+        }
 
         // garante que o valor esteja dentro dos limites
         this._clamp();
@@ -223,20 +230,6 @@ class InputNumber extends Input {
         if (this._max !== undefined && val > this._max) this._inputEl.value = String(this._max);
     }
 
-    _attachSpinnerListeners() {
-        if (!this._btnUp || !this._btnDown || this._spinnerAttached) return;
-        // clique simples
-        this._btnUp.addEventListener('click', () => { if (!this.disabled) this._step(1); });
-        this._btnDown.addEventListener('click', () => { if (!this.disabled) this._step(-1); });
-        // validação teclado simples (setas)
-        this._inputEl.addEventListener('keydown', (e) => {
-            if (e.key === 'ArrowUp') { e.preventDefault(); this._step(1); }
-            if (e.key === 'ArrowDown') { e.preventDefault(); this._step(-1); }
-        });
-        // change handler already set in _initNumber
-        this._spinnerAttached = true;
-    }
-
     _step(dir) {
         const step = Number(this._inputEl.step) || 1;
         let val = Number(this._inputEl.value) || 0;
@@ -248,6 +241,36 @@ class InputNumber extends Input {
         this.setAttribute('value', this._inputEl.value);
         this.dispatchEvent(new Event('input', { bubbles: true, composed: true }));
         this.dispatchEvent(new Event('change', { bubbles: true, composed: true }));
+    }
+
+    // ****************************************************************************
+    // Callbacks do ciclo de vida dos webcomponents
+    // ****************************************************************************
+    connectedCallback() {
+        if (!this._rootEl) { this._init(); this._initEvents(); }
+        this._applyAttributes();
+    }
+
+    attributeChangedCallback(name, oldV, newV) {
+        if (oldV === newV) return;
+        if (this._rootEl) {
+            if (name = 'disabled') {
+                if (this.disabled) {
+                    this._inputEl.disabled = true;
+                    this._btnUp.style.color = 'gray';
+                    this._btnDown.style.color = 'gray';
+                    this._btnUp.style.pointerEvents = 'none';
+                    this._btnDown.style.pointerEvents = 'none';
+                } else {
+                    this._inputEl.disabled = false;
+                    this._btnUp.style.color = 'black';
+                    this._btnDown.style.color = 'black';
+                    this._btnUp.style.pointerEvents = '';
+                    this._btnDown.style.pointerEvents = '';
+                }
+            }
+            this._applyAttributes();
+        }
     }
 }
 
