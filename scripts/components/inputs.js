@@ -9,7 +9,7 @@
 class Input extends HTMLElement {
     // atributos observador do compontente
     static get observedAttributes() { return ['value', 'placeholder', 'disabled', 'position', 'label']; } // necessário para o funcionamento do "attributeChangedCallback"
-
+    
     constructor() {
         super();
         this._rootEl = null;      // container (.algol_component-group)
@@ -49,8 +49,8 @@ class Input extends HTMLElement {
 
         // garantir id único evitando colisões
         if (!input.id) {
-            if (!this.constructor._uidCounter) this.constructor._uidCounter = 0;
-            input.id = `algol-input-${++this.constructor._uidCounter}`;
+            // if (!this.constructor._uidCounter) this.constructor._uidCounter = 0;
+            input.id = `algol-input-${++Input._uidCounter}`;
         }
         label.htmlFor = input.id;
 
@@ -148,17 +148,7 @@ class Input extends HTMLElement {
         // propriedade do elemento real (impede interação)
         if (this._inputEl) this._inputEl.disabled = isDisabled;
     }
-
-    // ****************************************************************************
-    // Gettes & Setters
-    // ****************************************************************************
-
-    get value() { return this._inputEl ? this._inputEl.value : this.getAttribute('value') || ''; }
-    set value(v) { this.setAttribute('value', v); }
-
-    disable() { this.setAttribute('disabled', ''); }
-    enable() { this.removeAttribute('disabled'); }
-
+    
     // ****************************************************************************
     // Callbacks do ciclo de vida dos webcomponents
     // ****************************************************************************
@@ -192,7 +182,7 @@ class Input extends HTMLElement {
         }
     }
 }
-
+Input._uidCounter = 0; // contador estático para IDs
 /* === subclasses simples que apenas definem o tipo do input === */
 
 class InputText extends Input {
