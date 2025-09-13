@@ -1,4 +1,4 @@
-class layout extends HTMLElement {
+class Base extends HTMLElement {
     // atributos observador do compontente
     static get observedAttributes() { return ['','','']; } // necessário para o funcionamento do "attributeChangedCallback"
 
@@ -28,70 +28,59 @@ class layout extends HTMLElement {
     _init() {
         if (this._base_initialized) return; // guard
 
-        // cria <label>
-        const label = document.createElement('label');
-
-        // cria <input>
-        const input = document.createElement('input');
-        input.type = this._type;
-        input.className = 'algol_input';
-
-        // garantir id único evitando colisões
-        if (!input.id) {
-            if (!this.constructor._uidCounter) this.constructor._uidCounter = 0;
-            input.id = `algol-input-${++this.constructor._uidCounter}`;
-        }
-        label.htmlFor = input.id;
-
-        // cria <div> para <label> e o <input>
-        const group = document.createElement('div');
-        group.className = 'algol_component-group';
-
-        // monta a árvore: group -> label + input
-        group.appendChild(label);
-        group.appendChild(input);
-
-        this.appendChild(group);// coloca os elementos dentro da tag
+        // cria cada um dos compoentes
+        
+        // monta a árvore
 
         // guarda referências
-        this._rootEl = group;
-        this._labelEl = label;
-        this._inputEl = input;
 
-        this._base_initialized = true;
+        this._base_initialized = true; // componente inicializado
     }
 
     _attachEvents() {
-        if (!this._inputEl) return;
-        if (!this._onInput) {
-            this._onInput = (e) => {
-                const val = this._inputEl.value;
-                // evita refletir atributo se já estiver igual (reduz triggers desnecessários)
-                if (this.getAttribute('value') !== val) this.setAttribute('value', val);
-                this.dispatchEvent(new Event('input', { bubbles: true, composed: true }));
-            };
-        }
-        if (!this._onChange) {
-            this._onChange = (e) => {
-                const val = this._inputEl.value;
-                if (this.getAttribute('value') !== val) this.setAttribute('value', val);
-                this.dispatchEvent(new Event('change', { bubbles: true, composed: true }));
-            };
-        }
-        this._inputEl.addEventListener('input', this._onInput);
-        this._inputEl.addEventListener('change', this._onChange);
+        // guarda
     }
 
     _detachEvents() {
-        if (!this._inputEl) return; // guard
-        //remove os eventos
-        if (this._onInput) {
-            this._inputEl.removeEventListener('input', this._onInput);
-            this._onInput = null;
-        }
-        if (this._onChange) {
-            this._inputEl.removeEventListener('change', this._onChange);
-            this._onChange = null;
+       // guarda
+    }
+
+    // ****************************************************************************
+    // Métodos de atributos
+    // ****************************************************************************
+
+    /** Serve para reaplicar os atributos nas partes filhas dos componentes */
+    _applyAttributes() {
+        // guarda
+        // invoca funções específicas para aplicar cada um dos atributos de forma individual
+        
+    }
+
+    // ****************************************************************************
+    // Callbacks do ciclo de vida dos webcomponents
+    // ****************************************************************************
+
+    /** invocado automaticamente quando o componente é inserido no DOM ou movido para outro local. */
+    connectedCallback() {
+        if (this._connected) return;
+        // contrói o componente, se ainda não foi
+        this._init();
+        this._attachEvents(); // liga os eventos
+        this._applyAttributes(); // aplica atributos
+        this._connected = true; // marca como motado
+    }
+    disconnectedCallback() {
+        this._detachEvents();
+        this._connected = false; // marca como desmontado
+    }
+    /** invocado automaticamente quando muda o valor de algum atributo observado ('observedAttributes'). */
+    attributeChangedCallback(name, oldV, newV) {
+        if (oldV === newV) return;
+        if (!this._connected) return; // só trata eventos de mudança se tiver montado
+
+        switch (name) {
+            // faz o case para cada atributo e invoca o this._applyAttribute_ específico
         }
     }
+    
 }

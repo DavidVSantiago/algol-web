@@ -1,6 +1,6 @@
 class BtnBase extends HTMLElement {
     // atributos observador do compontente
-    static get observedAttributes() { return ['size', 'disabled', 'position']; } // necessário para o funcionamento do "attributeChangedCallback"
+    static get observedAttributes() { return ['size', 'disabled', 'position', 'positionCel']; } // necessário para o funcionamento do "attributeChangedCallback"
 
     constructor() {
         super();
@@ -32,6 +32,13 @@ class BtnBase extends HTMLElement {
         // Cria o <button>
         const btn = document.createElement('button');
         btn.className = `algol_btn ${this._variantClass}`; // define a classe base + a variante (definida da classe derivada)
+
+        // garantir id único evitando
+        if (!btn.id) {
+            // inicializa o contador no próprio Input (classe base) se necessário
+            if (typeof BtnBase._uidCounter === 'undefined') BtnBase._uidCounter = 0;
+            btn.id = `algol-input-${++BtnBase._uidCounter}`;
+        }
 
         // Evita seleção de texto no botão (e no host), com fallbacks
         btn.style.cssText += '-webkit-user-select:none; -ms-user-select:none; user-select:none; -webkit-touch-callout:none;';
@@ -81,10 +88,11 @@ class BtnBase extends HTMLElement {
 
     /** Serve para reaplicar os atributos nas partes filhas dos componentes */
     _applyAttributes() {
-        if (!this.btn) return; // guard
+        if (!this._btn) return; // guard
         // invoca funções específicas para aplicar cada um dos atributos de forma individual
         this._applyAttribute_size();
         this._applyAttribute_position();
+        this._applyAttribute_positionCel();
         this._applyAttribute_disabled();
     }
     _applyAttribute_size() {
@@ -99,6 +107,16 @@ class BtnBase extends HTMLElement {
         }
     }
     _applyAttribute_position() {
+        const positions = ['left', 'center', 'right', 'all'];
+        this.classList.remove(...positions.map(p => `algol_position-${p}`));
+        const pos = this.getAttribute('position');
+        if (positions.includes(pos)) this.classList.add(`algol_position-${pos}`);
+        if (pos == 'all') {
+            this._btn.classList.add(`algol_position-${pos}`);
+            this._btn.setAttribute('style', 'width:100%;display:flex;justify-content:center;');
+        }
+    }
+    _applyAttribute_positionCel() {
         const positions = ['left', 'center', 'right', 'all'];
         this.classList.remove(...positions.map(p => `algol_position-${p}`));
         const pos = this.getAttribute('position');
@@ -139,6 +157,7 @@ class BtnBase extends HTMLElement {
         switch (name) {
             case 'size': this._applyAttribute_size(); break;
             case 'position': this._applyAttribute_position(); break;
+            case 'positionCel': this._applyAttribute_positionCel(); break;
             case 'disabled': this._applyAttribute_disabled(); break;
         }
     }

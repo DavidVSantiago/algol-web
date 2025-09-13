@@ -9,7 +9,7 @@
 class Input extends HTMLElement {
     // atributos observador do compontente
     static get observedAttributes() { return ['value', 'placeholder', 'disabled', 'position', 'label']; } // necessário para o funcionamento do "attributeChangedCallback"
-    
+
     constructor() {
         super();
         this._rootEl = null;      // container (.algol_component-group)
@@ -40,7 +40,8 @@ class Input extends HTMLElement {
         if (this._base_initialized) return;
 
         // cria <label>
-        const label = document.createElement('label');
+        const label = document.createElement('div');
+        label.className = 'algol_label';
 
         // cria <input>
         const input = document.createElement('input');
@@ -49,16 +50,17 @@ class Input extends HTMLElement {
 
         // garantir id único evitando colisões
         if (!input.id) {
-            // if (!this.constructor._uidCounter) this.constructor._uidCounter = 0;
+            // inicializa o contador no próprio Input (classe base) se necessário
+            if (typeof Input._uidCounter === 'undefined') Input._uidCounter = 0;
             input.id = `algol-input-${++Input._uidCounter}`;
         }
-        label.htmlFor = input.id;
 
         // cria <div> para <label> e o <input>
         const group = document.createElement('div');
         group.className = 'algol_component-group';
 
         // monta a árvore: group -> label + input
+
         group.appendChild(label);
         group.appendChild(input);
 
@@ -148,7 +150,7 @@ class Input extends HTMLElement {
         // propriedade do elemento real (impede interação)
         if (this._inputEl) this._inputEl.disabled = isDisabled;
     }
-    
+
     // ****************************************************************************
     // Callbacks do ciclo de vida dos webcomponents
     // ****************************************************************************
@@ -332,7 +334,7 @@ class InputNumber extends Input {
 
         if (isDisabled) {
             // salva o valor visível e limpa a caixa para que nada apareça
-            this._savedValue = this._inputEl.value;            
+            this._savedValue = this._inputEl.value;
             this._inputEl.value = '';
             this._inputEl.disabled = true;
             // remover listeners para evitar alterações enquanto desabilitado
@@ -399,7 +401,7 @@ class InputNumber extends Input {
     }
 
     _clamp() {
-        if(this.hasAttribute('disabled')) return;
+        if (this.hasAttribute('disabled')) return;
         const val = Number(this._inputEl.value);
         if (Number.isNaN(val)) {
             if (this._min !== undefined) this._inputEl.value = String(this._min);

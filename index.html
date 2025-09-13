@@ -8,6 +8,8 @@
     <link rel="stylesheet" href="algol_styles.css">
     <script src="scripts/components/buttons.js" defer></script>
     <script src="scripts/components/inputs.js" defer></script>
+    <script src="scripts/components/layout.js" defer></script>
+    <script src="scripts/components/textarea.js" defer></script>
     <script src="scripts/components.js" defer></script>
 </head>
 
@@ -45,38 +47,34 @@
 
             <div class="algol_section-bubble">
                 <h2>Botões</h2>
-                <div class="algol_layout algol_layout-2cols">
-                    <algol-btn-primary position="left">Botão Primário</algol-btn-primary>
-                    <algol-btn-secondary position="center">Botão Secundário</algol-btn-secondary>
-                    <algol-btn-outline position="all">Botão Outline</algol-btn-outline>
-                    <algol-btn-success>Botão Success</algol-btn-success>
-                    <algol-btn-danger>Botão Danger</algol-btn-danger>
-                    <algol-btn-warning>Botão Warning</algol-btn-warning>
-                    <algol-btn-info>Botão Info</algol-btn-info>
-                    <algol-btn-link>Botão de Link</algol-btn-link>
-                    <algol-btn-primary disabled>Botão Primário</algol-btn-primary>
-                    <algol-btn-primary size="small" >Pequeno</algol-btn-primary>
-                    <algol-btn-primary size="big">Grande</algol-btn-primary>
-                </div>
+                    <div class="lay lay-2cols">
+                        <algol-btn-primary position="center" positionCel="all">Botão Primário</algol-btn-primary>
+                        <algol-btn-secondary position="center" positionCel="all">Botão Secundário</algol-btn-secondary>
+                        <algol-btn-outline position="all" positionCel="all">Botão Outline</algol-btn-outline>
+                        <algol-btn-success>Botão Success</algol-btn-success>
+                        <algol-btn-danger>Botão Danger</algol-btn-danger>
+                        <algol-btn-warning>Botão Warning</algol-btn-warning>
+                        <algol-btn-info>Botão Info</algol-btn-info>
+                        <algol-btn-link>Botão de Link</algol-btn-link>
+                        <algol-btn-primary disabled>Botão Primário</algol-btn-primary>
+                        <algol-btn-primary size="small" >Pequeno</algol-btn-primary>
+                        <algol-btn-primary size="big">Grande</algol-btn-primary>
+                    </div>
             </div>
 
             <div class="algol_section-bubble">
                 <h2>Elementos de Formulário</h2>
                 <form>
-                    <div class="algol_layout">
-                    <algol-layout>
+                    <div class="lay">
                         <algol-input-text position="left" placeholder="sd" label="Input text Estilizado" disabled></algol-input-text>
-                        <algol-input-email position="right" label="Input email Estilizado"></algol-input-email>
+                        <algol-input-email position="center" label="Input email Estilizado"></algol-input-email>
                         <algol-input-password position="all" label="Input password Estilizado"></algol-input-password>
                         <algol-input-number position="all" label="Input number Estilizado" min="20" max="60"></algol-input-number>
                         <algol-input-number label="Disabled" min="10" max="30" disabled></algol-input-number>
-      
-                        <!-- <div class="algol_component-group">
-                            <label for="textarea-texto">Área de Texto</label>
-                            <textarea id="textarea-texto" class="input-padrao" rows="4" placeholder="Escreva sua mensagem aqui..."></textarea>
-                        </div>
+                        <algol-textarea label="Textarea padrão" placeholder="Digite aqui..." position="left" rows="10" name="Algol" wrap="hard"></algol-textarea>
+            
 
-                        <div class="algol_component-group">
+                        
                             <label for="select-opcoes">Seletor de Opções</label>
                             <select id="select-opcoes" class="select-padrao">
                                 <option value="">Selecione uma opção</option>
@@ -85,6 +83,7 @@
                                 <option value="opcao3">Opção 3</option>
                             </select>
                         </div>
+                         <!-- 
 
                         <div class="algol_component-group">
                             <label>Caixas de Seleção (Checkboxes)</label>
