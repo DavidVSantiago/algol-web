@@ -1,26 +1,19 @@
-class Layout extends HTMLElement {
-    // atributos observador do compontente
-    static get observedAttributes() { return ['cols', 'celCols']; } // necessário para o funcionamento do "attributeChangedCallback"
+class AlgolLayout extends HTMLElement {
+    static get observedAttributes() {
+        return ['cols', 'gap', 'align', 'position', 'width', 'height'];
+    }
 
     constructor() {
         super();
-        // this._type = ''; // para distinção de subtipos em subclasses
-
-        this._cols = 1;
-        this._celCols = 1;
-        this._mq = null;        // MediaQueryList armazenado
-        this._mqHandler = null; // handler armazenado
-
-        this._base_initialized = false; // para saber se o componente foi inicializado
-        this._connected = false; // para saber se o componente foi montado
+        this._items = []; // Array com refs para os algol-grid-item
+        this._observer = null;
+        
+        this._base_initialized = false;
+        this._connected = false;
 
         const propsToUpgrade = this.constructor.observedAttributes || [];
         propsToUpgrade.forEach(p => this._upgradeProperty(p));
     }
-
-    // ****************************************************************************
-    // Métodos de inicialização
-    // ****************************************************************************
 
     _upgradeProperty(prop) {
         if (Object.prototype.hasOwnProperty.call(this, prop)) {
@@ -29,98 +22,130 @@ class Layout extends HTMLElement {
             this[prop] = value;
         }
     }
-    /** Faz a construção interna do compoenente */
+
     _init() {
-        if (this._base_initialized) return; // guard
-        this._base_initialized = true; // componente inicializado
+        if (this._base_initialized) return;
+
+        this.style.display = 'grid';
+        this.style.boxSizing = 'border-box';
+        this.classList.add('algol_section-bubble');
+
+        // Inicializa o Observer para detectar novos itens inseridos via JS
+        this._initObserver();
+        
+        this._base_initialized = true;
     }
 
-    _attachEvents() {
-        // obtém o breakpoint (string como '800px' ou similar)
-        const rawBp = getComputedStyle(document.documentElement).getPropertyValue('--cel-breakpoint').trim() || '0px';
-
-        // cria/atualiza matchMedia e handler (arrow function preserva `this`)
-        this._mq = window.matchMedia(`(max-width: ${rawBp})`);
-
-        // handler usa this._cols / this._celCols (já atualizados via atributos)
-        this._mqHandler = () => {
-            if (this._mq.matches) {
-                // recomenda-se definir a var no host para isolamento:
-                this.style.setProperty('--layout-cols-value', String(this._celCols));
-            } else {
-                this.style.setProperty('--layout-cols-value', String(this._cols));
-            }
-        };
-
-        // executa uma vez para sincronizar o estado inicial
-        this._mqHandler();
-
-        // adiciona listener (armazenado para posterior remoção)
-        this._mq.addEventListener('change', this._mqHandler);
+    _initObserver() {
+        this._observer = new MutationObserver(() => {
+            this._updateItemsList();
+        });
+        
+        this._observer.observe(this, { childList: true });
     }
 
-    _detachEvents() {
-        if (this._mq && this._mqHandler) {
-            this._mq.removeEventListener('change', this._mqHandler);
-            this._mqHandler = null;
-            this._mq = null;
-        }
+    /** Atualiza a lista de referências e aplica estilos aos itens */
+    _updateItemsList() {
+        // Busca apenas filhos diretos que sejam algol-grid-item
+        this._items = Array.from(this.querySelectorAll(':scope > algol-grid-item'));
+        
+        this._items.forEach(item => {
+            // Define o display grid para cada item como solicitado
+            item.style.display = 'grid';
+            item.style.boxSizing = 'border-box';
+        });
+
+        // Re-aplica a posição para os novos itens encontrados
+        this._applyAttribute_position();
     }
 
     // ****************************************************************************
-    // Métodos de atributos
+    // Aplicação de Atributos
     // ****************************************************************************
-
-    /** Serve para reaplicar os atributos nas partes filhas dos componentes */
+    
     _applyAttributes() {
-        this._applyAttributes_cols();
-        this._applyAttributes_celCols();
-        // força recalcular o estado atual (útil quando attrs mudam após connect)
-        if (this._mqHandler) this._mqHandler();
+        this._applyAttribute_cols();
+        this._applyAttribute_gap();
+        this._applyAttribute_align();
+        this._applyAttribute_dims();
+        this._updateItemsList(); // Isso já chama o _applyAttribute_position()
     }
-    _applyAttributes_cols() {
-        if (this.hasAttribute('cols')) {
-            // guarda como número
-            const val = Number(this.getAttribute('cols'));
-            this._cols = Number.isFinite(val) ? val : 1;
-            this.style.setProperty("--layout-cols", String(this._cols)); // var no host
-        }
+
+    _applyAttribute_cols() {
+        const cols = this.getAttribute('cols') || '1fr';
+        this.style.gridTemplateColumns = cols;
     }
-    _applyAttributes_celCols() {
-        if (this.hasAttribute('celCols')) {
-            const val = Number(this.getAttribute('celCols'));
-            this._celCols = Number.isFinite(val) ? val : 1;
-            this.style.setProperty("--layout-celCols", String(this._celCols)); // var no host
+
+    _applyAttribute_gap() {
+        const gap = this.getAttribute('gap');
+        if (gap) this.style.gap = gap;
+        else this.style.removeProperty('gap');
+    }
+
+    _applyAttribute_align() {
+        const align = this.getAttribute('align');
+        if (align) this.style.alignItems = align;
+        else this.style.removeProperty('align-items');
+    }
+
+    _applyAttribute_position() {
+        const positions = ['left', 'center', 'right', 'all'];
+        const pos = this.getAttribute('position');
+
+        // 1. Aplica ao próprio Layout
+        this.classList.remove(...positions.map(p => `algol_position-${p}`));
+        if (positions.includes(pos)) {
+            this.classList.add(`algol_position-${pos}`);
         }
+
+        // 2. Aplica a cada item dentro do array de refs
+        this._items.forEach(item => {
+            item.classList.remove(...positions.map(p => `algol_position-${p}`));
+            if (positions.includes(pos)) {
+                item.classList.add(`algol_position-${pos}`);
+            }
+        });
+    }
+    
+    _applyAttribute_dims() {
+        const w = this.getAttribute('width');
+        const h = this.getAttribute('height');
+        if(w) this.style.width = w;
+        if(h) this.style.height = h;
     }
 
     // ****************************************************************************
-    // Callbacks do ciclo de vida dos webcomponents
+    // Ciclo de Vida
     // ****************************************************************************
-
-    /** invocado automaticamente quando o componente é inserido no DOM ou movido para outro local. */
+    
     connectedCallback() {
         if (this._connected) return;
-        // contrói o componente, se ainda não foi
         this._init();
-        this._attachEvents(); // liga os eventos
-        this._applyAttributes(); // aplica atributos
-        this._connected = true; // marca como motado
+        this._applyAttributes();
+        this._connected = true;
     }
+
     disconnectedCallback() {
-        this._detachEvents();
-        this._connected = false; // marca como desmontado
+        if (this._observer) this._observer.disconnect();
+        this._connected = false;
     }
-    /** invocado automaticamente quando muda o valor de algum atributo observado ('observedAttributes'). */
+
     attributeChangedCallback(name, oldV, newV) {
         if (oldV === newV) return;
-        if (!this._connected) return; // só trata eventos de mudança se tiver montado
-
-        switch (name) {
-            case 'cols': this._applyAttributes_cols(); break;
-            case 'celCols': this._applyAttributes_celCols();
+        if (!this._connected) return;
+        
+        switch(name) {
+            case 'cols': this._applyAttribute_cols(); break;
+            case 'gap': this._applyAttribute_gap(); break;
+            case 'align': this._applyAttribute_align(); break;
+            case 'position': this._applyAttribute_position(); break;
+            case 'width': 
+            case 'height': this._applyAttribute_dims(); break;
         }
-        if (this._mqHandler) this._mqHandler();
     }
+}
 
+// Registro apenas do Layout
+if (!customElements.get('algol-layout')) {
+    customElements.define('algol-layout', AlgolLayout);
 }

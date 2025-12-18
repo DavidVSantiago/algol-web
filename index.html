@@ -10,11 +10,45 @@
     <script src="scripts/components/inputs.js" defer></script>
     <script src="scripts/components/layout.js" defer></script>
     <script src="scripts/components/textarea.js" defer></script>
+    <script src="scripts/components/select.js" defer></script>
     <script src="scripts/components.js" defer></script>
+    <script defer>
+        // temporário. apenas para teste
+        window.addEventListener('load', function (event) {
+            let fatorAtual = 1.0;
+            const PASSO = 0.1;
+            const MINIMO = 0.5;
+            const MAXIMO = 3.0;
+
+            function atualizarCSS() {
+            // Aplica o valor arredondado à variável global CSS
+                document.documentElement.style.setProperty('--fator-escala', fatorAtual.toFixed(1));
+            }
+
+            window.addEventListener('keydown', (e) => {
+                // Detecta as teclas + (ou =) e - (ou _)
+                if (e.key === '+' || e.key === '=') {
+                    if (fatorAtual < MAXIMO) {
+                    fatorAtual += PASSO;
+                    atualizarCSS();
+                    }
+                } 
+                else if (e.key === '-' || e.key === '_') {
+                    if (fatorAtual > MINIMO) {
+                    fatorAtual -= PASSO;
+                    atualizarCSS();
+                    }
+                }
+            });
+        })
+    </script>
 </head>
 
 <body>
     <div id="app-container">
+        <div class="caixa-teste">
+            Pressione as teclas + ou - para ajustar o zoom
+        </div>
         <header>
             <h1>Catálogo de Componentes</h1>
         </header>
@@ -33,33 +67,42 @@
                 vero id aperiam debitis sapiente, ea quis nostrum nihil et ut vitae amet inventore temporibus.</p>
             <section class="algol_section-bubble">
                 <h2>Tipografia</h2>
-                <div class="group">
-                    <h1>Título Principal H1</h1>
-                    <h2>Título Secundário H2</h2>
+                <h1>Título Principal H1</h1>
+                <h2>Título Secundário H2</h2>
+                <h3>Título H3</h3>
+                <h4>Título H4</h4>
+                <h5>Título H5</h5>
+                <h6>Título H6</h6>
+                <p>Este é um parágrafo de texto para você testar a fonte, o espaçamento entre linhas e as cores. É aqui que a mágica acontece.</p>
+                <p><strong>Texto em negrito</strong> e <em>texto em itálico</em>.</p>
+            </section>
+
+            <algol-layout cols="1fr 1fr" position="right">
+                <algol-grid-item>
                     <h3>Título H3</h3>
+                </algol-grid-item>
+                <algol-grid-item>
                     <h4>Título H4</h4>
                     <h5>Título H5</h5>
                     <h6>Título H6</h6>
-                    <p>Este é um parágrafo de texto para você testar a fonte, o espaçamento entre linhas e as cores. É aqui que a mágica acontece.</p>
-                    <p><strong>Texto em negrito</strong> e <em>texto em itálico</em>.</p>
-                </div>
-            </section>
+                </algol-grid-item>
+            </algol-layout>
 
             <div class="algol_section-bubble">
                 <h2>Botões</h2>
-                    <div class="lay lay-2cols">
-                        <algol-btn-primary position="center" positionCel="all">Botão Primário</algol-btn-primary>
-                        <algol-btn-secondary position="center" positionCel="all">Botão Secundário</algol-btn-secondary>
-                        <algol-btn-outline position="all" positionCel="all">Botão Outline</algol-btn-outline>
-                        <algol-btn-success>Botão Success</algol-btn-success>
-                        <algol-btn-danger>Botão Danger</algol-btn-danger>
-                        <algol-btn-warning>Botão Warning</algol-btn-warning>
-                        <algol-btn-info>Botão Info</algol-btn-info>
-                        <algol-btn-link>Botão de Link</algol-btn-link>
-                        <algol-btn-primary disabled>Botão Primário</algol-btn-primary>
-                        <algol-btn-primary size="small" >Pequeno</algol-btn-primary>
-                        <algol-btn-primary size="big">Grande</algol-btn-primary>
-                    </div>
+                <div class="lay lay-2cols">
+                    <algol-btn-primary position="center" positionCel="all">Botão Primário</algol-btn-primary>
+                    <algol-btn-secondary position="center" positionCel="all">Botão Secundário</algol-btn-secondary>
+                    <algol-btn-outline position="all" positionCel="all">Botão Outline</algol-btn-outline>
+                    <algol-btn-success>Botão Success</algol-btn-success>
+                    <algol-btn-danger>Botão Danger</algol-btn-danger>
+                    <algol-btn-warning>Botão Warning</algol-btn-warning>
+                    <algol-btn-info>Botão Info</algol-btn-info>
+                    <algol-btn-link>Botão de Link</algol-btn-link>
+                    <algol-btn-primary disabled>Botão Primário</algol-btn-primary>
+                    <algol-btn-primary size="small" >Pequeno</algol-btn-primary>
+                    <algol-btn-primary size="big">Grande</algol-btn-primary>
+                </div>
             </div>
 
             <div class="algol_section-bubble">
@@ -72,17 +115,23 @@
                         <algol-input-number position="all" label="Input number Estilizado" min="20" max="60"></algol-input-number>
                         <algol-input-number label="Disabled" min="10" max="30" disabled></algol-input-number>
                         <algol-textarea label="Textarea padrão" placeholder="Digite aqui..." position="left" rows="10" name="Algol" wrap="hard"></algol-textarea>
-            
+                        <algol-textarea label="Textarea padrão" placeholder="Digite aqui..." position="all" rows="10" name="Algol" wrap="hard" disabled></algol-textarea>
 
-                        
-                            <label for="select-opcoes">Seletor de Opções</label>
-                            <select id="select-opcoes" class="select-padrao">
-                                <option value="">Selecione uma opção</option>
-                                <option value="opcao1">Opção 1</option>
-                                <option value="opcao2">Opção 2</option>
-                                <option value="opcao3">Opção 3</option>
-                            </select>
-                        </div>
+                        <algol-select label="Select" required position="center">
+                            <option value="null"> Selecione uma das opções</option>
+                            <option value="opcao1">Opção 1</option>
+                            <option value="opcao2">Opção 2</option>
+                            <option value="opcao3">Opção 3</option>
+                        </algol-select>
+                        <algol-select label="Select disabled" position="all" required disabled>
+                            <option value="">Selecione uma opção</option>
+                            <option value="opcao1">Opção 1</option>
+                            <option value="opcao2">Opção 2</option>
+                            <option value="opcao3">Opção 3</option>
+                        </algol-select>
+                    </div>
+                </form>
+            </div>
                          <!-- 
 
                         <div class="algol_component-group">
@@ -128,56 +177,58 @@
                             <label for="input-file">Seletor de Arquivo</label>
                             <input type="file" id="input-file" class="file-padrao">
                         </div> -->
+
+                <div class="section-separator"></div>
+                
+                <div class="algol_section-bubble">
+                    <h2>Listas e Tabelas</h2>
+                    <div class="lay lay-2cols">
+                        <div>
+                            <h3>Lista Não Ordenada</h3>
+                            <ul>
+                                <li>Item 1</li>
+                                <li>Item 2</li>
+                                <li>Item 3</li>
+                            </ul>
+
+                            <h3>Lista Ordenada</h3>
+                            <ol>
+                                <li>Primeiro Item</li>
+                                <li>Segundo Item</li>
+                                <li>Terceiro Item</li>
+                            </ol>
+                        </div>
+                        <div>
+                        <h3>Tabela</h3>
+                            <table class="tabela-padrao">
+                                <thead>
+                                    <tr>
+                                        <th>Nome</th>
+                                        <th>Idade</th>
+                                        <th>Cidade</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>João</td>
+                                        <td>30</td>
+                                        <td>São Paulo</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Maria</td>
+                                        <td>25</td>
+                                        <td>Rio de Janeiro</td>
+                                    </tr>
+                                    <tr class="tabela-destaque">
+                                        <td>Carlos</td>
+                                        <td>45</td>
+                                        <td>Belo Horizonte</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
-                </form>
-            </div>
-
-            <div class="section-separator">
-                <h2>Listas e Tabelas</h2>
-                <div class="algol_component-group">
-                    <h3>Lista Não Ordenada</h3>
-                    <ul>
-                        <li>Item 1</li>
-                        <li>Item 2</li>
-                        <li>Item 3</li>
-                    </ul>
-
-                    <h3>Lista Ordenada</h3>
-                    <ol>
-                        <li>Primeiro Item</li>
-                        <li>Segundo Item</li>
-                        <li>Terceiro Item</li>
-                    </ol>
-
-                    <h3>Tabela</h3>
-                    <table class="tabela-padrao">
-                        <thead>
-                            <tr>
-                                <th>Nome</th>
-                                <th>Idade</th>
-                                <th>Cidade</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>João</td>
-                                <td>30</td>
-                                <td>São Paulo</td>
-                            </tr>
-                            <tr>
-                                <td>Maria</td>
-                                <td>25</td>
-                                <td>Rio de Janeiro</td>
-                            </tr>
-                            <tr class="tabela-destaque">
-                                <td>Carlos</td>
-                                <td>45</td>
-                                <td>Belo Horizonte</td>
-                            </tr>
-                        </tbody>
-                    </table>
                 </div>
-            </div>
 
             <div class="section-separator">
                 <h2>Alertas e Mensagens</h2>

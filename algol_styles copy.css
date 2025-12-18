@@ -217,17 +217,30 @@ h1,h2,h3,h4,h5,h6{
 }
 
 /* comportamento dos componentes ************************************ */
-.algol_position-left{
+.algol_position-self-left{
     justify-self: left;
 }
-.algol_position-center{
+.algol_position-self-center{
     justify-self: center;
 }
-.algol_position-right{
+.algol_position-self-right{
     justify-self: right;
 }
-.algol_position-all{
+.algol_position-self-all{
     justify-self: stretch;
+}
+
+.algol_position-left{
+    justify-content: left;
+}
+.algol_position-center{
+    justify-content: center;
+}
+.algol_position-right{
+    justify-content: right;
+}
+.algol_position-all{
+    justify-content: stretch;
 }
 
 /* ****************************************************************** */

@@ -141,14 +141,19 @@ class Input extends HTMLElement {
     }
     _applyAttribute_position() {
         const positions = ['left', 'center', 'right', 'all'];
-        this.classList.remove(...positions.map(p => `algol_position-${p}`));
+        this.classList.remove(...positions.map(p => `algol_position-self-${p}`));
         const pos = this.getAttribute('position');
-        if (positions.includes(pos)) this.classList.add(`algol_position-${pos}`);
+        if (positions.includes(pos)) this.classList.add(`algol_position-self-${pos}`);
     }
     _applyAttribute_disabled() {
         const isDisabled = this.hasAttribute('disabled');
         // propriedade do elemento real (impede interação)
         if (this._inputEl) this._inputEl.disabled = isDisabled;
+        if (isDisabled) {
+            this._inputEl.style.cursor = 'not-allowed';
+        } else {
+            this._inputEl.style.cursor = '';
+        }
     }
 
     // ****************************************************************************
@@ -337,6 +342,7 @@ class InputNumber extends Input {
             this._savedValue = this._inputEl.value;
             this._inputEl.value = '';
             this._inputEl.disabled = true;
+            this._inputEl.style.cursor = 'not-allowed';
             // remover listeners para evitar alterações enquanto desabilitado
             this._detachEvents();
         } else {
@@ -345,6 +351,7 @@ class InputNumber extends Input {
             const restored = this.hasAttribute('value') ? this.getAttribute('value') : (this._savedValue !== undefined ? this._savedValue : '');
             this._inputEl.value = restored;
             this._savedValue = undefined; // limpa a savedValue após restaurar
+            this._inputEl.style.cursor = '';
             // reaplica listeners
             this._attachEvents();
         }

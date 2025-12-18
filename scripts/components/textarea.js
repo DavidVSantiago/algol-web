@@ -139,13 +139,18 @@ class TextArea extends HTMLElement {
     }
     _applyAttribute_position() {
         const positions = ['left', 'center', 'right', 'all'];
-        this.classList.remove(...positions.map(p => `algol_position-${p}`));
+        this.classList.remove(...positions.map(p => `algol_position-self-${p}`));
         const pos = this.getAttribute('position');
-        if (positions.includes(pos)) this.classList.add(`algol_position-${pos}`);
+        if (positions.includes(pos)) this.classList.add(`algol_position-self-${pos}`);
     }
     _applyAttribute_disabled() {
         if (!this._taEl) return;
         this._taEl.disabled = this.hasAttribute('disabled');
+        if (this.hasAttribute('disabled')) {
+            this._taEl.style.cursor = 'not-allowed';
+        } else {
+            this._taEl.style.cursor = '';
+        }
     }
 
     // específicos

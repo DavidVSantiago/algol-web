@@ -13,3 +13,4 @@ customElements.define('algol-input-password', InputPassword);
 customElements.define('algol-input-number', InputNumber);
 customElements.define('algol-textarea', TextArea);
 customElements.define('algol-select', Select);
+customElements.define('algol-layout', AlgolLayout);

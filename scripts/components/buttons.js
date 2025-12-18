@@ -108,26 +108,31 @@ class BtnBase extends HTMLElement {
     }
     _applyAttribute_position() {
         const positions = ['left', 'center', 'right', 'all'];
-        this.classList.remove(...positions.map(p => `algol_position-${p}`));
+        this.classList.remove(...positions.map(p => `algol_position-self-${p}`));
         const pos = this.getAttribute('position');
-        if (positions.includes(pos)) this.classList.add(`algol_position-${pos}`);
+        if (positions.includes(pos)) this.classList.add(`algol_position-self-${pos}`);
         if (pos == 'all') {
-            this._btn.classList.add(`algol_position-${pos}`);
+            this._btn.classList.add(`algol_position-self-${pos}`);
             this._btn.setAttribute('style', 'width:100%;display:flex;justify-content:center;');
         }
     }
     _applyAttribute_positionCel() {
         const positions = ['left', 'center', 'right', 'all'];
-        this.classList.remove(...positions.map(p => `algol_position-${p}`));
+        this.classList.remove(...positions.map(p => `algol_position-self-${p}`));
         const pos = this.getAttribute('position');
-        if (positions.includes(pos)) this.classList.add(`algol_position-${pos}`);
+        if (positions.includes(pos)) this.classList.add(`algol_position-self-${pos}`);
         if (pos == 'all') {
-            this._btn.classList.add(`algol_position-${pos}`);
+            this._btn.classList.add(`algol_position-self-${pos}`);
             this._btn.setAttribute('style', 'width:100%;display:flex;justify-content:center;');
         }
     }
     _applyAttribute_disabled() {
-        this._btn.disabled = this.disabled;
+        this._btn.disabled = this.hasAttribute('disabled');
+        if (this.hasAttribute('disabled')) {
+            this._btn.style.cursor = 'not-allowed';
+        } else {
+            this._btn.style.cursor = '';
+        }
     }
 
     // ****************************************************************************
