@@ -5,12 +5,12 @@
 // /***********************************************************************************************/
 // document.addEventListener('DOMContentLoaded', () => {
 //     /* trata os eventos do input number de inteiros */
-//     document.querySelectorAll('.algol_input-container').forEach(container => {
-//         const input = container.querySelector('.algol_input');
+//     document.querySelectorAll('.algol-input-container').forEach(container => {
+//         const input = container.querySelector('.algol-input');
 //         const increment = () => input.value = (input.value < parseInt(input.max)) ? parseInt(input.value) + 1 : parseInt(input.max);
 //         const decrement = () => input.value = (input.value > parseInt(input.min)) ? parseInt(input.value) - 1 : parseInt(input.min);
-//         container.querySelector('.algol_spinner-up').addEventListener('click', increment);
-//         container.querySelector('.algol_spinner-down').addEventListener('click', decrement);
+//         container.querySelector('.algol-spinner-up').addEventListener('click', increment);
+//         container.querySelector('.algol-spinner-down').addEventListener('click', decrement);
 //         // validação de limites do input na mudança via teclado
 //         input.addEventListener('change', () => {
 //             if (isNaN(parseInt(input.value))) input.value = parseInt(input.min);
@@ -40,7 +40,7 @@
 //         else if (this.position === 'all') this.classList.add('algol-position-all');
 //     }
 //     render(type = 'text') {
-//         let htmlCode = `<div class="algol_algol_component-group"> <label>${this.label}</label> <input type="${type}" class="algol_input" `;
+//         let htmlCode = `<div class="algol-algol-component-group"> <label>${this.label}</label> <input type="${type}" class="algol-input" `;
 //         if (this.value !== '') htmlCode += `value="${this.value}" `;
 //         if (this.placeholder !== '') htmlCode += `placeholder="${this.placeholder}" `;
 //         htmlCode += `${this.disabled}/></div>`;
@@ -76,13 +76,13 @@
 //     }
 //     render() {
 //         let htmlCode = `
-//             <div class="algol_algol_component-group">
+//             <div class="algol-algol-component-group">
 //                 <label>${this.label}</label>
-//                 <div class="algol_input-container">
-//                     <input type="number" class="algol_input" min="${this.min}" max="${this.max}" value="${this.value}">
-//                     <div class="algol_spinner-buttons">
-//                         <div class="algol_spinner-up">▲</div>
-//                         <div class="algol_spinner-down">▼</div>
+//                 <div class="algol-input-container">
+//                     <input type="number" class="algol-input" min="${this.min}" max="${this.max}" value="${this.value}">
+//                     <div class="algol-spinner-buttons">
+//                         <div class="algol-spinner-up">▲</div>
+//                         <div class="algol-spinner-down">▼</div>
 //                     </div>
 //                 </div>
 //             </div>

@@ -1,6 +1,6 @@
 class AlgolLayout extends HTMLElement {
     static get observedAttributes() {
-        return ['cols', 'gap', 'align', 'position', 'width', 'height'];
+        return ['colunas', 'gap', 'posicao'];
     }
 
     constructor() {
@@ -28,7 +28,6 @@ class AlgolLayout extends HTMLElement {
 
         this.style.display = 'grid';
         this.style.boxSizing = 'border-box';
-        this.classList.add('algol_section-bubble');
 
         // Inicializa o Observer para detectar novos itens inseridos via JS
         this._initObserver();
@@ -38,7 +37,16 @@ class AlgolLayout extends HTMLElement {
 
     _initObserver() {
         this._observer = new MutationObserver(() => {
-            this._updateItemsList();
+            mutations.forEach((mutation) => {
+            if (mutation.type === 'childList') {
+                // Verifica se a mutação foi causada por uma substituição de elemento
+                if (mutation.addedNodes.length > 0 && mutation.removedNodes.length > 0) {
+                    // Não faz nada se a mutação foi causada por uma substituição de elemento
+                    return;
+                }
+                this._updateItemsList();
+            }
+        });
         });
         
         this._observer.observe(this, { childList: true });
@@ -47,33 +55,45 @@ class AlgolLayout extends HTMLElement {
     /** Atualiza a lista de referências e aplica estilos aos itens */
     _updateItemsList() {
         // Busca apenas filhos diretos que sejam algol-grid-item
-        this._items = Array.from(this.querySelectorAll(':scope > algol-grid-item'));
+        this._items = Array.from(this.children);
         
         this._items.forEach(item => {
+            // Verifica se o item não é um algol-grid-item
+            if (item.tagName.toLowerCase() !== 'algol-grid-item') {
+                // Cria um novo elemento span com o texto "ERRO!"
+                const errorSpan = document.createElement('span');
+                errorSpan.style.color= 'white';
+                errorSpan.style.backgroundColor= 'red';
+
+                errorSpan.textContent = `ERRO! coloque o elemento ${item.outerHTML} dentro de um <algol-grid-item>`;
+
+                // Substitui o item pelo novo span
+                this.replaceChild(errorSpan, item);
+
+                // Atualiza a lista de itens para incluir o novo span
+                this._items = Array.from(this.children);
+            }
             // Define o display grid para cada item como solicitado
             item.style.display = 'grid';
             item.style.boxSizing = 'border-box';
         });
 
-        // Re-aplica a posição para os novos itens encontrados
-        this._applyAttribute_position();
+        this._applyAttributes();
     }
-
+    
     // ****************************************************************************
     // Aplicação de Atributos
     // ****************************************************************************
     
     _applyAttributes() {
-        this._applyAttribute_cols();
+        this._applyAttribute_colunas();
         this._applyAttribute_gap();
-        this._applyAttribute_align();
-        this._applyAttribute_dims();
-        this._updateItemsList(); // Isso já chama o _applyAttribute_position()
+        this._applyAttribute_posicao();
     }
 
-    _applyAttribute_cols() {
-        const cols = this.getAttribute('cols') || '1fr';
-        this.style.gridTemplateColumns = cols;
+    _applyAttribute_colunas() {
+        const colunas = this.getAttribute('colunas') || '1fr';
+        this.style.gridTemplateColumns = colunas;
     }
 
     _applyAttribute_gap() {
@@ -82,36 +102,25 @@ class AlgolLayout extends HTMLElement {
         else this.style.removeProperty('gap');
     }
 
-    _applyAttribute_align() {
-        const align = this.getAttribute('align');
-        if (align) this.style.alignItems = align;
-        else this.style.removeProperty('align-items');
-    }
-
-    _applyAttribute_position() {
-        const positions = ['left', 'center', 'right', 'all'];
-        const pos = this.getAttribute('position');
-
-        // 1. Aplica ao próprio Layout
-        this.classList.remove(...positions.map(p => `algol_position-${p}`));
-        if (positions.includes(pos)) {
-            this.classList.add(`algol_position-${pos}`);
-        }
-
-        // 2. Aplica a cada item dentro do array de refs
-        this._items.forEach(item => {
-            item.classList.remove(...positions.map(p => `algol_position-${p}`));
-            if (positions.includes(pos)) {
-                item.classList.add(`algol_position-${pos}`);
+    _applyAttribute_posicao() {
+        const pos = this.getAttribute('posicao');
+        if (pos){ // se existe a propiedade 'posicao'
+            const posValues = ['inicio','fim','centro','total']; // valores aceitos para 'posicao'
+            let alignValue = 'stretch'; // total
+            this.style.justifyItems = alignValue;
+            switch(pos){
+                case posValues[0]: alignValue = 'start'; break;
+                case posValues[1]: alignValue = 'end'; break;
+                case posValues[2]: alignValue = 'center'; break;
             }
-        });
-    }
-    
-    _applyAttribute_dims() {
-        const w = this.getAttribute('width');
-        const h = this.getAttribute('height');
-        if(w) this.style.width = w;
-        if(h) this.style.height = h;
+            this._items.forEach(item => {
+                item.style.justifyItems = alignValue;
+            });
+        }else{ // se não existe a propriedade 'posicao'
+            this._items.forEach(item => {
+                item.style.justifyItems = 'start';
+            });
+        }
     }
 
     // ****************************************************************************
@@ -121,6 +130,7 @@ class AlgolLayout extends HTMLElement {
     connectedCallback() {
         if (this._connected) return;
         this._init();
+        this._updateItemsList();
         this._applyAttributes();
         this._connected = true;
     }
@@ -135,17 +145,9 @@ class AlgolLayout extends HTMLElement {
         if (!this._connected) return;
         
         switch(name) {
-            case 'cols': this._applyAttribute_cols(); break;
+            case 'colunas': this._applyAttribute_colunas(); break;
             case 'gap': this._applyAttribute_gap(); break;
-            case 'align': this._applyAttribute_align(); break;
-            case 'position': this._applyAttribute_position(); break;
-            case 'width': 
-            case 'height': this._applyAttribute_dims(); break;
+            case 'posicao': this._applyAttribute_posicao(); break;
         }
     }
-}
-
-// Registro apenas do Layout
-if (!customElements.get('algol-layout')) {
-    customElements.define('algol-layout', AlgolLayout);
 }

@@ -7,8 +7,8 @@ class TextArea extends HTMLElement {
 
     constructor() {
         super();
-        this._rootEl = null;    // container (.algol_component-group)
-        this._labelEl = null;   // <div.algol_label>
+        this._rootEl = null;    // container (.algol-component-group)
+        this._labelEl = null;   // <div.algol-label>
         this._taEl = null;      // <textarea>
 
         this._base_initialized = false;
@@ -34,11 +34,11 @@ class TextArea extends HTMLElement {
 
         // label (segue padrão atual do inputs.js usando <div> com classe)
         const label = document.createElement('div');
-        label.className = 'algol_label';
+        label.className = 'algol-label';
 
         // textarea
         const ta = document.createElement('textarea');
-        ta.className = 'algol_textarea';
+        ta.className = 'algol-textarea';
 
         // garantir id único evitando
         if (!ta.id) {
@@ -49,7 +49,7 @@ class TextArea extends HTMLElement {
 
         // container
         const group = document.createElement('div');
-        group.className = 'algol_component-group';
+        group.className = 'algol-component-group';
 
         // monta a árvore
         group.appendChild(label);
@@ -139,9 +139,9 @@ class TextArea extends HTMLElement {
     }
     _applyAttribute_position() {
         const positions = ['left', 'center', 'right', 'all'];
-        this.classList.remove(...positions.map(p => `algol_position-self-${p}`));
+        this.classList.remove(...positions.map(p => `algol-position-self-${p}`));
         const pos = this.getAttribute('position');
-        if (positions.includes(pos)) this.classList.add(`algol_position-self-${pos}`);
+        if (positions.includes(pos)) this.classList.add(`algol-position-self-${pos}`);
     }
     _applyAttribute_disabled() {
         if (!this._taEl) return;

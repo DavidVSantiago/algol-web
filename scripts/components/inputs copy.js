@@ -1,23 +1,45 @@
-class Input extends AlgolComponent {
+/** classe base para inputs
+ * atributos gerais:
+ * - label -> define o rótulo do form. se não existir o form não possuirá rótulo
+ * - placeholder ->
+ * - position ->
+ * - value ->
+ * - disabled ->
+ */
+class Input extends HTMLElement {
+    // atributos observador do compontente
+    static get observedAttributes() { return ['value', 'placeholder', 'disabled', 'position', 'label']; } // necessário para o funcionamento do "attributeChangedCallback"
 
-    constructor(atributos) {
-        super(atributos); 
-        
+    constructor() {
+        super();
         this._rootEl = null;      // container (.algol-component-group)
         this._labelEl = null;     // <label>
         this._inputEl = null;     // <input>
         this._type = 'text';
+
+        this._base_initialized = false; // para saber se o componente foi inicializado
+        this._connected = false; // para saber se o componente foi montado
+
+        const propsToUpgrade = this.constructor.observedAttributes || [];
+        propsToUpgrade.forEach(p => this._upgradeProperty(p));
     }
-    
+
     // ****************************************************************************
     // Métodos de inicialização
     // ****************************************************************************
-       
-    /** Faz a construção interna do componente */
+
+    _upgradeProperty(prop) {
+        if (Object.prototype.hasOwnProperty.call(this, prop)) {
+            const value = this[prop];
+            delete this[prop];
+            this[prop] = value;
+        }
+    }
+    /** Faz a construção interna do compoenente */
     _init() {
         if (this._base_initialized) return;
-        
-       // cria <label>
+
+        // cria <label>
         const label = document.createElement('div');
         label.className = 'algol-label';
 
@@ -87,9 +109,19 @@ class Input extends AlgolComponent {
     }
 
     // ****************************************************************************
-    // Métodos dos atributos
+    // Métodos de atributos
     // ****************************************************************************
 
+    /** Serve para reaplicar os atributos nas partes filhas dos componentes */
+    _applyAttributes() {
+        if (!this._rootEl) return; // guard
+        // invoca funções específicas para aplicar cada um dos atributos de forma individual
+        this._applyAttribute_label();
+        this._applyAttribute_placeholder();
+        this._applyAttribute_value();
+        this._applyAttribute_position();
+        this._applyAttribute_disabled();
+    }
     _applyAttribute_label() {
         const label = this.getAttribute('label');
         if (label && label != '') { // existe o atributo label e ele não está vazio
@@ -123,18 +155,53 @@ class Input extends AlgolComponent {
             this._inputEl.style.cursor = '';
         }
     }
+
+    // ****************************************************************************
+    // Callbacks do ciclo de vida dos webcomponents
+    // ****************************************************************************
+
+    /** invocado automaticamente quando o componente é inserido no DOM ou movido para outro local. */
+    connectedCallback() {
+        if (this._connected) return;
+        // contrói o componente, se ainda não foi
+        this._init();
+        this._attachEvents(); // liga os eventos
+        this._applyAttributes(); // aplica atributos
+        this._connected = true; // marca como motado
+    }
+
+    disconnectedCallback() {
+        this._detachEvents();
+        this._connected = false; // marca como desmontado
+    }
+
+    /** invocado automaticamente quando muda o valor de algum atributo observado ('observedAttributes'). */
+    attributeChangedCallback(name, oldV, newV) {
+        if (oldV === newV) return;
+        if (!this._connected) return; // só trata eventos de mudança se tiver montado
+
+        switch (name) {
+            case 'label': this._applyAttribute_label(); break;
+            case 'placeholder': this._applyAttribute_placeholder(); break;
+            case 'value': this._applyAttribute_value(); break;
+            case 'position': this._applyAttribute_position(); break;
+            case 'disabled': this._applyAttribute_disabled(); break;
+        }
+    }
 }
+Input._uidCounter = 0; // contador estático para IDs
+/* === subclasses simples que apenas definem o tipo do input === */
 
 class InputText extends Input {
-    constructor() { super(['value', 'placeholder', 'disabled', 'position', 'label']); }
+    constructor() { super(); }
     connectedCallback() { super.connectedCallback(); }
 }
 class InputEmail extends Input {
-    constructor() { super(['value', 'placeholder', 'disabled', 'position', 'label']); }
+    constructor() { super(); }
     connectedCallback() { this._type = 'email'; super.connectedCallback(); }
 }
 class InputPassword extends Input {
-    constructor() { super(['value', 'placeholder', 'disabled', 'position', 'label']); }
+    constructor() { super(); }
     connectedCallback() { this._type = 'password'; super.connectedCallback(); }
 }
 

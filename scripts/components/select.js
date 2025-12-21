@@ -5,7 +5,7 @@ class Select extends HTMLElement {
 
     constructor() {
         super();
-        this._rootEl = null;        // .algol_component-group
+        this._rootEl = null;        // .algol-component-group
         this._label = null;
         this._select = null;
 
@@ -30,15 +30,15 @@ class Select extends HTMLElement {
 
         // container raiz
         const group = document.createElement('div');
-        group.className = 'algol_component-group';
+        group.className = 'algol-component-group';
 
         // label
         const label = document.createElement('label');
-        label.className = 'algol_label';
+        label.className = 'algol-label';
 
         // wrapper do select custom
         const select = document.createElement('select');
-        select.className = 'algol_select';
+        select.className = 'algol-select';
 
         // Move as <option> existentes para o select nativo
         while (this.firstChild) {
@@ -153,9 +153,9 @@ class Select extends HTMLElement {
     }
     _applyAttribute_position() {
         const positions = ['left', 'center', 'right', 'all'];
-        this.classList.remove(...positions.map(p => `algol_position-self-${p}`));
+        this.classList.remove(...positions.map(p => `algol-position-self-${p}`));
         const pos = this.getAttribute('position');
-        if (positions.includes(pos)) this.classList.add(`algol_position-self-${pos}`);
+        if (positions.includes(pos)) this.classList.add(`algol-position-self-${pos}`);
     }
 
     // ****************************************************************************

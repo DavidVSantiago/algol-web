@@ -1,86 +1,44 @@
-class Base extends HTMLElement {
-    // atributos observador do compontente
-    static get observedAttributes() { return ['','','']; } // necessário para o funcionamento do "attributeChangedCallback"
+class ClassName extends AlgolComponent {
+    
+    static _innerText = ''; // para armazenar o possivel texto contido dentro da tag
 
     constructor() {
-        super();
-        // this._type = ''; // para distinção de subtipos em subclasses
-
+        super(['','','']); // TODO passe os atributos aceitos pelo componente
+        
+        BtnBase._innerText = this.textContent; // captura o texto dentro da tag
+        // TODO inicialize aqui as referências para os elementos do componente
         this._base_initialized = false; // para saber se o componente foi inicializado
-        this._connected = false; // para saber se o componente foi montado
-
-        const propsToUpgrade = this.constructor.observedAttributes || [];
-        propsToUpgrade.forEach(p => this._upgradeProperty(p));
     }
-
+    
     // ****************************************************************************
     // Métodos de inicialização
     // ****************************************************************************
-
-    _upgradeProperty(prop) {
-        if (Object.prototype.hasOwnProperty.call(this, prop)) {
-            const value = this[prop];
-            delete this[prop];
-            this[prop] = value;
-        }
-    }
-    /** Faz a construção interna do compoenente */
+       
+    /** Faz a construção interna do componente */
     _init() {
-        if (this._base_initialized) return; // guard
-
-        // cria cada um dos compoentes
+        if (this._base_initialized) return;
         
-        // monta a árvore
+        // TODO crie a estrutura do componente e a adicione com this.add(..)
 
-        // guarda referências
-
-        this._base_initialized = true; // componente inicializado
+        this._base_initialized = true;
     }
 
     _attachEvents() {
-        // guarda
+        if (!true) return; // TODO implemente guards para não adicionar eventos a compoenntes vazios
+        
+        // TODO implemente os eventos dos componentes
     }
 
     _detachEvents() {
-       // guarda
-    }
-
-    // ****************************************************************************
-    // Métodos de atributos
-    // ****************************************************************************
-
-    /** Serve para reaplicar os atributos nas partes filhas dos componentes */
-    _applyAttributes() {
-        // guarda
-        // invoca funções específicas para aplicar cada um dos atributos de forma individual
+        if (!true) return; // TODO implemente guards para não adicionar eventos a compoenntes vazios
         
+        // TODO remova os eventos com removeEventListener
     }
 
     // ****************************************************************************
-    // Callbacks do ciclo de vida dos webcomponents
+    // Métodos dos atributos
     // ****************************************************************************
-
-    /** invocado automaticamente quando o componente é inserido no DOM ou movido para outro local. */
-    connectedCallback() {
-        if (this._connected) return;
-        // contrói o componente, se ainda não foi
-        this._init();
-        this._attachEvents(); // liga os eventos
-        this._applyAttributes(); // aplica atributos
-        this._connected = true; // marca como motado
-    }
-    disconnectedCallback() {
-        this._detachEvents();
-        this._connected = false; // marca como desmontado
-    }
-    /** invocado automaticamente quando muda o valor de algum atributo observado ('observedAttributes'). */
-    attributeChangedCallback(name, oldV, newV) {
-        if (oldV === newV) return;
-        if (!this._connected) return; // só trata eventos de mudança se tiver montado
-
-        switch (name) {
-            // faz o case para cada atributo e invoca o this._applyAttribute_ específico
-        }
-    }
+    
+    // TODO implemente um método para cada atributo aceito pelo componente, com  o prefixo '_applyAttribute_[atributo]'
     
 }
