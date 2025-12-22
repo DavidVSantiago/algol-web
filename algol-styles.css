@@ -161,6 +161,7 @@ algol-btn-link {
     .algol-btn:disabled:active {
         background-color: var(--bg-color-forms-disabled);
         color: var(--text-color-btn-disabled);
+        border: none;
     }
 
     .algol-btn-primary {
@@ -262,7 +263,7 @@ algol-select {
         /* border: solid 0.1vw red; */
         width: 100%;
 
-        .algol-label {
+        .algol-rotulo {
             color: var(--text-color-forms-label);
             font-size: calc(1.0vw * var(--fator-escala));
         }
@@ -388,34 +389,6 @@ algol-select[disabled] {
 
 /* components **************************************************************** */
 
-
-/* comportamento dos componentes ************************************ */
-/*TODO remover essas classes do compoennte input*/
-.algol-position-self-left{
-    justify-self: left;
-}
-.algol-position-self-center{
-    justify-self: center;
-}
-.algol-position-self-right{
-    justify-self: right;
-}
-.algol-position-self-all{
-    justify-self: stretch;
-}
-
-.algol-position-left{
-    justify-items: left;
-}
-.algol-position-center{
-    justify-items: center;
-}
-.algol-position-right{
-    justify-items: right;
-}
-.algol-position-all{
-    justify-items: stretch;
-}
 
 /* ****************************************************************** */
 

@@ -3,8 +3,7 @@ class BtnBase extends AlgolComponent {
         return ['valor','tamanho','posicao','disabled'];
     }
     constructor() {
-        super(); // atributos aceitos pelo componente
-        this._elems = new Map(); // elementos internos do componente
+        super();
         this._variantClass = 'algol-btn-primary'; // botão padrão
     }
     
@@ -15,9 +14,11 @@ class BtnBase extends AlgolComponent {
     /** Faz a construção interna do componente */
     _init() {
         if (this._base_initialized) return;
+        if (!this.hasAttribute('tabindex')) this.setAttribute('tabindex', '0'); // Torna o componente focável
         
         // Cria o <button>
         const btn = document.createElement('button');
+        btn.setAttribute('tabindex', '-1'); // para não receber foco
         btn.className = `algol-btn ${this._variantClass}`; // define a classe base + a variante (definida da classe derivada)
         btn.id = `algol-btn-${++AlgolComponent._idCont}`; // define o id unico
         
@@ -40,8 +41,8 @@ class BtnBase extends AlgolComponent {
         if (!btn) return; // guard
         
         // Apenas bloqueamos interação quando o botão estiver desabilitado.
-        this._onClick = (e) => {
-            if (this.disabled) {
+        let onClick = (e) => {
+            if (this.hasAttribute('disabled')) {
                 e.preventDefault();
                 e.stopImmediatePropagation();
                 return;
@@ -49,7 +50,17 @@ class BtnBase extends AlgolComponent {
             // Caso contrário, deixe o evento propagar normalmente.
         };
 
-        btn.addEventListener('click', this._onClick,{ capture: true });
+        btn.addEventListener('click', onClick,{ capture: true });
+
+        // para fazer o enter ou espaço funcionar como clique
+        this.addEventListener('keydown', (e) => {
+            if (this.hasAttribute('disabled')) return;
+            // Enter (13) ou Espaço (32)
+            if (e.key === 'Enter' || e.code === 'Space') {
+                e.preventDefault(); // Evita scroll da página com o Espaço
+                this.click();       // Dispara o evento de clique do próprio elemento
+            }
+        });
     }
 
     // ****************************************************************************
@@ -96,13 +107,74 @@ class BtnBase extends AlgolComponent {
     // Métodos dos eventos do componente
     // ****************************************************************************
 
-    adicionarEvento(teste){
-        this.addEventListener('click', teste);
-        //TODO implementar um enumerador para gerenciar os tipos de eventos
+    /** envie um callback que receba dois argumentos:
+     * @param origem - elemento onde o evento ocorreu.
+     * @param mouseInfo - objeto com as informações de pos do mouse durante o clique.
+     */
+    addEventoClique(callback){
+        const wrapperCallback = (e) => {
+            if (this.hasAttribute('disabled')) {
+                e.preventDefault();
+                return;
+            }
+            let origem = e.currentTarget
+            let mouseInfo = {
+                x: e.clientX,
+                y: e.clientY,
+                offsetX: e.offsetX,
+                offsetY: e.offsetY
+            }
+            callback(origem,mouseInfo);
+        };
+        this.addEventListener('click', wrapperCallback);
+    }
+    addEventoFoco(callback) {
+        const wrapperCallback = (e) => {
+            if (this.hasAttribute('disabled')) return;
+            let origem = e.currentTarget
+            callback(origem);
+        };
+        this.addEventListener('focus', wrapperCallback);
+    }
+    addEventoBlur(callback) {
+        const wrapperCallback = (e) => {
+            if (this.hasAttribute('disabled')) return;
+            let origem = e.currentTarget
+            callback(origem);
+        };
+        this.addEventListener('blur', wrapperCallback);
+    }
+    addEventoMouseEntra(callback) {
+        const wrapperCallback = (e) => {
+            if (this.hasAttribute('disabled')) return;
+            let origem = e.currentTarget
+            callback(origem);
+        };
+        this.addEventListener('mouseenter', wrapperCallback);
+    }
+    addEventoMouseSai(callback) {
+        const wrapperCallback = (e) => {
+            if (this.hasAttribute('disabled')) return;
+            let origem = e.currentTarget
+            callback(origem);
+        };
+        this.addEventListener('mouseleave', wrapperCallback);
+    }
+    addEventoMouseSobre(callback) {
+        const wrapperCallback = (e) => {
+            if (this.hasAttribute('disabled')) return;
+            let origem = e.currentTarget
+            let mouseInfo = {
+                x: e.clientX,
+                y: e.clientY,
+                offsetX: e.offsetX,
+                offsetY: e.offsetY
+            }
+            callback(origem,mouseInfo);
+        };
+        this.addEventListener('mousemove', wrapperCallback);
     }
 }
-
-
 
 // Subclasses: definem apenas a variante, não renderizam no constructor
 class BtnPrimary extends BtnBase {

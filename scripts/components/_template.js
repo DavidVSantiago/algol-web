@@ -1,44 +1,37 @@
-class ClassName extends AlgolComponent {
-    
-    static _innerText = ''; // para armazenar o possivel texto contido dentro da tag
-
+class NomeComponente extends AlgolComponent {
+    static get observedAttributes() {
+        return []; // TODO - retornar os atributos aceitos pelo componente
+    }
     constructor() {
-        super(['','','']); // TODO passe os atributos aceitos pelo componente
-        
-        BtnBase._innerText = this.textContent; // captura o texto dentro da tag
-        // TODO inicialize aqui as referências para os elementos do componente
-        this._base_initialized = false; // para saber se o componente foi inicializado
+        super();
     }
     
     // ****************************************************************************
     // Métodos de inicialização
     // ****************************************************************************
        
-    /** Faz a construção interna do componente */
     _init() {
         if (this._base_initialized) return;
+        if (!this.hasAttribute('tabindex')) this.setAttribute('tabindex', '0'); // Torna o componente focável
         
-        // TODO crie a estrutura do componente e a adicione com this.add(..)
+        // TODO - inicializar aqui os elementos internos do componente
 
-        this._base_initialized = true;
+        this._base_initialized = true; // marca como inicializado
     }
 
     _attachEvents() {
-        if (!true) return; // TODO implemente guards para não adicionar eventos a compoenntes vazios
-        
-        // TODO implemente os eventos dos componentes
-    }
-
-    _detachEvents() {
-        if (!true) return; // TODO implemente guards para não adicionar eventos a compoenntes vazios
-        
-        // TODO remova os eventos com removeEventListener
+        // TODO - faça os ajustes dos eventos dos elementos internos do componente
     }
 
     // ****************************************************************************
     // Métodos dos atributos
     // ****************************************************************************
     
-    // TODO implemente um método para cada atributo aceito pelo componente, com  o prefixo '_applyAttribute_[atributo]'
-    
+    // TODO - crie cada um dos métodos _applyAttribute_[...], um para cada atributo
+
+    // ****************************************************************************
+    // Métodos dos eventos do componente
+    // ****************************************************************************
+
+    // TODO - crie cada um dos métodos de eventos do componente
 }

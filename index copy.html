@@ -79,6 +79,7 @@
                 <algol-grid-item>
                     <h5>Título H5</h5>
                     <algol-btn-outline id="teste" posicao="total" valor="Botão Outline"></algol-btn-outline>
+                    <algol-btn-outline id="teste" disabled posicao="total" valor="Botão Outline"></algol-btn-outline>
                 </algol-grid-item>
             </algol-layout>
             
@@ -86,12 +87,26 @@
                 // temporário. apenas para teste
                 window.addEventListener('load', function (event) {
                     let btn = document.getElementById('teste');
-                    btn.adicionarEventoClique(()=>{
-                        console.log('Chamou o callback!');
-                        // btn.posicao='inicio';
-                        btn.setAttribute('posicao','inicio')
+                    btn.addEventoClique((origem,mouseInfo)=>{
+                        console.log(origem);
+                        console.log(mouseInfo);
                     });
-                    // console.log('Valor: '+btn.posicao);
+                    btn.addEventoFoco((origem)=>{
+                        console.log(origem);
+                    });
+                    btn.addEventoBlur((origem)=>{
+                        console.log(origem);
+                    });
+                    btn.addEventoMouseEntra((origem)=>{
+                        console.log(origem);
+                    });
+                    btn.addEventoMouseSai((origem)=>{
+                        console.log(origem);
+                    });
+                    btn.addEventoMouseSobre((origem,mouseInfo)=>{
+                        console.log(origem);
+                        console.log(mouseInfo);
+                    });
                 });
             </script>
 

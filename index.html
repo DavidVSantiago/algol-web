@@ -92,17 +92,17 @@
             <div class="algol-bolha-01">
                 <h2>Botões</h2>
                 <div class="lay lay-2cols">
-                    <algol-btn-primary posicao="fim">Botão Primário</algol-btn-primary>
-                    <algol-btn-secondary posicao="centro">Botão Secundário</algol-btn-secondary>
-                    <algol-btn-outline id="teste" posicao="total">Botão Outline</algol-btn-outline>
-                    <algol-btn-success>Botão Success</algol-btn-success>
-                    <algol-btn-danger>Botão Danger</algol-btn-danger>
-                    <algol-btn-warning>Botão Warning</algol-btn-warning>
-                    <algol-btn-info>Botão Info</algol-btn-info>
-                    <algol-btn-link>Botão de Link</algol-btn-link>
-                    <algol-btn-primary  posicao="total" disabled>Botão Primário</algol-btn-primary>
-                    <algol-btn-primary tamanho="pequeno" >Pequeno</algol-btn-primary>
-                    <algol-btn-primary tamanho="grande">Grande</algol-btn-primary>
+                    <algol-btn-primary posicao="fim" valor="Botão Primário"> </algol-btn-primary>
+                    <algol-btn-secondary posicao="centro" valor="Botão Secundário"></algol-btn-secondary>
+                    <algol-btn-outline id="teste" posicao="total" valor="Botão Outline"></algol-btn-outline>
+                    <algol-btn-success valor="Botão Success"></algol-btn-success>
+                    <algol-btn-danger valor="Botão Danger"></algol-btn-danger>
+                    <algol-btn-warning valor="Botão Warning"></algol-btn-warning>
+                    <algol-btn-info valor="Botão Info"></algol-btn-info>
+                    <algol-btn-link valor="Botão de Link"></algol-btn-link>
+                    <algol-btn-primary  posicao="total" disabled valor="Botão Primário"></algol-btn-primary>
+                    <algol-btn-primary tamanho="pequeno" valor="Pequeno"></algol-btn-primary>
+                    <algol-btn-primary tamanho="grande" valor="Grande"></algol-btn-primary>
                 </div>
             </div>
 
@@ -110,21 +110,21 @@
                 <h2>Elementos de Formulário</h2>
                 <form>
                     <div class="lay">
-                        <algol-input-text position="left" placeholder="sd" label="Input text Estilizado" disabled></algol-input-text>
-                        <algol-input-email position="center" label="Input email Estilizado"></algol-input-email>
-                        <algol-input-password position="all" label="Input password Estilizado"></algol-input-password>
-                        <algol-input-number position="all" label="Input number Estilizado" min="20" max="60"></algol-input-number>
-                        <algol-input-number label="Disabled" min="10" max="30" disabled></algol-input-number>
-                        <algol-textarea label="Textarea padrão" placeholder="Digite aqui..." position="left" rows="10" name="Algol" wrap="hard"></algol-textarea>
-                        <algol-textarea label="Textarea padrão" placeholder="Digite aqui..." position="all" rows="10" name="Algol" wrap="hard" disabled></algol-textarea>
+                        <algol-input-text posicao="inicio" placeholder="sd" rotulo="Input text Estilizado" disabled></algol-input-text>
+                        <algol-input-email posicao="centro" rotulo="Input email Estilizado"></algol-input-email>
+                        <algol-input-password posicao="total" rotulo="Input password Estilizado"></algol-input-password>
+                        <algol-input-number posicao="total" rotulo="Input number Estilizado" valor="35" min="20" max="60"></algol-input-number>
+                        <algol-input-number rotulo="Disabled" min="10" max="30" disabled></algol-input-number>
+                        <algol-textarea rotulo="Textarea padrão" placeholder="Digite aqui..." position="left" rows="10" name="Algol" wrap="hard"></algol-textarea>
+                        <algol-textarea rotulo="Textarea padrão" placeholder="Digite aqui..." position="all" rows="10" name="Algol" wrap="hard" disabled></algol-textarea>
 
-                        <algol-select label="Select" required position="center">
+                        <algol-select rotulo="Select" required position="center">
                             <option value="null"> Selecione uma das opções</option>
                             <option value="opcao1">Opção 1</option>
                             <option value="opcao2">Opção 2</option>
                             <option value="opcao3">Opção 3</option>
                         </algol-select>
-                        <algol-select label="Select disabled" position="all" required disabled>
+                        <algol-select rotulo="Select disabled" position="all" required disabled>
                             <option value="">Selecione uma opção</option>
                             <option value="opcao1">Opção 1</option>
                             <option value="opcao2">Opção 2</option>

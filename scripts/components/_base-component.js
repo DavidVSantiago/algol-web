@@ -5,6 +5,7 @@ class AlgolComponent extends HTMLElement{
 
     constructor() {
         super();
+        this._elems = new Map(); // mapa dos elementos internos do componente
         this._gerarAcessores();
         this._base_initialized = false; // para saber se o componente foi inicializado
         this._connected = false; // para saber se o componente foi montado
@@ -61,11 +62,6 @@ class AlgolComponent extends HTMLElement{
         this._attachEvents(); // *abstract* implementado na classe filha
         this._applyAttributes(); // aplica atributos
         this._connected = true; // marca como motado
-    }
-    
-    disconnectedCallback() {
-        this._detachEvents();
-        this._connected = false;
     }
 
     /** invocado automaticamente quando muda o valor de algum atributo observado ('observedAttributes'). */
