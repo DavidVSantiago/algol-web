@@ -1,6 +1,7 @@
 class BtnBase extends AlgolComponent {
     static get observedAttributes() {
         return ['valor','tamanho','posicao','disabled'];
+        // TODO - mudar posicao para posicaoH, e criar posicaoV, para todos os componentes
     }
     constructor() {
         super();

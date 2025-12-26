@@ -14,3 +14,12 @@ customElements.define('algol-input-number', InputNumber);
 customElements.define('algol-textarea', TextArea);
 customElements.define('algol-select', Select);
 customElements.define('algol-layout', AlgolLayout);
+
+
+/**  */
+
+window.addEventListener('keydown', function(event) {
+    if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
+        event.preventDefault();
+    }
+});

@@ -30,7 +30,7 @@
     --text-color-btn-clicked: #ddd;
     --text-color-btn-disabled: var(--text-color-disabled);
     --bg-color-btn-primary: #3b82f6;
-    --bg-color-btn-primary-hover: #3674d6;
+    --bg-color-btn-primary-hover: #2f67c2;
     --bg-color-btn-success: #2ebe50;
     --bg-color-btn-success-hover: #29a746;
     --bg-color-btn-secondary: #334155;
@@ -43,7 +43,7 @@
     --bg-color-btn-info-hover: #148c9e;
     --bg-color-btn-outline: #0000;
     --border-color-btn-outline: #3b82f6;
-    --bg-color-btn-outline-hover: #2857a3;
+    --bg-color-btn-outline-hover: #2f67c2;
     --bg-color-btn-link: #0000;
     --text-color-btn-link: #3b82f6;
     --text-color-btn-link-hover: #3674d6;

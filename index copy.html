@@ -9,9 +9,9 @@
     <script src="scripts/components/_base-component.js" defer></script>
     <script src="scripts/components/buttons.js" defer></script>
     <script src="scripts/components/inputs.js" defer></script>
-    <script src="scripts/components/layout.js" defer></script>
     <script src="scripts/components/textarea.js" defer></script>
     <script src="scripts/components/select.js" defer></script>
+    <script src="scripts/layouts/layout.js" defer></script>
     <script src="scripts/components.js" defer></script>
  
     <script defer>
@@ -68,45 +68,32 @@
                 eligendi
                 vero id aperiam debitis sapiente, ea quis nostrum nihil et ut vitae amet inventore temporibus.</p>
 
-            <algol-layout colunas="1fr 1fr 1fr" gap="1vw" posicao="fim" class="algol-bolha-01">
+            <algol-layout colunas="1fr 1fr" gap="1vw" posicao="centro" class="algol-bolha-01">
                 <algol-grid-item>
-                    <h3>Título H3</h3>
+                    <!-- <algol-input-text id="teste" posicao="inicio" placeholder="sd" rotulo="Input text Estilizado"></algol-input-text> -->
+                    <!-- <algol-input-email id="teste" posicao="centro" rotulo="Input email Estilizado"></algol-input-email> -->
+                    <!-- <algol-input-password id="teste" posicao="total" required rotulo="Input password Estilizado"></algol-input-password> -->
+                    <!-- <algol-input-number id="teste" posicao="total" rotulo="Input number Estilizado" valor="35" min="20" max="60"></algol-input-number> -->
+                    <algol-textarea id="teste" rotulo="Textarea padrão" placeholder="Digite aqui..." posicao="total" linhas="10" name="Algol" fixo></algol-textarea>
                 </algol-grid-item>
                 <algol-grid-item>
-                    <h6>Título H6</h6>
-                    <h4>Título H4</h4>
-                </algol-grid-item>
-                <algol-grid-item>
-                    <h5>Título H5</h5>
-                    <algol-btn-outline id="teste" posicao="total" valor="Botão Outline"></algol-btn-outline>
-                    <algol-btn-outline id="teste" disabled posicao="total" valor="Botão Outline"></algol-btn-outline>
+                    <algol-textarea rotulo="Textarea padrão" placeholder="Digite aqui..." posicao="total" linhas="10" name="Algol" disabled></algol-textarea>
                 </algol-grid-item>
             </algol-layout>
             
             <script defer>
                 // temporário. apenas para teste
                 window.addEventListener('load', function (event) {
-                    let btn = document.getElementById('teste');
-                    btn.addEventoClique((origem,mouseInfo)=>{
-                        console.log(origem);
-                        console.log(mouseInfo);
-                    });
-                    btn.addEventoFoco((origem)=>{
-                        console.log(origem);
-                    });
-                    btn.addEventoBlur((origem)=>{
-                        console.log(origem);
-                    });
-                    btn.addEventoMouseEntra((origem)=>{
-                        console.log(origem);
-                    });
-                    btn.addEventoMouseSai((origem)=>{
-                        console.log(origem);
-                    });
-                    btn.addEventoMouseSobre((origem,mouseInfo)=>{
-                        console.log(origem);
-                        console.log(mouseInfo);
-                    });
+                    let comp = document.getElementById('teste');
+                    // comp.addEventoClique((origem,mouseInfo)=>console.log(origem,mouseInfo));
+                    // comp.addEventoFoco((origem)=>console.log(origem));
+                    // comp.addEventoBlur((origem)=>console.log(origem));
+                    // comp.addEventoMouseEntra((origem)=>console.log(origem));
+                    // comp.addEventoMouseSai((origem)=>console.log(origem));
+                    // comp.addEventoMouseSobre((origem,mouseInfo)=>console.log(origem,mouseInfo));
+                    // comp.addEventoCliqueSobe((origem,mouseInfo)=>console.log(origem,mouseInfo));
+                    // comp.addEventoCliqueDesce((origem,mouseInfo)=>console.log(origem,mouseInfo));
+                    comp.addEventoMudaValor((origem,mouseInfo)=>console.log(origem,mouseInfo));
                 });
             </script>
 

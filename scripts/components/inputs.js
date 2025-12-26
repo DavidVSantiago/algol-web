@@ -1,5 +1,7 @@
 class Input extends AlgolComponent {
-    
+    static get observedAttributes() {
+        return ['valor', 'placeholder', 'disabled', 'posicao', 'rotulo', 'required'];
+    }
     constructor() {
         super();
         this._type = 'text';
@@ -44,20 +46,25 @@ class Input extends AlgolComponent {
     }
 
     _attachEvents() {
-        /** sincroniza o valor digitado no input com o atributo valor do componente */
-        let onInput = (e) => {
+        /* reflete o valor digitado no input no atributo valor do componente */
+        this._elems.get('input').addEventListener('input', (e) => {
             const val = this._elems.get('input').value; 
             if (this.getAttribute('valor') !== val) this.setAttribute('valor', val);
             this.dispatchEvent(new Event('input', { bubbles: true, composed: true }));
-        };
-        let onChange = (e) => {
+        });
+        this._elems.get('input').addEventListener('change', (e) => {
             const val = this._elems.get('input').value; // obtém o valor do input
             if (this.getAttribute('valor') !== val) this.setAttribute('valor', val);
             this.dispatchEvent(new Event('change', { bubbles: true, composed: true }));
-        };
-    
-        this._elems.get('input').addEventListener('input', onInput);
-        this._elems.get('input').addEventListener('change', onChange);
+        });
+
+        // faz com que o enter no componente leve o foco para o input
+        this.addEventListener('keydown', (e) => {
+            if (this.hasAttribute('disabled')) return;
+            if (e.key === 'Enter') {
+                this._elems.get('input').focus();
+            }
+        });
     }
 
     // ****************************************************************************
@@ -76,6 +83,7 @@ class Input extends AlgolComponent {
         }
     }
     _applyAttribute_placeholder() {
+        if(this.hasAttribute('disabled'))return;
         if (this.hasAttribute('placeholder')) this._elems.get('input').placeholder = this.getAttribute('placeholder');
     }
     _applyAttribute_valor() {
@@ -95,37 +103,109 @@ class Input extends AlgolComponent {
     _applyAttribute_disabled() {
         const isDisabled = this.hasAttribute('disabled');
         // propriedade do elemento real (impede interação)
-        if (this._elems.get('input')) this._elems.get('input').disabled = isDisabled;
+        this._elems.get('input').disabled = isDisabled;
         if (isDisabled) {
             this._elems.get('input').style.cursor = 'not-allowed';
         } else {
             this._elems.get('input').style.cursor = '';
         }
     }
+    _applyAttribute_required() {
+        this._elems.get('input').required = this.hasAttribute('required');
+    }
 
     // ****************************************************************************
     // Métodos dos eventos do componente
     // ****************************************************************************
 
-    // TODO - crie cada um dos métodos de eventos do componente
+    // gerais
+    addEventoClique(callback){
+        const wrapperCallback = (e) => {
+            if (this.hasAttribute('disabled')) {
+                e.preventDefault();
+                return;
+            }
+            let origem = e.currentTarget
+            let mouseInfo = {
+                x: e.clientX,
+                y: e.clientY,
+                offsetX: e.offsetX,
+                offsetY: e.offsetY
+            }
+            callback(origem,mouseInfo);
+        };
+        this.addEventListener('click', wrapperCallback);
+    }
+    addEventoFoco(callback) {
+        const wrapperCallback = (e) => {
+            if (this.hasAttribute('disabled')) return;
+            let origem = e.currentTarget
+            callback(origem);
+        };
+        this.addEventListener('focus', wrapperCallback);
+    }
+    addEventoBlur(callback) {
+        const wrapperCallback = (e) => {
+            if (this.hasAttribute('disabled')) return;
+            let origem = e.currentTarget
+            callback(origem);
+        };
+        this.addEventListener('blur', wrapperCallback);
+    }
+    addEventoMouseEntra(callback) {
+        const wrapperCallback = (e) => {
+            if (this.hasAttribute('disabled')) return;
+            let origem = e.currentTarget
+            callback(origem);
+        };
+        this.addEventListener('mouseenter', wrapperCallback);
+    }
+    addEventoMouseSai(callback) {
+        const wrapperCallback = (e) => {
+            if (this.hasAttribute('disabled')) return;
+            let origem = e.currentTarget
+            callback(origem);
+        };
+        this.addEventListener('mouseleave', wrapperCallback);
+    }
+    addEventoMouseSobre(callback) {
+        const wrapperCallback = (e) => {
+            if (this.hasAttribute('disabled')) return;
+            let origem = e.currentTarget
+            let mouseInfo = {
+                x: e.clientX,
+                y: e.clientY,
+                offsetX: e.offsetX,
+                offsetY: e.offsetY
+            }
+            callback(origem,mouseInfo);
+        };
+        this.addEventListener('mousemove', wrapperCallback);
+    }
+    addEventoMudaValor(callback){
+        const wrapperCallback = (e) => {
+            if (this.hasAttribute('disabled')) {
+                e.preventDefault();
+                return;
+            }
+            if(e.detail.attribute=='valor'){
+                let origem = e.currentTarget
+                let valor = this.valor;
+                callback(origem,valor);
+                return;
+            }
+        };
+        this.addEventListener('mudancaAtributo', wrapperCallback);
+    }
 }
 
 class InputText extends Input {
-    static get observedAttributes() {
-        return ['valor', 'placeholder', 'disabled', 'posicao', 'rotulo'];
-    }
     constructor() { super(); }
 }
 class InputEmail extends Input {
-    static get observedAttributes() {
-        return ['valor', 'placeholder', 'disabled', 'posicao', 'rotulo'];
-    }
     constructor() { super(); this._type = 'email';}
 }
 class InputPassword extends Input {
-    static get observedAttributes() {
-        return ['valor', 'placeholder', 'disabled', 'posicao', 'rotulo'];
-    }
     constructor() { super(); this._type = 'password';}
 }
 class InputNumber extends Input {
@@ -188,35 +268,37 @@ class InputNumber extends Input {
     }
 
     _attachEvents() {
-        // cria os eventos
-        let btnUpEvent = (e) => {
+        // eventos de clique nos bottões spin (up e down)
+        this._elems.get('up').addEventListener('click', (e) => {
             if (this.hasAttribute('disabled')) return;
-            this._step(1);
-        };
-        let btnDownEvent = (e) => {
+            this._incrementaValor(1);
+            this._refleteValor();
+        });
+        this._elems.get('down').addEventListener('click', (e) => {
             if (this.hasAttribute('disabled')) return;
-            this._step(-1);
-        };
-        let inputElKeydownEvent = (e) => {
-            if (this.hasAttribute('disabled')) return;
-            if (e.key === 'ArrowUp') { e.preventDefault(); }
-            if (e.key === 'ArrowDown') { e.preventDefault(); }
-        };
-        let inputElBlurEvent = (e) => {
+            this._incrementaValor(-1);
+            this._refleteValor();
+        });
+        // eventos ...
+        this._elems.get('input').addEventListener('blur', (e) => {
             if (this.hasAttribute('disabled')) return;
             this._refleteValor();
-        };
-        let onChange = (e) => {
+        });
+        this._elems.get('input').addEventListener('change', (e) => {
             if (this.hasAttribute('disabled')) return;
             this._refleteValor();
-            this.dispatchEvent(new Event('change', { bubbles: true, composed: true }));
-        };
+        });
 
-        this._elems.get('up').addEventListener('click', btnUpEvent);
-        this._elems.get('down').addEventListener('click', btnDownEvent);
-        this._elems.get('input').addEventListener('keydown', inputElKeydownEvent);
-        this._elems.get('input').addEventListener('blur', inputElBlurEvent);
-        this._elems.get('input').addEventListener('change', onChange);
+        // para fazer o 'up' e 'down' funcionarem pra subir e descer o valor do inputnumber
+        this.addEventListener('keydown', (e) => {
+            if (this.hasAttribute('disabled')) return;
+            if (e.key === 'ArrowUp') {this._incrementaValor(1); this._refleteValor();}
+            if (e.key === 'ArrowDown') {this._incrementaValor(-1); this._refleteValor();}
+            if (e.key === 'Enter') {
+                this._elems.get('input').focus();
+                return;
+            }
+        });
     }
 
     // ****************************************************************************
@@ -246,10 +328,10 @@ class InputNumber extends Input {
             this._elems.get('input').value = this.max;
         }
     }
-
     _applyAttribute_disabled() {
         if (this.hasAttribute('disabled')) {
             this._elems.get('input').disabled = true;
+            this._elems.get('input').value = '';
             this._elems.get('up').style.cursor = 'not-allowed';
             this._elems.get('down').style.cursor = 'not-allowed';
             this._elems.get('input').style.cursor = 'not-allowed';
@@ -272,47 +354,40 @@ class InputNumber extends Input {
 
     /** Esta função reflete o valor do input no atributo */
     _refleteValor() {
-        // obtem o valor do input
-        const raw = this._elems.get('input').value.trim();
-        // se estiver vazio, 
-        if (raw === '') { 
-            this._elems.get('input').value = ''; // limpa o valor do componente
-            this.valor=''; // limpa o valor do atributo
-            this.dispatchEvent(new Event('change', { bubbles: true, composed: true }));
-            this.dispatchEvent(new Event('input', { bubbles: true, composed: true }));
-            return;
-        }
-        let num = Number(raw); // tenta converter para numero
-        if (Number.isNaN(num)) { // se não for numero
-            if (this.min !== null) { // se min estiver definido
-                this._elems.get('input').value = this.min;
-                this.valor=min;
-            } else {
-                this._elems.get('input').value = '';
-                this.valor='';
-            }
-        } else { // é número: aplicar min/max
-            if (this.min !== null && num < this.min) num = this.min;
-            if (this.max !== null && num > this.max) num = this.max;
-            this._elems.get('input').value = String(num);
-        }
-
-        // reflete atributo e dispara eventos
-        this.valor = this._elems.get('input').value;
-        this.dispatchEvent(new Event('input', { bubbles: true, composed: true }));
-        this.dispatchEvent(new Event('change', { bubbles: true, composed: true }));
+        this.valor = this._elems.get('input').value.trim();
+    }
+    _incrementaValor(incremento){
+        this._elems.get('input').value = Number(this._elems.get('input').value)+incremento;
     }
 
-    _step(dir) {
-        const step = Number(this._elems.get('input').step) || 1;
-        let val = Number(this._elems.get('input').value) || 0;
-        val = val + dir * step;
-        if (this.min !== null && val < this.min) val = this.min;
-        if (this.max !== null && val > this.max) val = this.max;
-        this._elems.get('input').value = String(val);
-        // reflete e dispara eventos
-        this.valor = this._elems.get('input').value;
-        this.dispatchEvent(new Event('input', { bubbles: true, composed: true }));
-        this.dispatchEvent(new Event('change', { bubbles: true, composed: true }));
+
+    // ****************************************************************************
+    // Métodos dos eventos do componente
+    // ****************************************************************************
+
+    // específicos de <algol-input-number>
+    addEventoCliqueSobe(callback){
+        const wrapperCallback = (e) => {
+            if (this.hasAttribute('disabled')) {
+                e.preventDefault();
+                return;
+            }
+            let origem = e.currentTarget
+            let valor = this.valor
+            callback(origem,valor);
+        };
+        this._elems.get('up').addEventListener('click', wrapperCallback);
+    }
+    addEventoCliqueDesce(callback){
+        const wrapperCallback = (e) => {
+            if (this.hasAttribute('disabled')) {
+                e.preventDefault();
+                return;
+            }
+            let origem = e.currentTarget
+            let valor = this.valor
+            callback(origem,valor);
+        };
+        this._elems.get('down').addEventListener('click', wrapperCallback);
     }
 }

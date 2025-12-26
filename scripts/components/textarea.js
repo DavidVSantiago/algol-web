@@ -1,243 +1,232 @@
-class TextArea extends HTMLElement {
+class TextArea extends AlgolComponent {
     // atributos observados
     static get observedAttributes() {
-        return ['value', 'placeholder', 'disabled', 'position', 'label',
-                'rows', 'maxlength', 'readonly', 'name', 'required', 'wrap', 'autofocus'];
+        return ['valor', 'placeholder', 'rotulo', 'disabled', 'posicao', ,
+                'linhas', 'maxcaracteres', 'apenasleitura', 'required', 'fixo'];
     }
 
     constructor() {
         super();
-        this._rootEl = null;    // container (.algol-component-group)
-        this._labelEl = null;   // <div.algol-label>
-        this._taEl = null;      // <textarea>
-
-        this._base_initialized = false;
-        this._connected = false;
-
-        const propsToUpgrade = this.constructor.observedAttributes || [];
-        propsToUpgrade.forEach(p => this._upgradeProperty(p));
     }
 
     // ****************************************************************************
     // Inicialização
     // ****************************************************************************
-    _upgradeProperty(prop) {
-        if (Object.prototype.hasOwnProperty.call(this, prop)) {
-            const value = this[prop];
-            delete this[prop];
-            this[prop] = value;
-        }
-    }
 
     _init() {
         if (this._base_initialized) return;
+        if (!this.hasAttribute('tabindex')) this.setAttribute('tabindex', '0'); // Torna o componente focável
 
-        // label (segue padrão atual do inputs.js usando <div> com classe)
-        const label = document.createElement('div');
-        label.className = 'algol-label';
-
+        // rotulo (segue padrão atual do inputs.js usando <div> com classe)
+        const rotulo = document.createElement('div');
+        rotulo.className = 'algol-rotulo';
+        rotulo.setAttribute('tabindex', '-1'); // para não receber foco
+        
         // textarea
         const ta = document.createElement('textarea');
         ta.className = 'algol-textarea';
-
+        ta.setAttribute('tabindex', '-1'); // para não receber foco
+        
         // garantir id único evitando
         if (!ta.id) {
             // inicializa o contador no próprio Input (classe base) se necessário
             if (typeof TextArea._uidCounter === 'undefined') TextArea._uidCounter = 0;
             ta.id = `algol-textarea-${++TextArea._uidCounter}`;
         }
-
+        
         // container
         const group = document.createElement('div');
         group.className = 'algol-component-group';
+        group.setAttribute('tabindex', '-1'); // para não receber foco
 
         // monta a árvore
-        group.appendChild(label);
+        group.appendChild(rotulo);
         group.appendChild(ta);
         this.appendChild(group);
 
-        // refs
-        this._rootEl = group;
-        this._labelEl = label;
-        this._taEl = ta;
+        // salva as refs globais
+        this._elems['root'] = group;
+        this._elems['rotulo'] = rotulo;
+        this._elems['textarea'] = ta;
 
         this._base_initialized = true;
     }
 
     _attachEvents() {
-        if (!this._taEl) return;
+        /* reflete o valor digitado no input no atributo valor do componente */
+        this._elems['textarea'].addEventListener('input', () => {
+            const val = this._elems['textarea'].value;
+            if (this.valor !== val) this.valor = val;
+            this.dispatchEvent(new Event('input', { bubbles: true, composed: true }));
+        });
+        this._elems['textarea'].addEventListener('change',() => {
+            const val = this._elems['textarea'].value;
+            if (this.valor !== val) this.valor = val;
+            this.dispatchEvent(new Event('change', { bubbles: true, composed: true }));
+        });
 
-        if (!this._onInput) {
-            this._onInput = () => {
-                const val = this._taEl.value;
-                if (this.getAttribute('value') !== val) this.setAttribute('value', val);
-                this.dispatchEvent(new Event('input', { bubbles: true, composed: true }));
-            };
-        }
-        if (!this._onChange) {
-            this._onChange = () => {
-                const val = this._taEl.value;
-                if (this.getAttribute('value') !== val) this.setAttribute('value', val);
-                this.dispatchEvent(new Event('change', { bubbles: true, composed: true }));
-            };
-        }
-
-        this._taEl.addEventListener('input', this._onInput);
-        this._taEl.addEventListener('change', this._onChange);
-    }
-
-    _detachEvents() {
-        if (!this._taEl) return;
-        if (this._onInput) {
-            this._taEl.removeEventListener('input', this._onInput);
-            this._onInput = null;
-        }
-        if (this._onChange) {
-            this._taEl.removeEventListener('change', this._onChange);
-            this._onChange = null;
-        }
+        // faz com que o enter no componente leve o foco para o input
+        this.addEventListener('keydown', (e) => {
+            if (this.hasAttribute('disabled')) return;
+            if (e.key === 'Enter') {
+                this._elems['textarea'].focus();
+                return;
+            }
+        });
     }
 
     // ****************************************************************************
-    // Atributos
+    // Métodos dos atributos
     // ****************************************************************************
-    _applyAttributes() {
-        if (!this._rootEl) return;
-        this._applyAttribute_label();
-        this._applyAttribute_placeholder();
-        this._applyAttribute_value();
-        this._applyAttribute_position();
-        this._applyAttribute_disabled();
 
-        // específicos de textarea
-        this._applyAttribute_rows();
-        this._applyAttribute_maxlength();
-        this._applyAttribute_readonly();
-        this._applyAttribute_name();
-        this._applyAttribute_required();
-        this._applyAttribute_wrap();
-        this._applyAttribute_autofocus();
-    }
-
-    _applyAttribute_label() {
-        const label = this.getAttribute('label');
-        if (label && label !== '') {
-            this._labelEl.textContent = label;
-            if (!this._labelEl.parentNode) this._rootEl.insertBefore(this._labelEl, this._taEl);
+    _applyAttribute_rotulo() {
+        const rotulo = this.getAttribute('rotulo');
+        if (rotulo && rotulo !== '') {
+            this._elems['rotulo'].textContent = rotulo;
+            if (!this._elems['rotulo'].parentNode) this._elems['root'].insertBefore(this._elems['rotulo'], this._elems['textarea']);
         } else {
-            if (this._labelEl.parentNode) this._rootEl.removeChild(this._labelEl);
+            if (this._elems['rotulo'].parentNode) this._elems['root'].removeChild(this._elems['rotulo']);
         }
     }
     _applyAttribute_placeholder() {
-        if (!this._taEl) return;
-        if (this.hasAttribute('placeholder')) this._taEl.placeholder = this.getAttribute('placeholder') ?? '';
-        else this._taEl.removeAttribute('placeholder');
+        if(this.hasAttribute('disabled'))return;
+        if (this.hasAttribute('placeholder')) this._elems['textarea'].placeholder = this.getAttribute('placeholder');
     }
-    _applyAttribute_value() {
-        if (!this._taEl) return;
-        if (this.hasAttribute('value')) this._taEl.value = this.getAttribute('value') ?? '';
+    _applyAttribute_valor() {
+        if (this.hasAttribute('valor')) this._elems['textarea'].value = this.valor;
     }
-    _applyAttribute_position() {
-        const positions = ['left', 'center', 'right', 'all'];
-        this.classList.remove(...positions.map(p => `algol-position-self-${p}`));
-        const pos = this.getAttribute('position');
-        if (positions.includes(pos)) this.classList.add(`algol-position-self-${pos}`);
+    _applyAttribute_posicao() {
+        const pos = this.getAttribute('posicao');       
+        if (!pos) return; // se não existe a propiedade 'posicao', abandona
+        const posValues = ['inicio','fim','centro','total']; // valores aceitos para 'posicao'
+        switch(pos){
+            case posValues[0]: this.style.justifySelf = 'start'; break;
+            case posValues[1]: this.style.justifySelf = 'end'; break;
+            case posValues[2]: this.style.justifySelf = 'center'; break;
+            case posValues[3]: this.style.justifySelf = 'stretch'; break;
+        }
     }
     _applyAttribute_disabled() {
-        if (!this._taEl) return;
-        this._taEl.disabled = this.hasAttribute('disabled');
-        if (this.hasAttribute('disabled')) {
-            this._taEl.style.cursor = 'not-allowed';
+        const isDisabled = this.hasAttribute('disabled');
+        this._elems['textarea'].disabled = isDisabled;
+        if (isDisabled) {
+            this._elems['textarea'].style.cursor = 'not-allowed';
         } else {
-            this._taEl.style.cursor = '';
+            this._elems['textarea'].style.cursor = '';
         }
-    }
-
-    // específicos
-    _applyAttribute_rows() {
-        if (!this._taEl) return;
-        if (this.hasAttribute('rows')) {
-            const v = parseInt(this.getAttribute('rows'), 10);
-            if (Number.isFinite(v) && v > 0) this._taEl.rows = v;
-        } else {
-            this._taEl.removeAttribute('rows');
-        }
-    }
-    _applyAttribute_maxlength() {
-        if (!this._taEl) return;
-        if (this.hasAttribute('maxlength')) {
-            const v = parseInt(this.getAttribute('maxlength'), 10);
-            if (Number.isFinite(v) && v >= 0) this._taEl.maxLength = v;
-        } else {
-            this._taEl.removeAttribute('maxlength');
-        }
-    }
-    _applyAttribute_readonly() {
-        if (!this._taEl) return;
-        this._taEl.readOnly = this.hasAttribute('readonly');
-    }
-    _applyAttribute_name() {
-        if (!this._taEl) return;
-        if (this.hasAttribute('name')) this._taEl.name = this.getAttribute('name') ?? '';
-        else this._taEl.removeAttribute('name');
     }
     _applyAttribute_required() {
-        if (!this._taEl) return;
-        this._taEl.required = this.hasAttribute('required');
+        this._elems['textarea'].required = this.hasAttribute('required');
     }
-    _applyAttribute_wrap() {
-        if (!this._taEl) return;
-        if (this.hasAttribute('wrap')) {
-            const v = this.getAttribute('wrap');
-            if (v === 'hard' || v === 'soft') this._taEl.wrap = v;
-        } else {
-            this._taEl.removeAttribute('wrap');
+
+    // específicos do textarea
+    _applyAttribute_linhas() {
+        if (!this._elems['textarea']) return;
+        if (this.hasAttribute('linhas')) {
+            const v = parseInt(this.linhas, 10);
+            if (Number.isFinite(v) && v > 0) this._elems['textarea'].rows = v;
         }
     }
-    _applyAttribute_autofocus() {
-        if (!this._taEl) return;
-        // refletimos o atributo; o foco real fica a cargo do navegador
-        if (this.hasAttribute('autofocus')) this._taEl.setAttribute('autofocus', '');
-        else this._taEl.removeAttribute('autofocus');
+    _applyAttribute_maxcaracteres() {
+        if (this.hasAttribute('maxcaracteres')) {
+            const v = parseInt(this.maxcaracteres, 10);
+            if (Number.isFinite(v) && v >= 0) this._elems['textarea'].maxLength = v;
+        }
+    }
+    _applyAttribute_apenasleitura() {
+        const apenasleitura =  this.hasAttribute('apenasleitura'); 
+        if (!apenasleitura) return;
+        this._elems['textarea'].readOnly = 'readonly';
+    }
+    _applyAttribute_fixo() {
+        const apenasleitura =  this.hasAttribute('fixo'); 
+        if (!apenasleitura) return;
+        this._elems['textarea'].style.resize = 'none';
     }
 
     // ****************************************************************************
-    // Ciclo de vida
+    // Métodos dos eventos do componente
     // ****************************************************************************
-    connectedCallback() {
-        if (this._connected) return;
-        this._init();
-        this._attachEvents();
-        this._applyAttributes();
-        this._connected = true;
-    }
 
-    disconnectedCallback() {
-        this._detachEvents();
-        this._connected = false;
+    // gerais
+    addEventoClique(callback){
+        const wrapperCallback = (e) => {
+            if (this.hasAttribute('disabled')) {
+                e.preventDefault();
+                return;
+            }
+            let origem = e.currentTarget
+            let mouseInfo = {
+                x: e.clientX,
+                y: e.clientY,
+                offsetX: e.offsetX,
+                offsetY: e.offsetY
+            }
+            callback(origem,mouseInfo);
+        };
+        this.addEventListener('click', wrapperCallback);
     }
-
-    attributeChangedCallback(name, oldV, newV) {
-        if (oldV === newV) return;
-        if (!this._connected) return;
-
-        switch (name) {
-            case 'label': this._applyAttribute_label(); break;
-            case 'placeholder': this._applyAttribute_placeholder(); break;
-            case 'value': this._applyAttribute_value(); break;
-            case 'position': this._applyAttribute_position(); break;
-            case 'disabled': this._applyAttribute_disabled(); break;
-            case 'rows': this._applyAttribute_rows(); break;
-            case 'maxlength': this._applyAttribute_maxlength(); break;
-            case 'readonly': this._applyAttribute_readonly(); break;
-            case 'name': this._applyAttribute_name(); break;
-            case 'required': this._applyAttribute_required(); break;
-            case 'wrap': this._applyAttribute_wrap(); break;
-            case 'autofocus': this._applyAttribute_autofocus(); break;
-        }
+    addEventoFoco(callback) {
+        const wrapperCallback = (e) => {
+            if (this.hasAttribute('disabled')) return;
+            let origem = e.currentTarget
+            callback(origem);
+        };
+        this.addEventListener('focus', wrapperCallback);
     }
+    addEventoBlur(callback) {
+        const wrapperCallback = (e) => {
+            if (this.hasAttribute('disabled')) return;
+            let origem = e.currentTarget
+            callback(origem);
+        };
+        this.addEventListener('blur', wrapperCallback);
+    }
+    addEventoMouseEntra(callback) {
+        const wrapperCallback = (e) => {
+            if (this.hasAttribute('disabled')) return;
+            let origem = e.currentTarget
+            callback(origem);
+        };
+        this.addEventListener('mouseenter', wrapperCallback);
+    }
+    addEventoMouseSai(callback) {
+        const wrapperCallback = (e) => {
+            if (this.hasAttribute('disabled')) return;
+            let origem = e.currentTarget
+            callback(origem);
+        };
+        this.addEventListener('mouseleave', wrapperCallback);
+    }
+    addEventoMouseSobre(callback) {
+        const wrapperCallback = (e) => {
+            if (this.hasAttribute('disabled')) return;
+            let origem = e.currentTarget
+            let mouseInfo = {
+                x: e.clientX,
+                y: e.clientY,
+                offsetX: e.offsetX,
+                offsetY: e.offsetY
+            }
+            callback(origem,mouseInfo);
+        };
+        this.addEventListener('mousemove', wrapperCallback);
+    }
+    addEventoMudaValor(callback){
+        const wrapperCallback = (e) => {
+            if (this.hasAttribute('disabled')) {
+                e.preventDefault();
+                return;
+            }
+            if(e.detail.attribute=='valor'){
+                let origem = e.currentTarget
+                let valor = this.valor;
+                callback(origem,valor);
+                return;
+            }
+        };
+        this.addEventListener('mudancaAtributo', wrapperCallback);
+    }
+    
+
 }
-
-// Opcional: registre o custom element aqui.
-// Caso você centralize os defines em outro arquivo, remova a linha abaixo.
-// 

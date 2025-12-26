@@ -9,10 +9,11 @@
     <script src="scripts/components/_base-component.js" defer></script>
     <script src="scripts/components/buttons.js" defer></script>
     <script src="scripts/components/inputs.js" defer></script>
-    <script src="scripts/components/layout.js" defer></script>
     <script src="scripts/components/textarea.js" defer></script>
     <script src="scripts/components/select.js" defer></script>
+    <script src="scripts/layouts/layout.js" defer></script>
     <script src="scripts/components.js" defer></script>
+    
     <script defer>
         // temporário. apenas para teste
         window.addEventListener('load', function (event) {
@@ -112,7 +113,7 @@
                     <div class="lay">
                         <algol-input-text posicao="inicio" placeholder="sd" rotulo="Input text Estilizado" disabled></algol-input-text>
                         <algol-input-email posicao="centro" rotulo="Input email Estilizado"></algol-input-email>
-                        <algol-input-password posicao="total" rotulo="Input password Estilizado"></algol-input-password>
+                        <algol-input-password posicao="total" required rotulo="Input password Estilizado"></algol-input-password>
                         <algol-input-number posicao="total" rotulo="Input number Estilizado" valor="35" min="20" max="60"></algol-input-number>
                         <algol-input-number rotulo="Disabled" min="10" max="30" disabled></algol-input-number>
                         <algol-textarea rotulo="Textarea padrão" placeholder="Digite aqui..." position="left" rows="10" name="Algol" wrap="hard"></algol-textarea>

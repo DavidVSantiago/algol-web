@@ -15,6 +15,8 @@ class AlgolComponent extends HTMLElement{
     // Métodos de inicialização
     // ****************************************************************************
     
+    // TODO - criar o mecanismo de notificar a inserção de atributos não aceitáveis (não observados). substituir todo o conteúdo por texto vermelho
+
     /** gera dinamicamente os métodos getters e setters para os atributos */
     _gerarAcessores() {
         this.constructor.observedAttributes.forEach(attr => {
@@ -76,5 +78,13 @@ class AlgolComponent extends HTMLElement{
         if (typeof this[nomeMetodo] === 'function') {
             this[nomeMetodo]();
         }
+        // lança um evento de mudança de atributo, para quem quiser escutar
+        this.dispatchEvent(new CustomEvent('mudancaAtributo', {
+            detail: {
+                attribute: name,
+                oldValue: oldV,
+                newValue: newV
+            },
+        }));
     }
 }

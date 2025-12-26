@@ -5,7 +5,7 @@ class Select extends HTMLElement {
 
     constructor() {
         super();
-        this._rootEl = null;        // .algol-component-group
+        this._rootEl = null;
         this._label = null;
         this._select = null;
 
