@@ -1,6 +1,6 @@
-class Input extends AlgolComponent {
+class Input extends BaseComponent {
     static get observedAttributes() {
-        return ['valor', 'placeholder', 'disabled', 'posicao', 'rotulo', 'required'];
+        return ['valor', 'placeholder', 'disabled', 'posicaoh', 'posicaov', 'rotulo', 'required'];
     }
     constructor() {
         super();
@@ -15,6 +15,8 @@ class Input extends AlgolComponent {
         if (this._base_initialized) return;
         if (!this.hasAttribute('tabindex')) this.setAttribute('tabindex', '0'); // Torna o componente focável
         
+        this.style.alignSelf = 'center';
+
         // cria <rotulo>
         const rotulo = document.createElement('div');
         rotulo.className = 'algol-rotulo';
@@ -25,7 +27,7 @@ class Input extends AlgolComponent {
         input.type = this._type;
         input.className = 'algol-input';
         input.setAttribute('tabindex', '-1'); // para não receber foco
-        input.id = `algol-input-${++AlgolComponent._idCont}`;
+        input.id = `algol-input-${++BaseComponent._idCont}`;
         
         // cria <div> para <rotulo> e o <input>
         const group = document.createElement('div');
@@ -89,15 +91,26 @@ class Input extends AlgolComponent {
     _applyAttribute_valor() {
         if (this.hasAttribute('valor')) this._elems.get('input').value = this.valor;
     }
-    _applyAttribute_posicao() {
-        const pos = this.getAttribute('posicao');       
-        if (!pos) return; // se não existe a propiedade 'posicao', abandona
-        const posValues = ['inicio','fim','centro','total']; // valores aceitos para 'posicao'
+    _applyAttribute_posicaoh() {
+        const pos = this.getAttribute('posicaoh');       
+        if (!pos) return; // se não existe a propiedade 'posicaoh', abandona
+        const posValues = ['inicio','fim','centro','total']; // valores aceitos para 'posicaoh'
         switch(pos){
             case posValues[0]: this.style.justifySelf = 'start'; break;
             case posValues[1]: this.style.justifySelf = 'end'; break;
             case posValues[2]: this.style.justifySelf = 'center'; break;
             case posValues[3]: this.style.justifySelf = 'stretch'; break;
+        }
+    }
+    _applyAttribute_posicaov() {
+        const pos = this.getAttribute('posicaov');       
+        if (!pos) return; // se não existe a propiedade 'posicaov', abandona
+        const posValues = ['inicio','fim','centro','total']; // valores aceitos para 'posicaov'
+        switch(pos){
+            case posValues[0]: this.style.alignSelf = 'start'; break;
+            case posValues[1]: this.style.alignSelf = 'end'; break;
+            case posValues[2]: this.style.alignSelf = 'center'; break;
+            case posValues[3]: this.style.alignSelf = 'center'; break;
         }
     }
     _applyAttribute_disabled() {
@@ -210,7 +223,7 @@ class InputPassword extends Input {
 }
 class InputNumber extends Input {
     static get observedAttributes() {
-        return ['valor', 'min', 'max', 'disabled', 'posicao', 'rotulo'];
+        return ['valor', 'min', 'max', 'disabled', 'posicaoh', 'posicaov', 'rotulo'];
     }
     constructor() {
         super();

@@ -15,7 +15,6 @@ class NomeComponente extends AlgolComponent {
         if (!this.hasAttribute('tabindex')) this.setAttribute('tabindex', '0'); // Torna o componente focável
         
         // TODO - inicializar aqui os elementos internos do componente
-
         this._base_initialized = true; // marca como inicializado
     }
 

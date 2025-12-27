@@ -1,7 +1,7 @@
-class TextArea extends AlgolComponent {
+class TextArea extends BaseComponent {
     // atributos observados
     static get observedAttributes() {
-        return ['valor', 'placeholder', 'rotulo', 'disabled', 'posicao', ,
+        return ['valor', 'placeholder', 'rotulo', 'disabled', 'posicaoh', 'posicaov',
                 'linhas', 'maxcaracteres', 'apenasleitura', 'required', 'fixo'];
     }
 
@@ -17,6 +17,8 @@ class TextArea extends AlgolComponent {
         if (this._base_initialized) return;
         if (!this.hasAttribute('tabindex')) this.setAttribute('tabindex', '0'); // Torna o componente focável
 
+        this.style.alignSelf = 'center';
+        
         // rotulo (segue padrão atual do inputs.js usando <div> com classe)
         const rotulo = document.createElement('div');
         rotulo.className = 'algol-rotulo';
@@ -95,15 +97,26 @@ class TextArea extends AlgolComponent {
     _applyAttribute_valor() {
         if (this.hasAttribute('valor')) this._elems['textarea'].value = this.valor;
     }
-    _applyAttribute_posicao() {
-        const pos = this.getAttribute('posicao');       
-        if (!pos) return; // se não existe a propiedade 'posicao', abandona
-        const posValues = ['inicio','fim','centro','total']; // valores aceitos para 'posicao'
+    _applyAttribute_posicaoh() {
+        const pos = this.getAttribute('posicaoh');       
+        if (!pos) return; // se não existe a propiedade 'posicaoh', abandona
+        const posValues = ['inicio','fim','centro','total']; // valores aceitos para 'posicaoh'
         switch(pos){
             case posValues[0]: this.style.justifySelf = 'start'; break;
             case posValues[1]: this.style.justifySelf = 'end'; break;
             case posValues[2]: this.style.justifySelf = 'center'; break;
             case posValues[3]: this.style.justifySelf = 'stretch'; break;
+        }
+    }
+    _applyAttribute_posicaov() {
+        const pos = this.getAttribute('posicaov');       
+        if (!pos) return; // se não existe a propiedade 'posicaov', abandona
+        const posValues = ['inicio','fim','centro','total']; // valores aceitos para 'posicaov'
+        switch(pos){
+            case posValues[0]: this.style.alignSelf = 'start'; break;
+            case posValues[1]: this.style.alignSelf = 'end'; break;
+            case posValues[2]: this.style.alignSelf = 'center'; break;
+            case posValues[3]: this.style.alignSelf = 'center'; break;
         }
     }
     _applyAttribute_disabled() {

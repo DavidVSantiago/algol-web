@@ -1,7 +1,6 @@
-class BtnBase extends AlgolComponent {
+class BtnBase extends BaseComponent {
     static get observedAttributes() {
-        return ['valor','tamanho','posicao','disabled'];
-        // TODO - mudar posicao para posicaoH, e criar posicaoV, para todos os componentes
+        return ['valor','tamanho','posicaoh','posicaov','disabled'];
     }
     constructor() {
         super();
@@ -17,11 +16,14 @@ class BtnBase extends AlgolComponent {
         if (this._base_initialized) return;
         if (!this.hasAttribute('tabindex')) this.setAttribute('tabindex', '0'); // Torna o componente focável
         
+        this.style.alignSelf = 'center';
+        this.style.display = 'grid'
+
         // Cria o <button>
         const btn = document.createElement('button');
         btn.setAttribute('tabindex', '-1'); // para não receber foco
         btn.className = `algol-btn ${this._variantClass}`; // define a classe base + a variante (definida da classe derivada)
-        btn.id = `algol-btn-${++AlgolComponent._idCont}`; // define o id unico
+        btn.id = `algol-btn-${++BaseComponent._idCont}`; // define o id unico
         
         // Evita seleção de texto no botão (e no host), com fallbacks
         btn.style.cssText += '-webkit-user-select:none; -ms-user-select:none; user-select:none; -webkit-touch-callout:none;';
@@ -77,21 +79,32 @@ class BtnBase extends AlgolComponent {
         // reaplica-as condicionalmente
         const tamValue = this.getAttribute('tamanho');
         if (!tamValue) return; // se não existe a propiedade 'tamanho', abandona
-        const tamanho = ['pequeno','grande']; // valores aceitos para 'posicao'
+        const tamanho = ['pequeno','grande']; // valores aceitos para 'tamanho'
         switch(tamValue){
             case tamanho[0]: btn.classList.add('algol-btn-small'); break;
             case tamanho[1]: btn.classList.add('algol-btn-big'); break;
         }
     }
-    _applyAttribute_posicao() {
-        const pos = this.getAttribute('posicao');       
-        if (!pos) return; // se não existe a propiedade 'posicao', abandona
-        const posValues = ['inicio','fim','centro','total']; // valores aceitos para 'posicao'
+    _applyAttribute_posicaoh() {
+        const pos = this.getAttribute('posicaoh');       
+        if (!pos) return; // se não existe a propiedade 'posicaoh', abandona
+        const posValues = ['inicio','fim','centro','total']; // valores aceitos para 'posicaoh'
         switch(pos){
             case posValues[0]: this.style.justifySelf = 'start'; break;
             case posValues[1]: this.style.justifySelf = 'end'; break;
             case posValues[2]: this.style.justifySelf = 'center'; break;
             case posValues[3]: this.style.justifySelf = 'stretch'; break;
+        }
+    }
+    _applyAttribute_posicaov() {
+        const pos = this.getAttribute('posicaov');       
+        if (!pos) return; // se não existe a propiedade 'posicaov', abandona
+        const posValues = ['inicio','fim','centro','total']; // valores aceitos para 'posicaov'
+        switch(pos){
+            case posValues[0]: this.style.alignSelf = 'start'; break;
+            case posValues[1]: this.style.alignSelf = 'end'; break;
+            case posValues[2]: this.style.alignSelf = 'center'; break;
+            case posValues[3]: this.style.alignSelf = 'stretch'; break;
         }
     }
     _applyAttribute_disabled() {

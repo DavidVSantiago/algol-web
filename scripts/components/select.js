@@ -8,25 +8,17 @@ class Select extends HTMLElement {
         this._rootEl = null;
         this._label = null;
         this._select = null;
-
-        const propsToUpgrade = this.constructor.observedAttributes || [];
-        propsToUpgrade.forEach(p => this._upgradeProperty(p));
     }
 
     // ****************************************************************************
     // Inicialização
     // ****************************************************************************
 
-    _upgradeProperty(prop) {
-        if (Object.prototype.hasOwnProperty.call(this, prop)) {
-            const value = this[prop];
-            delete this[prop];
-            this[prop] = value;
-        }
-    }
-
     _init() {
         if (this._base_initialized) return; // guard para evitar dupla criação
+        if (!this.hasAttribute('tabindex')) this.setAttribute('tabindex', '0'); // Torna o componente focável
+
+        this.style.alignSelf = 'center';
 
         // container raiz
         const group = document.createElement('div');
