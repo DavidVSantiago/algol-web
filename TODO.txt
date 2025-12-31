@@ -1,5 +1,5 @@
-Todos os componentes devem ser implementados. A API não deve aceitar nenhuma tag HTML que não seja um componente
-Generalizar a classe layout
+Alterar o componente grid-layout para não mais tratar o grid-item. O grid item tem seu próprio componente
+
 Criar os componentes:
    - AlgolTitle (para as variações h1,h2,h3,h4,h5,h6)
    - AlgolImage (com todas as características de responsividade)

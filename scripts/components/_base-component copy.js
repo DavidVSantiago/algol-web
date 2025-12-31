@@ -1,47 +1,25 @@
-class BaseLayout extends HTMLElement {
-    static get observedAttributes() {return [];}
+class BaseComponent extends HTMLElement{
+    
+    static _idCont = 0 // contador para os ids únicos dos elementos internos do componente
+    static get observedAttributes() { return []; } // atributos observados serão definidos nas classes filhas
 
     constructor() {
         super();
-
-        this._ERRO = false;
-        this._observer = null; // MutationObserver para monitorar mudanças nos filhos
-        this._gerarAcessores(); // gera os acessores para os atributos observados
         
-        this._base_initialized = false;
-        this._connected = false;
+        this._elems = new Map(); // mapa dos elementos internos do componente
+        this._gerarAcessores();
+        this._InnerHtmlErro; // código de erro a ser exibido quando houver erro no conteúdo do componente
+        this._ERRO = false; // indica se o componente está em estado de erro
+
+        this._base_initialized = false; // para saber se o componente foi inicializado
+        this._connected = false; // para saber se o componente foi montado
     }
 
-    
     // ****************************************************************************
     // Métodos de inicialização
     // ****************************************************************************
     
-    _init(){ // @abstract
-        throw new Error("O método '_init()' deve ser implementado na classe filha.");
-    }
-    
-    _verificaFilhos(filhos){ // @abstract
-        throw new Error("O método '_verificaFilhos()' deve ser implementado na classe filha.");
-    }
-    
-    // _attachEvents(){ // @abstract
-    //     throw new Error("O método '_attachEvents()' deve ser implementado na classe filha.");
-    // }
-
-    _initObserver() {
-        this._observer = new MutationObserver((mutations) => {
-            mutations.forEach((mutation) => { // itera sobre as mutações observadas
-                if (mutation.type === 'childList') { // verifica se houve adição, remoção ou alteração de filhos
-                    console.log('Mutação!');
-                    
-                    this._verificaFilhos(Array.from(this.children));
-                }
-            });
-        });
-        
-        this._observer.observe(this, { childList: true });
-    }
+    // TODO - criar o mecanismo de notificar a inserção de atributos não aceitáveis (não observados). substituir todo o conteúdo por texto vermelho
 
     /** gera dinamicamente os métodos getters e setters para os atributos */
     _gerarAcessores() {
@@ -57,10 +35,13 @@ class BaseLayout extends HTMLElement {
         });
     }
 
-    // ****************************************************************************
-    // Aplicação de Atributos
-    // ****************************************************************************
-    
+    _init(){ // @abstract
+        throw new Error("O método '_init()' deve ser implementado na classe filha.");
+    }
+    _attachEvents(){ // @abstract
+        throw new Error("O método '_attachEvents()' deve ser implementado na classe filha.");
+    }
+
     // Aplica os atributos do componente
     _applyAttributes() {
         // invoca as funções '_applyAttribute_...' para cada atributo'
@@ -76,31 +57,33 @@ class BaseLayout extends HTMLElement {
     }
 
     // ****************************************************************************
-    // Ciclo de Vida
+    // Callbacks do ciclo de vida dos webcomponents
     // ****************************************************************************
-    
-    connectedCallback() {
-        if (this._connected) return;
 
+    /** invocado automaticamente quando o componente é inserido no DOM ou movido para outro local. */
+    connectedCallback() {
+        if (this._connected) return; // guard
+        
         // validação de erros. se houver erros, sinalizará ao componente
         this._validarAtributos();
         
-        if(this._ERRO) return; // se houver erro sinalizado, substitui o conteúdo do componente por uma mensagem de erro
-
-        this._init();
-        this._verificaFilhos(Array.from(this.children));
-        this._applyAttributes();
-        this._connected = true;
-    }
-
-    disconnectedCallback() {
-        if (this._observer) this._observer.disconnect();
-        this._connected = false;
-    }
-
-     /** invocado automaticamente quando muda o valor de algum atributo observado ('observedAttributes'). */
-    attributeChangedCallback(name, oldV, newV) {
+        if(this._ERRO){ // se houver erro sinalizado, substitui o conteúdo do componente por uma mensagem de erro
+            this._imprimeErro();
+            return;
+        }
         
+        this.innerHTML=''; // limpa o compoennte do zero
+        this._init(); // *abstract* implementado na classe filha
+        this._attachEvents(); // *abstract* implementado na classe filha
+        this._applyAttributes(); // aplica atributos
+        
+        this._connected = true; // marca como motado
+    }
+
+    /** invocado automaticamente quando muda o valor de algum atributo observado ('observedAttributes'). */
+    attributeChangedCallback(name, oldV, newV) {
+        if(this._ERRO) return; // não responde se em estado de erro!
+
         // 1. Só age se o valor realmente mudou e se o componente já foi montado
         if (oldV === newV || !this._connected) return;
 
@@ -154,14 +137,14 @@ class BaseLayout extends HTMLElement {
 
         if (invalidos.length > 0) {
             // altera o código de erro
-            this.innerHTML = this._montaMsgErroAtributo(invalidos,globaisPermitidos);
+            this._InnerHtmlErro = this._montaMsgErro(invalidos,globaisPermitidos);
             // sinaliza ao compoente
             this._ERRO = true;
         }
     }
 
     /** Exibe o erro visualmente (substitui o conteúdo por texto vermelho) */
-    _montaMsgErroAtributo(listaInvalidos,listaGlobaisPermitidos) {
+    _montaMsgErro(listaInvalidos,listaGlobaisPermitidos) {
         return `
         <div style="display:block; border:calc(0.5vw * var(--fator-escala)) dashed red; background-color:#fff0f0; padding:calc(1vw * var(--fator-escala)); color:red; fontFamily:'monospace';">
             <h3 style="margin: 0 0 calc(0.5vw * var(--fator-escala)) 0;">🚫 Erro de Atributo: &lt;${this.tagName.toLowerCase()}&gt;</h3>
@@ -176,5 +159,9 @@ class BaseLayout extends HTMLElement {
                 Outros atributos também aceitos: <em>[${listaGlobaisPermitidos.join(', ')}]</em>
             </p>
         </div>`;
+    }
+
+    _imprimeErro(){
+        this.innerHTML = this._InnerHtmlErro;
     }
 }

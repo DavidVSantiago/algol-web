@@ -1,6 +1,6 @@
 class BtnBase extends BaseComponent {
     static get observedAttributes() {
-        return ['tamanho','posicaoh','posicaov','disabled'];
+        return ['valor','tamanho','posicaoh','posicaov','disabled'];
     }
     constructor() {
         super();
@@ -31,7 +31,6 @@ class BtnBase extends BaseComponent {
         btn.onselectstart = () => false;  
         btn.style.width = '100%';
         btn.style.justifyContent = 'center';
-        btn.innerHTML = this._textoInterno;
 
         this._elems.set('button',btn); // salva uma referência global do botão
 
@@ -70,6 +69,9 @@ class BtnBase extends BaseComponent {
     // Métodos dos atributos
     // ****************************************************************************
     
+    _applyAttribute_valor() {
+        this._elems.get('button').innerHTML = this.getAttribute('valor'); // aplica o valor do atributo 'valor' ao botão
+    }
     _applyAttribute_tamanho() {
         const btn = this._elems.get('button'); // obtem o botão
         btn.classList.remove('algol-btn-small', 'algol-btn-big');// remove as classes responsáveis pelo tamanho

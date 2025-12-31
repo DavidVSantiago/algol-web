@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="algol-styles.css">
+    <script src="scripts/components/_base-component.js" defer></script>
+    <script src="scripts/components/buttons.js" defer></script>
+     <script src="scripts/components.js" defer></script>
+
+    <script defer>
+        // temporário. apenas para teste
+        window.addEventListener('load', function (event) {
+            let fatorAtual = 1.0;
+            const PASSO = 0.1;
+            const MINIMO = 0.5;
+            const MAXIMO = 3.0;
+
+            function atualizarCSS() {
+            // Aplica o valor arredondado à variável global CSS
+                document.documentElement.style.setProperty('--fator-escala', fatorAtual.toFixed(1));
+            }
+
+            window.addEventListener('keydown', (e) => {
+                // Detecta as teclas + (ou =) e - (ou _)
+                if (e.key === '+' || e.key === '=') {
+                    if (fatorAtual < MAXIMO) {
+                    fatorAtual += PASSO;
+                    atualizarCSS();
+                    }
+                } 
+                else if (e.key === '-' || e.key === '_') {
+                    if (fatorAtual > MINIMO) {
+                    fatorAtual -= PASSO;
+                    atualizarCSS();
+                    }
+                }
+            });
+        })
+    </script>
+</head>
+
+<body>
+    <div id="app-container">
+        <div class="caixa-teste">
+            Pressione as teclas + ou - para ajustar o zoom
+        </div>
+        <header>
+            <h1>Catálogo de Componentes</h1>
+        </header>
+        <nav>
+            <h2>Navegação</h2>
+        </nav>
+
+        <main>
+            <p>Use esta página para testar e estilizar os componentes do seu framework CSS.</p>
+            <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Doloremque deserunt recusandae iusto facilis
+                iste
+                nemo libero magnam quo? Temporibus ut earum cum voluptatem natus corporis dolores numquam perspiciatis,
+                ea
+                cumque! Lorem ipsum dolor sit amet consectetur adipisicing elit. Quasi nemo eum illo iusto quaerat,
+                eligendi
+                vero id aperiam debitis sapiente, ea quis nostrum nihil et ut vitae amet inventore temporibus.</p>
+
+            <algol-btn-primary id="btn" id="sa" posicaoh="" posicaov="">TOME</algol-btn-primary>
+            <div id="teste">teste</div>
+            
+            <script defer>
+                // temporário. apenas para teste
+                window.addEventListener('load', function (event) {
+                    let comp = document.getElementById('btn');
+                    // comp.addEventoClique((origem,mouseInfo)=>console.log(origem,mouseInfo));
+                    // comp.addEventoFoco((origem)=>console.log(origem));
+                    // comp.addEventoBlur((origem)=>console.log(origem));
+                    // comp.addEventoMouseEntra((origem)=>console.log(origem));
+                    // comp.addEventoMouseSai((origem)=>console.log(origem));
+                    // comp.addEventoMouseSobre((origem,mouseInfo)=>console.log(origem,mouseInfo));
+                    // comp.addEventoCliqueSobe((origem,mouseInfo)=>console.log(origem,mouseInfo));
+                    // comp.addEventoCliqueDesce((origem,mouseInfo)=>console.log(origem,mouseInfo));
+                    // comp.addEventoMudaValor((origem,mouseInfo)=>console.log(origem,mouseInfo));
+                });
+            </script>
+
+        </main>
+    </div>
+</body>
+
+</html>
