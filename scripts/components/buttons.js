@@ -25,17 +25,18 @@ class BtnBase extends BaseComponent {
         btn.id = `algol-btn-${++BaseComponent._idCont}`; // define o id unico
         
         // Evita seleção de texto no botão (e no host), com fallbacks
-        btn.style.cssText += '-webkit-user-select:none; -ms-user-select:none; user-select:none; -webkit-touch-callout:none;';
-        this.style.cssText += '-webkit-user-select:none; -ms-user-select:none; user-select:none;';
+        btn.style.cssText = '-webkit-user-select:none; -ms-user-select:none; user-select:none; -webkit-touch-callout:none;';
+        this.style.cssText = '-webkit-user-select:none; -ms-user-select:none; user-select:none;';
         btn.setAttribute('unselectable', 'on');            // IE <= 10
         btn.onselectstart = () => false;  
         btn.style.width = '100%';
         btn.style.justifyContent = 'center';
         btn.innerHTML = this._textoInterno;
 
+        this.appendChild(btn); // adiciona o botão ao componente
+
         this._elems.set('button',btn); // salva uma referência global do botão
 
-        this.appendChild(btn); // adiciona o botão ao componente
         this._base_initialized = true; // marca como inicializado
     }
 

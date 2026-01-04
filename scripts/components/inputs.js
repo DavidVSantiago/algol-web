@@ -6,7 +6,28 @@ class Input extends BaseComponent {
         super();
         this._type = 'text';
     }
-    
+
+    // sobrescreve o observador de mudanças
+    _mutationObserver (mutations) {
+        // Flag para evitar rebuilds desnecessários se a mudança não for relevante
+        let mudancaRelevante = false;
+        for (const mutation of mutations) { // percorre todas as mutações
+
+            if (mutation.type === 'childList') { // Mudança na estrutura do DOM (elementos adicionados/removidos)
+                mudancaRelevante = true; break;
+            } else if (mutation.type === 'attributes') { // Mudança de atributos
+                if (mutation.attributeName === 'valor'){ // se a mudança foi no atributo valor... 
+                    this.dispatchEvent(new CustomEvent('mudancaValor', {bubbles: false}));
+                    this._applyAttribute_valor(); // não deve reconstruir, apenas atualizar o valor
+                }else {mudancaRelevante = true; break;}
+            } else if (mutation.type === 'characterData') { // Mudança de texto]
+                
+                mudancaRelevante = true; break;
+            }
+        }
+        if(mudancaRelevante) { console.log('reconstruindo...'); this.reconstroi();}
+    }
+
     // ****************************************************************************
     // Métodos de inicialização
     // ****************************************************************************
@@ -14,25 +35,23 @@ class Input extends BaseComponent {
     _init() {
         if (this._base_initialized) return;
         if (!this.hasAttribute('tabindex')) this.setAttribute('tabindex', '0'); // Torna o componente focável
-        
-        this.style.alignSelf = 'center';
 
         // cria <rotulo>
         const rotulo = document.createElement('div');
-        rotulo.className = 'algol-rotulo';
         rotulo.setAttribute('tabindex', '-1'); // para não receber foco
+        rotulo.className = 'algol-rotulo';
         
         // cria <input>
         const input = document.createElement('input');
+        input.setAttribute('tabindex', '-1'); // para não receber foco
         input.type = this._type;
         input.className = 'algol-input';
-        input.setAttribute('tabindex', '-1'); // para não receber foco
         input.id = `algol-input-${++BaseComponent._idCont}`;
         
         // cria <div> para <rotulo> e o <input>
         const group = document.createElement('div');
-        group.className = 'algol-component-group';
         group.setAttribute('tabindex', '-1'); // para não receber foco
+        group.className = 'algol-component-group';
 
         // monta a árvore: group -> rotulo + input
         group.appendChild(rotulo);
@@ -201,14 +220,13 @@ class Input extends BaseComponent {
                 e.preventDefault();
                 return;
             }
-            if(e.detail.attribute=='valor'){
-                let origem = e.currentTarget
-                let valor = this.valor;
-                callback(origem,valor);
-                return;
-            }
+            let origem = e.currentTarget
+            let valor = this.valor;
+            callback(origem,valor);
+            return;
+            
         };
-        this.addEventListener('mudancaAtributo', wrapperCallback);
+        this.addEventListener('mudancaValor', wrapperCallback);
     }
 }
 
@@ -223,11 +241,10 @@ class InputPassword extends Input {
 }
 class InputNumber extends Input {
     static get observedAttributes() {
-        return ['valor', 'min', 'max', 'disabled', 'posicaoh', 'posicaov', 'rotulo'];
+        return ['valor', 'min', 'max', 'disabled', 'posicaoh', 'posicaov', 'rotulo', 'required'];
     }
     constructor() {
         super();
-        this._initialized = false; // para saber se o componente foi inicializado
     }
 
     // ****************************************************************************
@@ -236,7 +253,7 @@ class InputNumber extends Input {
 
     // cria estrutura específica para number (com botões up/down)
     _init() {
-        if (this._initialized) return;
+        if (this._base_initialized) return;
         super._init();
 
         // container para agrupar o input e o spinner
@@ -277,7 +294,7 @@ class InputNumber extends Input {
         this._elems.set('up',up);
         this._elems.set('down',down);
 
-        this._initialized = true;
+        this._base_initialized = true;
     }
 
     _attachEvents() {
@@ -292,7 +309,7 @@ class InputNumber extends Input {
             this._incrementaValor(-1);
             this._refleteValor();
         });
-        // eventos ...
+        // eventos 
         this._elems.get('input').addEventListener('blur', (e) => {
             if (this.hasAttribute('disabled')) return;
             this._refleteValor();
@@ -307,7 +324,7 @@ class InputNumber extends Input {
             if (this.hasAttribute('disabled')) return;
             if (e.key === 'ArrowUp') {this._incrementaValor(1); this._refleteValor();}
             if (e.key === 'ArrowDown') {this._incrementaValor(-1); this._refleteValor();}
-            if (e.key === 'Enter') {
+            if (e.key === 'Enter') { // para fazer o enter focar o input
                 this._elems.get('input').focus();
                 return;
             }
@@ -360,6 +377,9 @@ class InputNumber extends Input {
     _applyAttribute_max() {
         if (this.hasAttribute('max')) this._elems.get('input').max = this.max;
     }
+    _applyAttribute_required() {
+        this._elems.get('input').required = this.hasAttribute('required');
+    }
 
     // ****************************************************************************
     // Métodos auxiliares
@@ -402,5 +422,16 @@ class InputNumber extends Input {
             callback(origem,valor);
         };
         this._elems.get('down').addEventListener('click', wrapperCallback);
+    }
+
+    // ****************************************************************************
+    // Mensagens de Erro
+    // ****************************************************************************
+    
+    _montaMsgErroTextoInterno() {
+       return `
+        <div style="display:block; border:calc(0.5vw * var(--fator-escala)) dashed red; background-color:#fff0f0; padding:calc(1vw * var(--fator-escala)); color:red; fontFamily:'monospace';">
+            <h3 style="margin: 0 0 calc(0.5vw * var(--fator-escala)) 0;">🚫 Erro de Conteúdo: &lt;${this.tagName.toLowerCase()}&gt;</h3>
+        </div>`;
     }
 }

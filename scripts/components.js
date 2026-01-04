@@ -17,8 +17,7 @@ customElements.define('algol-grid-layout', GridLayout);
 customElements.define('algol-grid-item', GridItem);
 
 
-/**  */
-
+/** evita rolar a tela com os direcionais */
 window.addEventListener('keydown', function(event) {
     if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
         event.preventDefault();
@@ -26,25 +25,17 @@ window.addEventListener('keydown', function(event) {
 });
 
 
-/**  */
-var _lang = 'pt-BR';
-var _dict = {};
-
-async function load(lang) {
-    if (this._lang === lang && Object.keys(this._dict).length) return;
-
-    this._lang = lang;
-    const res = await fetch(`/i18n/${lang}.json`);
-    this._dict = await res.json();
+// injeta as variáveis globais
+for (const chave in GLOBAL) {
+    document.documentElement.style.setProperty(`--${chave}`, GLOBAL[chave]);
 }
-
-function t(path, params = {}) {
-    let text = path.split('.').reduce((o, k) => o?.[k], this._dict);
-    if (!text) return `⚠️ ${path}`;
-
-    Object.entries(params).forEach(([k, v]) => {
-        text = text.replaceAll(`{${k}}`, v);
-    });
-
-    return text;
-}
+// injeta a fonte global
+const style = document.createElement('style');
+style.textContent =
+`@font-face {
+    font-family: "Algol Font";
+    font-weight: normal;
+    font-style: normal;
+    src: url("${fontBase64}") format("woff");
+}`;
+document.head.appendChild(style);

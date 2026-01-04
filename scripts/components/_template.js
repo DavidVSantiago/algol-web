@@ -1,36 +1,72 @@
-class NomeComponente extends AlgolComponent {
+class NomeComponenete extends BaseComponent {
     static get observedAttributes() {
-        return []; // TODO - retornar os atributos aceitos pelo componente
+        return []; // passar lista de atributos observados
     }
-    constructor() {
-        super();
+
+    constructor() {super();}
+
+    // ****************************************************************************
+    // Métodos de construção do componente
+    // ****************************************************************************
+
+    /** @override */
+    init() {
+        if (this.base_initialized) return; // guard para evitar dupla criação
+        if (!this.hasAttribute('tabindex')) this.setAttribute('tabindex', '0'); // Torna o componente focável
+
+        // implementar a criação do componente aqui
+
+        this.base_initialized = true;
+    }
+    /** @override */
+    attachEvents() {
+        // eventos    
+    }
+
+    // ****************************************************************************
+    // Métodos de atualização
+    // ****************************************************************************
+   
+    // área para possível sobrescrita do método 'reconstroi'
+
+    // ****************************************************************************
+    // Ciclo de Vida de alterações do componente
+    // ****************************************************************************
+
+    /** @override */
+    mudaFilhosCallback() {
+        // decidir o que fazer quando o conteúdo interno do componente for alterado
+    }
+    /** @override */
+    mudaTextoCallback() {
+        // decidir o que fazer quando o texto interno do componente for alterado
+    }
+    /** @override */
+    mudaAtributosCallback(nomeAtributo, valorAntigo) {
+        // decidir o que fazer quando algum atributo for alterado
     }
     
     // ****************************************************************************
-    // Métodos de inicialização
+    // Utils
     // ****************************************************************************
-       
-    _init() {
-        if (this._base_initialized) return;
-        if (!this.hasAttribute('tabindex')) this.setAttribute('tabindex', '0'); // Torna o componente focável
-        
-        // TODO - inicializar aqui os elementos internos do componente
-        this._base_initialized = true; // marca como inicializado
-    }
 
-    _attachEvents() {
-        // TODO - faça os ajustes dos eventos dos elementos internos do componente
-    }
+    // área para métodos utilitários do componente
 
     // ****************************************************************************
     // Métodos dos atributos
     // ****************************************************************************
+
+    // implementar um método 'aplicaAtributo_...' para cada atributo observado
+
+    // ****************************************************************************
+    // Métodos dos eventos espcíficos deste componente
+    // ****************************************************************************
+
+    // implementar os métodos para adicionar eventos específicos deste componente
+
+    // ****************************************************************************
+    // Mensagens de Erro
+    // ****************************************************************************
     
-    // TODO - crie cada um dos métodos _applyAttribute_[...], um para cada atributo
-
-    // ****************************************************************************
-    // Métodos dos eventos do componente
-    // ****************************************************************************
-
-    // TODO - crie cada um dos métodos de eventos do componente
+    // implementar os métodos que montam as mensagens de erro para conteúdo inválido
 }

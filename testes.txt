@@ -1,0 +1,19 @@
+// mudar o texto interno do botão
+// espera-se que o texto interno do botão mude
+
+
+// inserir um elemento dentro de um componente
+// espera-se que o componente suma, pois não é permitido a inserção de nada dentro do componente
+document.querySelector('#comp').appendChild(document.querySelector('#div'));
+
+// mudança de atributos: valores
+document.querySelector('#comp').disabled = true; 
+document.querySelector('#comp').posicaoh = 'fim';
+document.querySelector('#comp').posicaov = 'inicio';
+document.querySelector('#comp').tamanho = 'grande';
+
+// mudança de atributos: remoção
+document.querySelector('#comp').removeAttribute("disabled");
+document.querySelector('#comp').removeAttribute("posicaov");
+document.querySelector('#comp').removeAttribute("tamanho");
+

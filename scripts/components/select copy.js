@@ -1,15 +1,13 @@
-class TextArea extends BaseComponent {
-    // atributos observados
+class Select extends BaseComponent {
     static get observedAttributes() {
-        return ['valor', 'placeholder', 'rotulo', 'disabled', 'posicaoh', 'posicaov',
-                'linhas', 'maxcaracteres', 'apenasleitura', 'required', 'fixo'];
+        return ['rotulo', 'valor', 'required', 'disabled','posicaoh', 'posicaov'];
     }
 
     constructor() {
         super();
     }
 
-    // sobrescreve o observador de mudanças
+    // observador de mudanças
     _mutationObserver (mutations) {
         // Flag para evitar rebuilds desnecessários se a mudança não for relevante
         let mudancaRelevante = false;
@@ -18,84 +16,100 @@ class TextArea extends BaseComponent {
             if (mutation.type === 'childList') { // Mudança na estrutura do DOM (elementos adicionados/removidos)
                 mudancaRelevante = true; break;
             } else if (mutation.type === 'attributes') { // Mudança de atributos
-                if (mutation.attributeName === 'style') break; // se a mudança foi no atributo valor... 
-                if (mutation.attributeName === 'valor'){ // se a mudança foi no atributo valor... 
+                if (mutation.attributeName === 'valor'){ // se a mudança foi no atributo valor...
                     this.dispatchEvent(new CustomEvent('mudancaValor', {bubbles: false}));
                     this._applyAttribute_valor(); // não deve reconstruir, apenas atualizar o valor
                 }else {mudancaRelevante = true; break;}
             } else if (mutation.type === 'characterData') { // Mudança de texto
+                
                 mudancaRelevante = true; break;
             }
         }
-        if(mudancaRelevante) { console.log('reconstruindo...'); this.reconstroi();}
+        if(mudancaRelevante) {
+            this.reaplicaAtributos();
+        }
     }
 
     // ****************************************************************************
-    // Inicialização
+    // Métodos de inicialização
     // ****************************************************************************
 
+     /** Faz a construção interna do componente */
     _init() {
-        if (this._base_initialized) return;
+        if (this._base_initialized) return; // guard para evitar dupla criação
         if (!this.hasAttribute('tabindex')) this.setAttribute('tabindex', '0'); // Torna o componente focável
 
         this.style.alignSelf = 'center';
-        
-        // rotulo (segue padrão atual do inputs.js usando <div> com classe)
-        const rotulo = document.createElement('div');
-        rotulo.className = 'algol-rotulo';
-        rotulo.setAttribute('tabindex', '-1'); // para não receber foco
-        
-        // textarea
-        const ta = document.createElement('textarea');
-        ta.className = 'algol-textarea';
-        ta.setAttribute('tabindex', '-1'); // para não receber foco
-        
-        // garantir id único evitando
-        if (!ta.id) {
-            // inicializa o contador no próprio Input (classe base) se necessário
-            if (typeof TextArea._uidCounter === 'undefined') TextArea._uidCounter = 0;
-            ta.id = `algol-textarea-${++TextArea._uidCounter}`;
-        }
-        
-        // container
+
+        // container raiz
         const group = document.createElement('div');
         group.className = 'algol-component-group';
-        group.setAttribute('tabindex', '-1'); // para não receber foco
 
-        // monta a árvore
-        group.appendChild(rotulo);
-        group.appendChild(ta);
+        // rotulo
+        const label = document.createElement('label');
+        label.className = 'algol-label';
+
+        // wrapper do select custom
+        const select = document.createElement('select');
+        select.className = 'algol-select';
+
+        // Move as <option> existentes para o select nativo
+        while (this.firstChild) {
+            const node = this.firstChild;
+            if (node.tagName === 'OPTION' || node.nodeType === Node.TEXT_NODE) {
+                select.append(node);
+            } else {
+                node.remove();
+            }
+        }
+
+        group.appendChild(label);
+        group.appendChild(select);
         this.appendChild(group);
 
-        // salva as refs globais
+        // refs
         this._elems['root'] = group;
-        this._elems['rotulo'] = rotulo;
-        this._elems['textarea'] = ta;
+        this._elems['label'] = label;
+        this._elems['select'] = select;
+
+        this._applyAttributes();
+        this._marcarOpcaoPadrao(); // para selecionar a opção padrão
 
         this._base_initialized = true;
     }
 
-    _attachEvents() {
-        /* reflete o valor digitado no input no atributo valor do componente */
-        this._elems['textarea'].addEventListener('input', () => {
-            const val = this._elems['textarea'].value;
-            if (this.valor !== val) this.valor = val;
-            this.dispatchEvent(new Event('input', { bubbles: true, composed: true }));
-        });
-        this._elems['textarea'].addEventListener('change',() => {
-            const val = this._elems['textarea'].value;
-            if (this.valor !== val) this.valor = val;
-            this.dispatchEvent(new Event('change', { bubbles: true, composed: true }));
-        });
-
-        // faz com que o enter no componente leve o foco para o input
-        this.addEventListener('keydown', (e) => {
-            if (this.hasAttribute('disabled')) return;
-            if (e.key === 'Enter') {
-                this._elems['textarea'].focus();
-                return;
+    _marcarOpcaoPadrao() {
+        if (this._elems['select'].options.length > 0) {
+            let select = this._elems['select'];
+            select.selectedIndex = 0; // a princípio, a opção padrão é a primeira
+            // seleciona o primeiro <option> marcado como ativo
+            for(let i=0;i<select.options.length;i++){
+                const option = select.options[i];
+                if(option.hasAttribute('ativa')) {
+                    select.selectedIndex = i;
+                    break;
+                }
             }
-        });
+            this._refletirValor(); // Atualiza o valor refletido
+        }
+    }
+
+    _attachEvents() {
+        this._elems['select'].addEventListener('input', () => this._refletirValor());
+        this._elems['select'].addEventListener('change', () => this._refletirValor());
+    }
+
+    // ****************************************************************************
+    // Utils
+    // ****************************************************************************
+
+    _refletirValor() {
+    const current = this._elems['select'].value;
+        if (this.valor !== current) {
+        this.valor = current;
+        this.dispatchEvent(new Event('input', { bubbles: true }));
+        this.dispatchEvent(new Event('change', { bubbles: true }));
+        }
     }
 
     // ****************************************************************************
@@ -104,19 +118,24 @@ class TextArea extends BaseComponent {
 
     _applyAttribute_rotulo() {
         const rotulo = this.getAttribute('rotulo');
-        if (rotulo && rotulo !== '') {
-            this._elems['rotulo'].textContent = rotulo;
-            if (!this._elems['rotulo'].parentNode) this._elems['root'].insertBefore(this._elems['rotulo'], this._elems['textarea']);
-        } else {
-            if (this._elems['rotulo'].parentNode) this._elems['root'].removeChild(this._elems['rotulo']);
-        }
-    }
-    _applyAttribute_placeholder() {
-        if(this.hasAttribute('disabled'))return;
-        if (this.hasAttribute('placeholder')) this._elems['textarea'].placeholder = this.getAttribute('placeholder');
+        this._elems['label'].textContent = rotulo;
     }
     _applyAttribute_valor() {
-        if (this.hasAttribute('valor')) this._elems['textarea'].value = this.valor;
+        // quando alterar externamente o atributo, aplica sem disparar eventos duplicados
+        const v = this.valor;
+        this._elems['select'].value = v;
+    }
+    _applyAttribute_disabled() {
+        this._elems['select'].disabled = this.hasAttribute('disabled');
+        if (this.hasAttribute('disabled')) {
+            this._elems['select'].style.cursor = 'not-allowed';
+        } else {
+            this._elems['select'].style.cursor = '';
+        }
+    }
+
+    _applyAttribute_required() {
+        this._elems['select'].toggleAttribute('required', this.hasAttribute('required'));
     }
     _applyAttribute_posicaoh() {
         const pos = this.getAttribute('posicaoh');       
@@ -140,44 +159,8 @@ class TextArea extends BaseComponent {
             case posValues[3]: this.style.alignSelf = 'center'; break;
         }
     }
-    _applyAttribute_disabled() {
-        const isDisabled = this.hasAttribute('disabled');
-        this._elems['textarea'].disabled = isDisabled;
-        if (isDisabled) {
-            this._elems['textarea'].style.cursor = 'not-allowed';
-        } else {
-            this._elems['textarea'].style.cursor = '';
-        }
-    }
-    _applyAttribute_required() {
-        this._elems['textarea'].required = this.hasAttribute('required');
-    }
-    // específicos do textarea
-    _applyAttribute_linhas() {
-        if (!this._elems['textarea']) return;
-        if (this.hasAttribute('linhas')) {
-            const v = parseInt(this.linhas, 10);
-            if (Number.isFinite(v) && v > 0) this._elems['textarea'].rows = v;
-        }
-    }
-    _applyAttribute_maxcaracteres() {
-        if (this.hasAttribute('maxcaracteres')) {
-            const v = parseInt(this.maxcaracteres, 10);
-            if (Number.isFinite(v) && v >= 0) this._elems['textarea'].maxLength = v;
-        }
-    }
-    _applyAttribute_apenasleitura() {
-        const apenasleitura =  this.hasAttribute('apenasleitura'); 
-        if (!apenasleitura) return;
-        this._elems['textarea'].readOnly = 'readonly';
-    }
-    _applyAttribute_fixo() {
-        const fixo =  this.hasAttribute('fixo'); 
-        if (!fixo) return;
-        this._elems['textarea'].style.resize = 'none';
-    }
 
-    // ****************************************************************************
+     // ****************************************************************************
     // Métodos dos eventos do componente
     // ****************************************************************************
 
@@ -232,7 +215,7 @@ class TextArea extends BaseComponent {
         this.addEventListener('mouseleave', wrapperCallback);
     }
     addEventoMouseSobre(callback) {
-        const wrapperCallback = (e) => {
+        const wrapperCallback = (e) => { 
             if (this.hasAttribute('disabled')) return;
             let origem = e.currentTarget
             let mouseInfo = {
@@ -259,6 +242,7 @@ class TextArea extends BaseComponent {
         };
         this.addEventListener('mudancaValor', wrapperCallback);
     }
-    
-
 }
+
+// static counter para ids
+Select._uidCounter = 0;

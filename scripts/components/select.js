@@ -1,30 +1,26 @@
-class Select extends HTMLElement {
+class Select extends BaseComponent {
     static get observedAttributes() {
-        return ['label', 'value', 'name', 'required', 'disabled','position'];
+        return ['rotulo', 'valor', 'required', 'disabled','posicaoh', 'posicaov'];
     }
 
     constructor() {
         super();
-        this._rootEl = null;
-        this._label = null;
-        this._select = null;
     }
 
     // ****************************************************************************
-    // Inicialização
+    // Métodos de construção do componente
     // ****************************************************************************
 
-    _init() {
-        if (this._base_initialized) return; // guard para evitar dupla criação
+    /** @override */
+    init() {
+        if (this.base_initialized) return; // guard para evitar dupla criação
         if (!this.hasAttribute('tabindex')) this.setAttribute('tabindex', '0'); // Torna o componente focável
-
-        this.style.alignSelf = 'center';
 
         // container raiz
         const group = document.createElement('div');
         group.className = 'algol-component-group';
 
-        // label
+        // rotulo
         const label = document.createElement('label');
         label.className = 'algol-label';
 
@@ -42,159 +38,186 @@ class Select extends HTMLElement {
             }
         }
 
-        // garante que o primeiro option sempre seja desabilitado
-        if (select.options.length > 0) select.options[0].disabled = true;
-
         group.appendChild(label);
         group.appendChild(select);
         this.appendChild(group);
 
         // refs
-        this._rootEl = group;
-        this._label = label;
-        this._select = select;
+        this.elems['root'] = group;
+        this.elems['label'] = label;
+        this.elems['select'] = select;
 
-        this._applyAttributes();
-        this._selectDefaultOption(); // Adiciona a chamada para selecionar a opção padrão
+        this.aplicaAtributos();
+        this._marcarOpcaoPadrao(); // para selecionar a opção padrão
 
-        this._base_initialized = true;
+        this.base_initialized = true;
     }
-
-    _selectDefaultOption() {
-        if (this._select.options.length > 0) {
-            this._select.selectedIndex = 0; // Seleciona o primeiro option
-            this._reflectValue(); // Atualiza o valor refletido
-        }
-    }
-
-    _attachEvents() {
-        this._select.addEventListener('input', () => this._reflectValue());
-        this._select.addEventListener('change', () => this._reflectValue());
-    }
-
-    _detachEvents() {
-        if (this._btnEl && this._onBtnClick) {
-            this._btnEl.removeEventListener('click', this._onBtnClick);
-            this._onBtnClick = null;
-        }
-        if (this._btnEl && this._onBtnKeydown) {
-            this._btnEl.removeEventListener('keydown', this._onBtnKeydown);
-            this._onBtnKeydown = null;
-        }
-        if (this._listEl && this._onListKeydown) {
-            this._listEl.removeEventListener('keydown', this._onListKeydown);
-            this._onListKeydown = null;
-        }
-        if (this._listEl && this._onOptionClick) {
-            this._listEl.removeEventListener('click', this._onOptionClick);
-            this._onOptionClick = null;
-        }
-        if (this._onOutside) {
-            document.removeEventListener('mousedown', this._onOutside);
-            document.removeEventListener('focusin', this._onOutside);
-            this._onOutside = null;
-        }
-    }
-
-    _reflectValue() {
-        const current = this._select.value;
-        if (this.getAttribute('value') !== current) {
-        this.setAttribute('value', current);
-        this.dispatchEvent(new Event('input', { bubbles: true }));
-        this.dispatchEvent(new Event('change', { bubbles: true }));
-        }
+    /** @override */
+    attachEvents() {
+        this.elems['select'].addEventListener('input', () => this._refletirValor());
+        this.elems['select'].addEventListener('change', () => this._refletirValor());
     }
 
     // ****************************************************************************
-    // Atributos
+    // Métodos de atualização
+    // ****************************************************************************
+   
+    /** @override */
+    reconstroi() {
+        console.log('reconstruindo select...');
+
+        // captura as opções atuais para restaurar depois
+        const opcoes = Array.from(this.elems['select'].options).map(option => option.cloneNode(true));
+        const valorAtual = this.elems['select'].value;
+
+        this.innerHTML = ''; // Limpa o componente para garantir reconstrução do zero
+        this.removeAttribute("style"); // limoa todos os estilos inline
+        this.elems.clear(); // limpa a lista de componente
+
+        // coloca as opções de volta
+        for (const opcao of opcoes) {
+            this.appendChild(opcao);
+        }
+        this.constroi();
+
+        // restaura o valor atual
+        this.valor = valorAtual; 
+        this.aplicaAtributo_valor();
+
+    }
+
+    // ****************************************************************************
+    // Ciclo de Vida de alterações do componente
     // ****************************************************************************
 
-    _applyAttributes() {
-        if (!this._rootEl) return;
-        this._applyAttribute_label();
-        this._applyAttribute_value();
-        this._applyAttribute_disabled();
-        this._applyAttribute_name();
-        this._applyAttribute_required();
-        this._applyAttribute_position();
+    /** @override */
+    mudaFilhosCallback() {
+        this.innerHTML = this._montaMsgErroConteudo();
+        this._ERRO = true;
     }
-
-    _applyAttribute_label() {
-        const label = this.getAttribute('label');
-        this._label.textContent = label;
+    /** @override */
+    mudaTextoCallback() {
+        this.innerHTML = this._montaMsgErroConteudo();
+        this._ERRO = true;
     }
-    _applyAttribute_value() {
-        // quando alterar externamente o atributo, aplica sem disparar eventos duplicados
-        const v = this.getAttribute('value');
-        this._select.value = v;
+    /** @override */
+    mudaAtributosCallback(nomeAtributo, valorAntigo) {
+        if (nomeAtributo === 'valor'){ // se a mudança foi no atributo valor... 
+            this.dispatchEvent(new CustomEvent('mudancaValor',{bubbles: false,detail: {antigo: valorAntigo, novo: this.valor}}));
+            this.aplicaAtributo_valor(); // não deve reconstruir, apenas atualizar o valor
+        }else {this.reconstroi();}
     }
-    _applyAttribute_disabled() {
-        this._select.disabled = this.hasAttribute('disabled');
-        if (this.hasAttribute('disabled')) {
-            this._select.style.cursor = 'not-allowed';
-        } else {
-            this._select.style.cursor = '';
-        }
-    }
-    _applyAttribute_name() {
-        const name = this.getAttribute('name');
-        name ? this._select.setAttribute('name', name) : this._select.removeAttribute('name');
-    }
-    _applyAttribute_required() {
-        this._select.toggleAttribute('required', this.hasAttribute('required'));
-    }
-    _applyAttribute_position() {
-        const positions = ['left', 'center', 'right', 'all'];
-        this.classList.remove(...positions.map(p => `algol-position-self-${p}`));
-        const pos = this.getAttribute('position');
-        if (positions.includes(pos)) this.classList.add(`algol-position-self-${pos}`);
-    }
-
+    
     // ****************************************************************************
     // Utils
     // ****************************************************************************
 
-     _reflectValue() {
-    const current = this._select.value;
-        if (this.getAttribute('value') !== current) {
-        this.setAttribute('value', current);
+    _marcarOpcaoPadrao() {
+        if (this.elems['select'].options.length > 0) {
+            let select = this.elems['select'];
+            select.selectedIndex = 0; // a princípio, a opção padrão é a primeira
+            // seleciona o primeiro <option> marcado como ativo
+            for(let i=0;i<select.options.length;i++){
+                const option = select.options[i];
+                if(option.hasAttribute('ativa')) {
+                    select.selectedIndex = i;
+                    break;
+                }
+            }
+            this._refletirValor(); // Atualiza o valor refletido
+        }
+    }
+
+    _refletirValor() {
+    const current = this.elems['select'].value;
+        if (this.valor !== current) {
+        this.valor = current;
         this.dispatchEvent(new Event('input', { bubbles: true }));
         this.dispatchEvent(new Event('change', { bubbles: true }));
         }
     }
 
     // ****************************************************************************
-    // Ciclo de vida
+    // Métodos dos atributos
     // ****************************************************************************
 
-    connectedCallback() {
-        if (this._connected) return;
-        this._init();
-        this._attachEvents();
-        this._applyAttributes();
-        this._connected = true;
+    aplicaAtributo_rotulo() {
+        const rotulo = this.getAttribute('rotulo');
+        this.elems['label'].textContent = rotulo;
     }
-
-    disconnectedCallback() {
-        this._detachEvents();
-        this._connected = false;
+    aplicaAtributo_valor() {
+        // quando alterar externamente o atributo, aplica sem disparar eventos duplicados
+        const v = this.valor;
+        this.elems['select'].value = v;
     }
-
-    attributeChangedCallback(name, oldV, newV) {
-        if (oldV === newV) return;
-        if (!this._connected) return;
-
-        switch (name) {
-            case 'label': this._applyAttribute_label(); break;
-            case 'placeholder': this._applyAttribute_placeholder(); break;
-            case 'value': this._applyAttribute_value(); break;
-            case 'position': this._applyAttribute_position(); break;
-            case 'disabled': this._applyAttribute_disabled(); break;
-            case 'name': this._applyAttribute_name(); break;
-            case 'required': this._applyAttribute_required(); break;
+    aplicaAtributo_disabled() {
+        this.elems['select'].disabled = this.hasAttribute('disabled');
+        if (this.hasAttribute('disabled')) {
+            this.elems['select'].style.cursor = 'not-allowed';
+        } else {
+            this.elems['select'].style.cursor = '';
         }
     }
-}
+    aplicaAtributo_required() {
+        this.elems['select'].toggleAttribute('required', this.hasAttribute('required'));
+    }
+    aplicaAtributo_posicaoh() {
+        const pos = this.getAttribute('posicaoh');       
+        if (!pos) return; // se não existe a propiedade 'posicaoh', abandona
+        const posValues = ['inicio','fim','centro','total']; // valores aceitos para 'posicaoh'
+        switch(pos){
+            case posValues[0]: this.style.justifySelf = 'start'; break;
+            case posValues[1]: this.style.justifySelf = 'end'; break;
+            case posValues[2]: this.style.justifySelf = 'center'; break;
+            case posValues[3]: this.style.justifySelf = 'stretch'; break;
+        }
+    }
+    aplicaAtributo_posicaov() {
+        const pos = this.getAttribute('posicaov');       
+        if (!pos) return; // se não existe a propiedade 'posicaov', abandona
+        const posValues = ['inicio','fim','centro','total']; // valores aceitos para 'posicaov'
+        switch(pos){
+            case posValues[0]: this.style.alignSelf = 'start'; break;
+            case posValues[1]: this.style.alignSelf = 'end'; break;
+            case posValues[2]: this.style.alignSelf = 'center'; break;
+            case posValues[3]: this.style.alignSelf = 'center'; break;
+        }
+    }
 
-// static counter para ids
-Select._uidCounter = 0;
+    // ****************************************************************************
+    // Métodos dos eventos espcíficos deste componente
+    // ****************************************************************************
+
+    addEventoMudaValor(callback){
+        const wrapperCallback = (e) => {
+            if (this.hasAttribute('disabled')) {
+                e.preventDefault();
+                return;
+            }
+            let origem = e.currentTarget
+            let antigo = e.detail.antigo;
+            let novo = e.detail.novo;
+            callback(origem,antigo,novo);
+            return;
+            
+        };
+        this.addEventListener('mudancaValor', wrapperCallback);
+    }
+
+    // ****************************************************************************
+    // Mensagens de Erro
+    // ****************************************************************************
+    
+    _montaMsgErroConteudo() {
+       return `
+        <div style="display:block; border:calc(0.5vw * var(--fator-escala)) dashed red; background-color:#fff0f0; padding:calc(1vw * var(--fator-escala)); color:red; fontFamily:'monospace';">
+            <h3 style="margin: 0 0 calc(0.5vw * var(--fator-escala)) 0;">🚫 Erro de Conteúdo: &lt;${this.tagName.toLowerCase()}&gt;</h3>
+            <p style="margin: 0;">
+                Este componente não permite alteração de seu conteúdo interno!
+            </p>
+            <p style="margin: calc(0.5vw * var(--fator-escala)) 0 0 0; font-size: 0.9em; color: #333;">
+                Recarregue a página para restaurar o conteúdo original!
+            </p>
+        </div>`;
+    }
+}

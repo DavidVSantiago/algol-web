@@ -1,4 +1,6 @@
-Alterar o componente grid-layout para não mais tratar o grid-item. O grid item tem seu próprio componente
+Ajustei a nova estrutura dos componentes. Agora eles já se encontram refinados.
+O template já está pronto. O componente 'select' tb.
+Preciso fazer os outros, começando com textarea
 
 Criar os componentes:
    - AlgolTitle (para as variações h1,h2,h3,h4,h5,h6)

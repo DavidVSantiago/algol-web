@@ -6,9 +6,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <link rel="stylesheet" href="algol-styles.css">
+    <script src="scripts/variaveis.js" defer></script>
     <script src="scripts/components/_base-component.js" defer></script>
     <script src="scripts/components/buttons.js" defer></script>
-     <script src="scripts/components.js" defer></script>
+    <script src="scripts/components/inputs.js" defer></script>
+    <script src="scripts/components/textarea.js" defer></script>
+    <script src="scripts/components/select.js" defer></script>
+    <script src="scripts/layouts/_base-layout.js" defer></script>
+    <script src="scripts/layouts/grid-layout.js" defer></script>
+    <script src="scripts/layouts/grid-item.js" defer></script>
+    <script src="scripts/components.js" defer></script>
 
     <script defer>
         // temporário. apenas para teste
@@ -64,13 +71,29 @@
                 eligendi
                 vero id aperiam debitis sapiente, ea quis nostrum nihil et ut vitae amet inventore temporibus.</p>
 
-            <algol-btn-primary id="btn" id="sa" posicaoh="" posicaov="">TOME</algol-btn-primary>
-            <div id="teste">teste</div>
-            
+            <algol-grid-layout>
+                <algol-grid-item>
+                    <algol-select id="comp" rotulo="Select" posicaoh="">
+                        <option disabled ativa> Selecione uma das opções</option>
+                        <option disabled>--Grupo 1--</option>
+                        <option value="A">Opção A</option>
+                        <option value="B">Opção B</option>
+                        <option disabled>--Grupo 2--</option>
+                        <option value="C">Opção C</option>
+                        <option value="D">Opção D</option>
+                        <option disabled>--Grupo 3--</option>
+                        <option value="E">Opção E</option>
+                        <option value="F">Opção F</option>
+                    </algol-select>
+                </algol-grid-item>
+                <algol-grid-item>   
+                    <div id="div">teste</div>
+                </algol-grid-item>
+            </algol-grid-layout>
             <script defer>
                 // temporário. apenas para teste
                 window.addEventListener('load', function (event) {
-                    let comp = document.getElementById('btn');
+                    let comp = document.getElementById('comp');
                     // comp.addEventoClique((origem,mouseInfo)=>console.log(origem,mouseInfo));
                     // comp.addEventoFoco((origem)=>console.log(origem));
                     // comp.addEventoBlur((origem)=>console.log(origem));
@@ -79,7 +102,7 @@
                     // comp.addEventoMouseSobre((origem,mouseInfo)=>console.log(origem,mouseInfo));
                     // comp.addEventoCliqueSobe((origem,mouseInfo)=>console.log(origem,mouseInfo));
                     // comp.addEventoCliqueDesce((origem,mouseInfo)=>console.log(origem,mouseInfo));
-                    // comp.addEventoMudaValor((origem,mouseInfo)=>console.log(origem,mouseInfo));
+                    comp.addEventoMudaValor((origem,antigo,novo)=>console.log('Valor='+novo+'\nAntigo='+antigo));
                 });
             </script>
 
