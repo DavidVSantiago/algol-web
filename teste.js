@@ -1,1 +1,920 @@
-class BaseComponent extends HTMLElement{static _idCont=0;static get observedAttributes(){return[]}constructor(){super(),this._elems=new Map,this._gerarAcessores(),this._InnerHtmlErro,this._ERRO=!1,this._base_initialized=!1,this._connected=!1}_gerarAcessores(){this.constructor.observedAttributes.forEach((t=>{t in this||Object.defineProperty(this,t,{get:()=>this.getAttribute(t),set:e=>this.setAttribute(t,e),configurable:!0})}))}_init(){throw new Error("O método '_init()' deve ser implementado na classe filha.")}_attachEvents(){throw new Error("O método '_attachEvents()' deve ser implementado na classe filha.")}_applyAttributes(){this.constructor.observedAttributes.forEach((t=>{const e=`_applyAttribute_${t}`;"function"==typeof this[e]?this[e]():console.error(`Faltando o método ${e} no componente.`)}))}connectedCallback(){this._connected||(this._validarAtributos(),this._ERRO?this._imprimeErro():(this.innerHTML="",this._init(),this._attachEvents(),this._applyAttributes(),this._connected=!0))}attributeChangedCallback(t,e,s){if(this._ERRO)return;if(e===s||!this._connected)return;const i=`_applyAttribute_${t}`;"function"==typeof this[i]&&this[i](),this.dispatchEvent(new CustomEvent("mudancaAtributo",{detail:{attribute:t,oldValue:e,newValue:s}}))}_validarAtributos(){const t=this.constructor.observedAttributes||[],e=["id","class","style","tabindex","slot","hidden","title","lang","dir","accesskey","draggable","spellcheck"],s=[];Array.from(this.attributes).forEach((i=>{const a=i.name;t.includes(a)||e.includes(a)||a.startsWith("data-")||a.startsWith("aria-")||a.startsWith("on")||s.push(a)})),s.length>0&&(this._InnerHtmlErro=this._montaMsgErro(s,e),this._ERRO=!0)}_montaMsgErro(t,e){return`\n        <div style="display:block; border:calc(0.5vw * var(--fator-escala)) dashed red; background-color:#fff0f0; padding:calc(1vw * var(--fator-escala)); color:red; fontFamily:'monospace';">\n            <h3 style="margin: 0 0 calc(0.5vw * var(--fator-escala)) 0;">🚫 Erro de Atributo: &lt;${this.tagName.toLowerCase()}&gt;</h3>\n            <p style="margin: 0;">\n                Os seguintes atributos não são reconhecidos:\n                <strong><em>'${t.join(", ")}'</em></strong>.<br>Remova-os!\n            </p>\n            <p style="margin: calc(0.5vw * var(--fator-escala)) 0 0 0; font-size: 0.9em; color: #333;">\n                Atributos padrão do componente: <em>[${this.constructor.observedAttributes.join(", ")}]</em>\n            </p>\n            <p style="margin: calc(0.5vw * var(--fator-escala)) 0 0 0; font-size: 0.9em; color: #333;">\n                Outros atributos também aceitos: <em>[${e.join(", ")}]</em>\n            </p>\n        </div>`}_imprimeErro(){this.innerHTML=this._InnerHtmlErro}}class BtnBase extends BaseComponent{static get observedAttributes(){return["valor","tamanho","posicaoh","posicaov","disabled"]}constructor(){super(),this._variantClass="algol-btn-primary"}_init(){if(this._base_initialized)return;this.hasAttribute("tabindex")||this.setAttribute("tabindex","0"),this.style.display="grid";const t=document.createElement("button");t.setAttribute("tabindex","-1"),t.className=`algol-btn ${this._variantClass}`,t.id="algol-btn-"+ ++BaseComponent._idCont,t.style.cssText+="-webkit-user-select:none; -ms-user-select:none; user-select:none; -webkit-touch-callout:none;",this.style.cssText+="-webkit-user-select:none; -ms-user-select:none; user-select:none;",t.setAttribute("unselectable","on"),t.onselectstart=()=>!1,t.style.width="100%",t.style.justifyContent="center",this._elems.set("button",t),this.appendChild(t),this._base_initialized=!0}_attachEvents(){const t=this._elems.get("button");if(!t)return;t.addEventListener("click",(t=>{if(this.hasAttribute("disabled"))return t.preventDefault(),void t.stopImmediatePropagation()}),{capture:!0}),this.addEventListener("keydown",(t=>{this.hasAttribute("disabled")||"Enter"!==t.key&&"Space"!==t.code||(t.preventDefault(),this.click())}))}_applyAttribute_valor(){this._elems.get("button").innerHTML=this.getAttribute("valor")}_applyAttribute_tamanho(){const t=this._elems.get("button");t.classList.remove("algol-btn-small","algol-btn-big");const e=this.getAttribute("tamanho");if(!e)return;const s=["pequeno","grande"];switch(e){case s[0]:t.classList.add("algol-btn-small");break;case s[1]:t.classList.add("algol-btn-big")}}_applyAttribute_posicaoh(){const t=this.getAttribute("posicaoh");if(!t)return;const e=["inicio","fim","centro","total"];switch(t){case e[0]:this.style.justifySelf="start";break;case e[1]:this.style.justifySelf="end";break;case e[2]:this.style.justifySelf="center";break;case e[3]:this.style.justifySelf="stretch"}}_applyAttribute_posicaov(){const t=this.getAttribute("posicaov");if(!t)return;const e=["inicio","fim","centro","total"];switch(t){case e[0]:this.style.alignSelf="start";break;case e[1]:this.style.alignSelf="end";break;case e[2]:this.style.alignSelf="center";break;case e[3]:this.style.alignSelf="stretch"}}_applyAttribute_disabled(){const t=this._elems.get("button");t.disabled=this.hasAttribute("disabled"),this.hasAttribute("disabled")?t.style.cursor="not-allowed":t.style.cursor=""}addEventoClique(t){this.addEventListener("click",(e=>{if(this.hasAttribute("disabled"))return void e.preventDefault();let s=e.currentTarget,i={x:e.clientX,y:e.clientY,offsetX:e.offsetX,offsetY:e.offsetY};t(s,i)}))}addEventoFoco(t){this.addEventListener("focus",(e=>{if(this.hasAttribute("disabled"))return;let s=e.currentTarget;t(s)}))}addEventoBlur(t){this.addEventListener("blur",(e=>{if(this.hasAttribute("disabled"))return;let s=e.currentTarget;t(s)}))}addEventoMouseEntra(t){this.addEventListener("mouseenter",(e=>{if(this.hasAttribute("disabled"))return;let s=e.currentTarget;t(s)}))}addEventoMouseSai(t){this.addEventListener("mouseleave",(e=>{if(this.hasAttribute("disabled"))return;let s=e.currentTarget;t(s)}))}addEventoMouseSobre(t){this.addEventListener("mousemove",(e=>{if(this.hasAttribute("disabled"))return;let s=e.currentTarget,i={x:e.clientX,y:e.clientY,offsetX:e.offsetX,offsetY:e.offsetY};t(s,i)}))}}class BtnPrimary extends BtnBase{constructor(){super()}}class BtnSecondary extends BtnBase{constructor(){super(),this._variantClass="algol-btn-secondary"}}class BtnOutline extends BtnBase{constructor(){super(),this._variantClass="algol-btn-outline"}}class BtnSuccess extends BtnBase{constructor(){super(),this._variantClass="algol-btn-success"}}class BtnDanger extends BtnBase{constructor(){super(),this._variantClass="algol-btn-danger"}}class BtnWarning extends BtnBase{constructor(){super(),this._variantClass="algol-btn-warning"}}class BtnInfo extends BtnBase{constructor(){super(),this._variantClass="algol-btn-info"}}class BtnLink extends BtnBase{constructor(){super(),this._variantClass="algol-btn-link"}}class Input extends BaseComponent{static get observedAttributes(){return["valor","placeholder","disabled","posicaoh","posicaov","rotulo","required"]}constructor(){super(),this._type="text"}_init(){if(this._base_initialized)return;this.hasAttribute("tabindex")||this.setAttribute("tabindex","0"),this.style.alignSelf="center";const t=document.createElement("div");t.className="algol-rotulo",t.setAttribute("tabindex","-1");const e=document.createElement("input");e.type=this._type,e.className="algol-input",e.setAttribute("tabindex","-1"),e.id="algol-input-"+ ++BaseComponent._idCont;const s=document.createElement("div");s.className="algol-component-group",s.setAttribute("tabindex","-1"),s.appendChild(t),s.appendChild(e),this.appendChild(s),this._elems.set("group",s),this._elems.set("rotulo",t),this._elems.set("input",e),this._base_initialized=!0}_attachEvents(){this._elems.get("input").addEventListener("input",(t=>{const e=this._elems.get("input").value;this.getAttribute("valor")!==e&&this.setAttribute("valor",e),this.dispatchEvent(new Event("input",{bubbles:!0,composed:!0}))})),this._elems.get("input").addEventListener("change",(t=>{const e=this._elems.get("input").value;this.getAttribute("valor")!==e&&this.setAttribute("valor",e),this.dispatchEvent(new Event("change",{bubbles:!0,composed:!0}))})),this.addEventListener("keydown",(t=>{this.hasAttribute("disabled")||"Enter"===t.key&&this._elems.get("input").focus()}))}_applyAttribute_rotulo(){const t=this.getAttribute("rotulo");t&&""!=t?(this._elems.get("rotulo").textContent=t,this._elems.get("rotulo").parentNode||this._elems.get("group").insertBefore(this._elems.get("rotulo"),this._elems.get("input"))):this._elems.get("rotulo").parentNode&&this._elems.get("group").removeChild(this._elems.get("rotulo"))}_applyAttribute_placeholder(){this.hasAttribute("disabled")||this.hasAttribute("placeholder")&&(this._elems.get("input").placeholder=this.getAttribute("placeholder"))}_applyAttribute_valor(){this.hasAttribute("valor")&&(this._elems.get("input").value=this.valor)}_applyAttribute_posicaoh(){const t=this.getAttribute("posicaoh");if(!t)return;const e=["inicio","fim","centro","total"];switch(t){case e[0]:this.style.justifySelf="start";break;case e[1]:this.style.justifySelf="end";break;case e[2]:this.style.justifySelf="center";break;case e[3]:this.style.justifySelf="stretch"}}_applyAttribute_posicaov(){const t=this.getAttribute("posicaov");if(!t)return;const e=["inicio","fim","centro","total"];switch(t){case e[0]:this.style.alignSelf="start";break;case e[1]:this.style.alignSelf="end";break;case e[2]:case e[3]:this.style.alignSelf="center"}}_applyAttribute_disabled(){const t=this.hasAttribute("disabled");this._elems.get("input").disabled=t,this._elems.get("input").style.cursor=t?"not-allowed":""}_applyAttribute_required(){this._elems.get("input").required=this.hasAttribute("required")}addEventoClique(t){this.addEventListener("click",(e=>{if(this.hasAttribute("disabled"))return void e.preventDefault();let s=e.currentTarget,i={x:e.clientX,y:e.clientY,offsetX:e.offsetX,offsetY:e.offsetY};t(s,i)}))}addEventoFoco(t){this.addEventListener("focus",(e=>{if(this.hasAttribute("disabled"))return;let s=e.currentTarget;t(s)}))}addEventoBlur(t){this.addEventListener("blur",(e=>{if(this.hasAttribute("disabled"))return;let s=e.currentTarget;t(s)}))}addEventoMouseEntra(t){this.addEventListener("mouseenter",(e=>{if(this.hasAttribute("disabled"))return;let s=e.currentTarget;t(s)}))}addEventoMouseSai(t){this.addEventListener("mouseleave",(e=>{if(this.hasAttribute("disabled"))return;let s=e.currentTarget;t(s)}))}addEventoMouseSobre(t){this.addEventListener("mousemove",(e=>{if(this.hasAttribute("disabled"))return;let s=e.currentTarget,i={x:e.clientX,y:e.clientY,offsetX:e.offsetX,offsetY:e.offsetY};t(s,i)}))}addEventoMudaValor(t){this.addEventListener("mudancaAtributo",(e=>{if(this.hasAttribute("disabled"))e.preventDefault();else if("valor"!=e.detail.attribute);else{let s=e.currentTarget,i=this.valor;t(s,i)}}))}}class InputText extends Input{constructor(){super()}}class InputEmail extends Input{constructor(){super(),this._type="email"}}class InputPassword extends Input{constructor(){super(),this._type="password"}}class InputNumber extends Input{static get observedAttributes(){return["valor","min","max","disabled","posicaoh","posicaov","rotulo"]}constructor(){super(),this._initialized=!1}_init(){if(this._initialized)return;super._init();const t=document.createElement("div");t.className="algol-input-container",t.setAttribute("tabindex","-1");const e=document.createElement("div");e.className="algol-spinner-buttons",e.setAttribute("tabindex","-1");const s=document.createElement("div");s.className="algol-spinner-up",s.textContent="▲",s.setAttribute("tabindex","-1");const i=document.createElement("div");i.className="algol-spinner-down",i.textContent="▼",i.setAttribute("tabindex","-1"),s.style.userSelect="none",s.style.msUserSelect="none",i.style.userSelect="none",i.style.msUserSelect="none",s.addEventListener("mousedown",(t=>t.preventDefault())),i.addEventListener("mousedown",(t=>t.preventDefault())),s.setAttribute("role","button"),i.setAttribute("role","button"),e.appendChild(s),e.appendChild(i),t.appendChild(this._elems.get("input")),t.appendChild(e),this._elems.get("group").appendChild(t),this._elems.set("up",s),this._elems.set("down",i),this._initialized=!0}_attachEvents(){this._elems.get("up").addEventListener("click",(t=>{this.hasAttribute("disabled")||(this._incrementaValor(1),this._refleteValor())})),this._elems.get("down").addEventListener("click",(t=>{this.hasAttribute("disabled")||(this._incrementaValor(-1),this._refleteValor())})),this._elems.get("input").addEventListener("blur",(t=>{this.hasAttribute("disabled")||this._refleteValor()})),this._elems.get("input").addEventListener("change",(t=>{this.hasAttribute("disabled")||this._refleteValor()})),this.addEventListener("keydown",(t=>{this.hasAttribute("disabled")||("ArrowUp"===t.key&&(this._incrementaValor(1),this._refleteValor()),"ArrowDown"===t.key&&(this._incrementaValor(-1),this._refleteValor()),"Enter"!==t.key||this._elems.get("input").focus())}))}_applyAttribute_valor(){super._applyAttribute_valor();let t=Number(this.valor);Number.isNaN(t)?null!==this.min?(this.valor=this.min,this._elems.get("input").value=this.min):(this.valor="",this._elems.get("input").value=""):(null!==this.min&&t<this.min&&(this.valor=this.min,this._elems.get("input").value=this.min),null!==this.max&&t>this.max&&(this.valor=this.max,this._elems.get("input").value=this.max))}_applyAttribute_disabled(){this.hasAttribute("disabled")?(this._elems.get("input").disabled=!0,this._elems.get("input").value="",this._elems.get("up").style.cursor="not-allowed",this._elems.get("down").style.cursor="not-allowed",this._elems.get("input").style.cursor="not-allowed"):(this._elems.get("input").disabled=!1,this._elems.get("input").style.cursor="")}_applyAttribute_min(){this.hasAttribute("min")&&(this._elems.get("input").min=this.min)}_applyAttribute_max(){this.hasAttribute("max")&&(this._elems.get("input").max=this.max)}_refleteValor(){this.valor=this._elems.get("input").value.trim()}_incrementaValor(t){this._elems.get("input").value=Number(this._elems.get("input").value)+t}addEventoCliqueSobe(t){this._elems.get("up").addEventListener("click",(e=>{if(this.hasAttribute("disabled"))return void e.preventDefault();let s=e.currentTarget,i=this.valor;t(s,i)}))}addEventoCliqueDesce(t){this._elems.get("down").addEventListener("click",(e=>{if(this.hasAttribute("disabled"))return void e.preventDefault();let s=e.currentTarget,i=this.valor;t(s,i)}))}}class Select extends HTMLElement{static get observedAttributes(){return["label","value","name","required","disabled","position"]}constructor(){super(),this._rootEl=null,this._label=null,this._select=null}_init(){if(this._base_initialized)return;this.hasAttribute("tabindex")||this.setAttribute("tabindex","0"),this.style.alignSelf="center";const t=document.createElement("div");t.className="algol-component-group";const e=document.createElement("label");e.className="algol-label";const s=document.createElement("select");for(s.className="algol-select";this.firstChild;){const t=this.firstChild;"OPTION"===t.tagName||t.nodeType===Node.TEXT_NODE?s.append(t):t.remove()}s.options.length>0&&(s.options[0].disabled=!0),t.appendChild(e),t.appendChild(s),this.appendChild(t),this._rootEl=t,this._label=e,this._select=s,this._applyAttributes(),this._selectDefaultOption(),this._base_initialized=!0}_selectDefaultOption(){this._select.options.length>0&&(this._select.selectedIndex=0,this._reflectValue())}_attachEvents(){this._select.addEventListener("input",(()=>this._reflectValue())),this._select.addEventListener("change",(()=>this._reflectValue()))}_detachEvents(){this._btnEl&&this._onBtnClick&&(this._btnEl.removeEventListener("click",this._onBtnClick),this._onBtnClick=null),this._btnEl&&this._onBtnKeydown&&(this._btnEl.removeEventListener("keydown",this._onBtnKeydown),this._onBtnKeydown=null),this._listEl&&this._onListKeydown&&(this._listEl.removeEventListener("keydown",this._onListKeydown),this._onListKeydown=null),this._listEl&&this._onOptionClick&&(this._listEl.removeEventListener("click",this._onOptionClick),this._onOptionClick=null),this._onOutside&&(document.removeEventListener("mousedown",this._onOutside),document.removeEventListener("focusin",this._onOutside),this._onOutside=null)}_reflectValue(){const t=this._select.value;this.getAttribute("value")!==t&&(this.setAttribute("value",t),this.dispatchEvent(new Event("input",{bubbles:!0})),this.dispatchEvent(new Event("change",{bubbles:!0})))}_applyAttributes(){this._rootEl&&(this._applyAttribute_label(),this._applyAttribute_value(),this._applyAttribute_disabled(),this._applyAttribute_name(),this._applyAttribute_required(),this._applyAttribute_position())}_applyAttribute_label(){const t=this.getAttribute("label");this._label.textContent=t}_applyAttribute_value(){const t=this.getAttribute("value");this._select.value=t}_applyAttribute_disabled(){this._select.disabled=this.hasAttribute("disabled"),this.hasAttribute("disabled")?this._select.style.cursor="not-allowed":this._select.style.cursor=""}_applyAttribute_name(){const t=this.getAttribute("name");t?this._select.setAttribute("name",t):this._select.removeAttribute("name")}_applyAttribute_required(){this._select.toggleAttribute("required",this.hasAttribute("required"))}_applyAttribute_position(){const t=["left","center","right","all"];this.classList.remove(...t.map((t=>`algol-position-self-${t}`)));const e=this.getAttribute("position");t.includes(e)&&this.classList.add(`algol-position-self-${e}`)}_reflectValue(){const t=this._select.value;this.getAttribute("value")!==t&&(this.setAttribute("value",t),this.dispatchEvent(new Event("input",{bubbles:!0})),this.dispatchEvent(new Event("change",{bubbles:!0})))}connectedCallback(){this._connected||(this._init(),this._attachEvents(),this._applyAttributes(),this._connected=!0)}disconnectedCallback(){this._detachEvents(),this._connected=!1}attributeChangedCallback(t,e,s){if(e!==s&&this._connected)switch(t){case"label":this._applyAttribute_label();break;case"placeholder":this._applyAttribute_placeholder();break;case"value":this._applyAttribute_value();break;case"position":this._applyAttribute_position();break;case"disabled":this._applyAttribute_disabled();break;case"name":this._applyAttribute_name();break;case"required":this._applyAttribute_required()}}}Select._uidCounter=0;class TextArea extends BaseComponent{static get observedAttributes(){return["valor","placeholder","rotulo","disabled","posicaoh","posicaov","linhas","maxcaracteres","apenasleitura","required","fixo"]}constructor(){super()}_init(){if(this._base_initialized)return;this.hasAttribute("tabindex")||this.setAttribute("tabindex","0"),this.style.alignSelf="center";const t=document.createElement("div");t.className="algol-rotulo",t.setAttribute("tabindex","-1");const e=document.createElement("textarea");e.className="algol-textarea",e.setAttribute("tabindex","-1"),e.id||(void 0===TextArea._uidCounter&&(TextArea._uidCounter=0),e.id="algol-textarea-"+ ++TextArea._uidCounter);const s=document.createElement("div");s.className="algol-component-group",s.setAttribute("tabindex","-1"),s.appendChild(t),s.appendChild(e),this.appendChild(s),this._elems.root=s,this._elems.rotulo=t,this._elems.textarea=e,this._base_initialized=!0}_attachEvents(){this._elems.textarea.addEventListener("input",(()=>{const t=this._elems.textarea.value;this.valor!==t&&(this.valor=t),this.dispatchEvent(new Event("input",{bubbles:!0,composed:!0}))})),this._elems.textarea.addEventListener("change",(()=>{const t=this._elems.textarea.value;this.valor!==t&&(this.valor=t),this.dispatchEvent(new Event("change",{bubbles:!0,composed:!0}))})),this.addEventListener("keydown",(t=>{this.hasAttribute("disabled")||"Enter"!==t.key||this._elems.textarea.focus()}))}_applyAttribute_rotulo(){const t=this.getAttribute("rotulo");t&&""!==t?(this._elems.rotulo.textContent=t,this._elems.rotulo.parentNode||this._elems.root.insertBefore(this._elems.rotulo,this._elems.textarea)):this._elems.rotulo.parentNode&&this._elems.root.removeChild(this._elems.rotulo)}_applyAttribute_placeholder(){this.hasAttribute("disabled")||this.hasAttribute("placeholder")&&(this._elems.textarea.placeholder=this.getAttribute("placeholder"))}_applyAttribute_valor(){this.hasAttribute("valor")&&(this._elems.textarea.value=this.valor)}_applyAttribute_posicaoh(){const t=this.getAttribute("posicaoh");if(!t)return;const e=["inicio","fim","centro","total"];switch(t){case e[0]:this.style.justifySelf="start";break;case e[1]:this.style.justifySelf="end";break;case e[2]:this.style.justifySelf="center";break;case e[3]:this.style.justifySelf="stretch"}}_applyAttribute_posicaov(){const t=this.getAttribute("posicaov");if(!t)return;const e=["inicio","fim","centro","total"];switch(t){case e[0]:this.style.alignSelf="start";break;case e[1]:this.style.alignSelf="end";break;case e[2]:case e[3]:this.style.alignSelf="center"}}_applyAttribute_disabled(){const t=this.hasAttribute("disabled");this._elems.textarea.disabled=t,this._elems.textarea.style.cursor=t?"not-allowed":""}_applyAttribute_required(){this._elems.textarea.required=this.hasAttribute("required")}_applyAttribute_linhas(){if(this._elems.textarea&&this.hasAttribute("linhas")){const t=parseInt(this.linhas,10);Number.isFinite(t)&&t>0&&(this._elems.textarea.rows=t)}}_applyAttribute_maxcaracteres(){if(this.hasAttribute("maxcaracteres")){const t=parseInt(this.maxcaracteres,10);Number.isFinite(t)&&t>=0&&(this._elems.textarea.maxLength=t)}}_applyAttribute_apenasleitura(){this.hasAttribute("apenasleitura")&&(this._elems.textarea.readOnly="readonly")}_applyAttribute_fixo(){this.hasAttribute("fixo")&&(this._elems.textarea.style.resize="none")}addEventoClique(t){this.addEventListener("click",(e=>{if(this.hasAttribute("disabled"))return void e.preventDefault();let s=e.currentTarget,i={x:e.clientX,y:e.clientY,offsetX:e.offsetX,offsetY:e.offsetY};t(s,i)}))}addEventoFoco(t){this.addEventListener("focus",(e=>{if(this.hasAttribute("disabled"))return;let s=e.currentTarget;t(s)}))}addEventoBlur(t){this.addEventListener("blur",(e=>{if(this.hasAttribute("disabled"))return;let s=e.currentTarget;t(s)}))}addEventoMouseEntra(t){this.addEventListener("mouseenter",(e=>{if(this.hasAttribute("disabled"))return;let s=e.currentTarget;t(s)}))}addEventoMouseSai(t){this.addEventListener("mouseleave",(e=>{if(this.hasAttribute("disabled"))return;let s=e.currentTarget;t(s)}))}addEventoMouseSobre(t){this.addEventListener("mousemove",(e=>{if(this.hasAttribute("disabled"))return;let s=e.currentTarget,i={x:e.clientX,y:e.clientY,offsetX:e.offsetX,offsetY:e.offsetY};t(s,i)}))}addEventoMudaValor(t){this.addEventListener("mudancaAtributo",(e=>{if(this.hasAttribute("disabled"))e.preventDefault();else if("valor"!=e.detail.attribute);else{let s=e.currentTarget,i=this.valor;t(s,i)}}))}}class AlgolLayout extends HTMLElement{static get observedAttributes(){return["colunas","gap","posicaoh","posicaov"]}constructor(){super(),this._observer=null,this._base_initialized=!1,this._connected=!1}_init(){this._base_initialized||(this.style.display="grid",this.style.boxSizing="border-box",this._initObserver(),this._base_initialized=!0)}_initObserver(){this._observer=new MutationObserver((t=>{t.forEach((t=>{if("childList"===t.type){if(t.addedNodes.length>0&&t.removedNodes.length>0)return;this._verificaFilhos(Array.from(this.children))}}))})),this._observer.observe(this,{childList:!0})}_applyAttributes(){this._applyAttribute_colunas(),this._applyAttribute_gap(),this._applyAttribute_posicaoh(),this._applyAttribute_posicaov()}_applyAttribute_colunas(){const t=this.getAttribute("colunas")||"1fr";this.style.gridTemplateColumns=t}_applyAttribute_gap(){const t=this.getAttribute("gap");t?this.style.gap=t:this.style.removeProperty("gap")}_applyAttribute_posicaoh(){let t=Array.from(this.children);const e=this.getAttribute("posicaoh");if(e){const s=["inicio","fim","centro","total"];let i="stretch";switch(this.style.justifyItems=i,e){case s[0]:i="start";break;case s[1]:i="end";break;case s[2]:i="center"}for(let e=0;e<t.length;e++){const s=t[e];"algol-grid-item"===s.tagName.toLowerCase()&&(s.style.display="grid",s.style.justifyItems=i)}}else for(let e=0;e<t.length;e++){const s=t[e];"algol-grid-item"===s.tagName.toLowerCase()&&(s.style.display="grid",s.style.justifyItems="center")}}_applyAttribute_posicaov(){let t=Array.from(this.children);const e=this.getAttribute("posicaov");if(e){const s=["inicio","fim","centro","total"];let i="stretch";switch(this.style.alignItems=i,e){case s[0]:i="start";break;case s[1]:i="end";break;case s[2]:i="center"}for(let e=0;e<t.length;e++){const s=t[e];"algol-grid-item"===s.tagName.toLowerCase()&&(s.style.display="grid",s.style.alignItems=i)}}else for(let e=0;e<t.length;e++){const s=t[e];"algol-grid-item"===s.tagName.toLowerCase()&&(s.style.display="grid",s.style.alignItems="center")}}connectedCallback(){this._connected||(this._init(),this._verificaFilhos(Array.from(this.children)),this._applyAttributes(),this._connected=!0)}disconnectedCallback(){this._observer&&this._observer.disconnect(),this._connected=!1}attributeChangedCallback(t,e,s){if(e!==s&&this._connected)switch(t){case"colunas":this._applyAttribute_colunas();break;case"gap":this._applyAttribute_gap();break;case"posicaoh":this._applyAttribute_posicaoh();break;case"posicaov":this._applyAttribute_posicaov()}}_verificaFilhos(t){for(let e=0;e<t.length;e++){const s=t[e];if("algol-grid-layout"!==s.tagName.toLowerCase()){if("algol-grid-item"!==s.tagName.toLowerCase()){if("algol-error!"===s.id)continue;let t=document.createRange().createContextualFragment(this._montaMsgErro(s.tagName.toLowerCase()));s.replaceWith(t)}}else this._verificaFilhos(Array.from(s.children))}this._applyAttributes()}_verificaTipoFilho(t){"algol-grid-item"!==t.tagName.toLowerCase()&&this._montaMsgErro(t)}_montaMsgErro(t){return`\n        <div id="algol-error!" style="display:block; border:calc(0.5vw * var(--fator-escala)) dashed purple; background-color:#fff0f0; padding:calc(1vw * var(--fator-escala)); color:purple; fontFamily:'monospace';">\n            <h3 style="margin: 0 0 calc(0.5vw * var(--fator-escala)) 0;">🚫 Erro de Layout: &lt;${this.tagName.toLowerCase()}&gt;</h3>\n            <p style="margin: 0;">\n                Envolva o elemento <code>&lt;${t}&gt;</code> dentro de um <code>&lt;algol-grid-item&gt;</code><algol-grid-item></code>\n            </p>\n            \n        </div>`}}customElements.define("algol-btn-primary",BtnPrimary),customElements.define("algol-btn-secondary",BtnSecondary),customElements.define("algol-btn-outline",BtnOutline),customElements.define("algol-btn-success",BtnSuccess),customElements.define("algol-btn-danger",BtnDanger),customElements.define("algol-btn-warning",BtnWarning),customElements.define("algol-btn-info",BtnInfo),customElements.define("algol-btn-link",BtnLink),customElements.define("algol-input-text",InputText),customElements.define("algol-input-email",InputEmail),customElements.define("algol-input-password",InputPassword),customElements.define("algol-input-number",InputNumber),customElements.define("algol-textarea",TextArea),customElements.define("algol-select",Select),customElements.define("algol-grid-layout",AlgolLayout),window.addEventListener("keydown",(function(t){"ArrowUp"!==t.key&&"ArrowDown"!==t.key||t.preventDefault()}));
+// ****************************************************************************
+// VARIÁVEIS GLOBAIS DO LAYOUT
+// ****************************************************************************
+
+/** CUIDADO!! Não altere as chaves!! altere apenas os valores
+  * OBS: com exceção de 'fator-escala', altere o valor, mas MANTENHA A UNIDADE 'vw'!! ex: '1.2vw', '0.9vw', ...
+*/
+const GLOBAL = {
+    'fator-escala': 1.0, // multiplicador de escala global recomenda-se que seja um valor entre 0.5 e 1.5 (padrão 1.0)
+    'font-size': '1.1vw', // ajusta o tamanho da fonte global (padrão 1.1vw)
+    'line-height': '1.6vw', // ajusta a altura da linha global (padrão 1.6vw)
+    'border-radius-components': '0.5vw', // 
+    'border-radius-layout': '1.0vw', // 
+    'font-size-btn': '1.2vw', // 
+}
+
+// ****************************************************************************
+// FONTE GLOBAL DO LAYOUT
+// ****************************************************************************
+
+// 
+/** insira aqui o código base64 da fonte que será usada no layout
+  * OBS: a fonte deve estar no formato .woff ou .woff2 e deve ser convertida para base64
+*/
+const fontBase64 = "data:application/font-woff;base64,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";
+
+class BaseComponent extends HTMLElement {
+    static _idCont = 0;
+    static get observedAttributes() { return []; } 
+    
+    constructor() {
+        super();
+        
+        this.elems = new Map(); // lista de elementos internos do componente
+        this._gerarAcessores();
+        this._ERRO = false;
+        this._textoInterno = null;
+        this._connected = false;
+        this.base_initialized = false;
+        
+        // Configuração do Observer: o mais abrangente possível
+        this._observerConfig = {
+            attributes: true,       // Observa mudanças em atributos
+            childList: true,        // Observa adição/remoção de filhos
+            characterData: true,    // Observa mudanças de texto (innerText/textContent)
+            subtree: true,          // Não bserva filhos dos filhos (profundidade)
+            attributeOldValue: true
+        };
+
+        // define o observador de mudanças
+        this._observer = new MutationObserver(this.mutationObserver.bind(this));
+    }
+
+    // observador de mudanças
+    mutationObserver (mutations) {
+        for (const mutation of mutations) { // percorre todas as mutações
+            this._observer.disconnect(); // disabilita o observer temporariamente
+
+            if (mutation.type === 'childList')  this.mudaFilhosCallback();
+            else if (mutation.type === 'attributes') this.mudaAtributosCallback(mutation.attributeName, mutation.oldValue);
+            else if (mutation.type === 'characterData') this.mudaTextoCallback();
+
+            this._observer.observe(this, this._observerConfig);// reabilita o observer
+        }
+    }
+
+    // ****************************************************************************
+    // Métodos de construção do componente
+    // ****************************************************************************
+
+    /** @abstract */
+    init() { throw new Error("init deve ser implementado"); }
+    /** @abstract */
+    attachEvents() { throw new Error("attachEvents deve ser implementado"); }
+    
+    constroi(){
+        // 1. PAUSA O OBSERVER
+        // Isso é crucial! Se não desconectar, as alterações feitas pelo init() (ex: innerHTML='')
+        // dispararão o observer novamente, criando um loop infinito.
+        this.base_initialized = false; // reseta o estado de inicialização
+        this._ERRO = false; // reseta o estado de erro antes de reconstruir
+        if(this._textoInterno===null){ // captura o texto interno apenas primeira construção
+            this._textoInterno = this.textContent.trim();
+        }
+        try {
+            if(!this._validaAtributos()) return; // se houver atributos inválidos, abandona com erro!
+            this.init(); 
+            this.attachEvents();
+            this.aplicaAtributos(); // Aplica os valores atuais dos atributos
+
+        } catch (error) {
+            console.error("Erro ao reconstruir componente:", error);
+        } finally { 
+            // if (!this._ERRO) { // se não houve erro na reconstrução, religa o observer
+                
+            // }
+        }
+    }
+
+    // ****************************************************************************
+    // Métodos de atualização
+    // ****************************************************************************
+
+    reconstroi() {
+        console.log('reconstruindo...');
+        
+        this.innerHTML = ''; // Limpa o componente para garantir reconstrução do zero
+        this.removeAttribute("style"); // limoa todos os estilos inline
+        this.elems.clear(); // limpa a lista de componente
+        this.constroi();
+    }
+    reaplicaAtributos(){
+        console.log('reestilizando...');
+
+        this.removeAttribute("style");
+        this.aplicaAtributos();
+    }
+
+    // ****************************************************************************
+    // Ciclo de Vida de alterações do componente
+    // ****************************************************************************
+
+    /** @abstract */
+    mudaFilhosCallback() { throw new Error("mudaFilhosCallback() deve ser implementado"); }
+    /** @abstract */
+    mudaTextoCallback() { throw new Error("mudaTextoCallback() deve ser implementado"); }
+    /** @abstract */
+    mudaAtributosCallback(nomeAtributo, valorAntigo) {throw new Error("mudaAtributosCallback() deve ser implementado");}
+
+    // ****************************************************************************
+    // Ciclo de Vida de HTMLElement
+    // ****************************************************************************
+
+    /** @override */
+    connectedCallback() {
+        this._observer.disconnect();
+
+        // se já havia sido conectado antes...
+        if (this._connected) this.reconstroi(); // reconstrói o componente
+        else this.constroi(); // Realiza a primeira construção
+        
+        this._observer.observe(this, this._observerConfig);
+
+        this._connected = true;
+    }
+    /** @override */
+    disconnectedCallback() {
+        // Limpa o observer ao remover o elemento do DOM para evitar memory leaks
+        this._observer.disconnect();
+    }
+
+    // ****************************************************************************
+    // Geração de Acessores e Atributos
+    // ****************************************************************************
+
+    _gerarAcessores() {
+        this.constructor.observedAttributes.forEach(attr => {
+            if (!(attr in this)) {
+                Object.defineProperty(this, attr, {
+                    get: () => this.getAttribute(attr),
+                    set: (val) => this.setAttribute(attr, val),
+                    configurable: true
+                });
+            }
+        });
+    }
+    get textoInterno() {
+        return this._textoInterno;
+    }
+    set textoInterno(valor) {
+        if (valor !== this._textoInterno) {
+            this._textoInterno = valor;
+            
+            // Opcional: Se o valor mudar manualmente via código, 
+            // você pode querer disparar o rebuild.
+            if (this._connected) {
+                this.reconstroi();
+            }
+        }
+    }
+    aplicaAtributos() {
+        this.constructor.observedAttributes.forEach(item => {
+            const nomeMetodo = `aplicaAtributo_${item}`;
+            if (typeof this[nomeMetodo] === 'function') {
+                this[nomeMetodo]();
+            }else{
+                console.error(`DEV MSG: está faltando o método ${nomeMetodo}()`);
+            }
+        });
+    }
+
+    // ****************************************************************************
+    // Validações
+    // ****************************************************************************
+
+    _validaAtributos() {
+        const observados = this.constructor.observedAttributes || [];
+        const globaisPermitidos = ['id', 'class', 'style', 'tabindex', 'slot', 'hidden', 'title', 'lang', 'dir', 'accesskey', 'draggable', 'spellcheck'];
+        const invalidos = [];
+        Array.from(this.attributes).forEach(attr => {
+            const nome = attr.name;
+            if (observados.includes(nome)) return;
+            if (globaisPermitidos.includes(nome)) return;
+            if (nome.startsWith('data-') || nome.startsWith('aria-')) return;
+            if (nome.startsWith('on')) return;
+            invalidos.push(nome);
+        });
+        if (invalidos.length > 0) {
+            this.innerHTML = this._montaMsgErroAtributos(invalidos, globaisPermitidos);
+            this._ERRO = true;
+            return false;
+        }
+        return true;
+    }
+
+    // ****************************************************************************
+    // Métodos dos eventos padrão de um componente
+    // ****************************************************************************
+
+    addEventoClique(callback){
+        const wrapperCallback = (e) => {
+            if (this.hasAttribute('disabled')) {
+                e.preventDefault();
+                return;
+            }
+            let origem = e.currentTarget
+            let mouseInfo = {
+                x: e.clientX,
+                y: e.clientY,
+                offsetX: e.offsetX,
+                offsetY: e.offsetY
+            }
+            callback(origem,mouseInfo);
+        };
+        this.addEventListener('click', wrapperCallback);
+    }
+    addEventoFoco(callback) {
+        const wrapperCallback = (e) => {
+            if (this.hasAttribute('disabled')) return;
+            let origem = e.currentTarget
+            callback(origem);
+        };
+        this.addEventListener('focus', wrapperCallback);
+    }
+    addEventoBlur(callback) {
+        const wrapperCallback = (e) => {
+            if (this.hasAttribute('disabled')) return;
+            let origem = e.currentTarget
+            callback(origem);
+        };
+        this.addEventListener('blur', wrapperCallback);
+    }
+    addEventoMouseEntra(callback) {
+        const wrapperCallback = (e) => {
+            if (this.hasAttribute('disabled')) return;
+            let origem = e.currentTarget
+            callback(origem);
+        };
+        this.addEventListener('mouseenter', wrapperCallback);
+    }
+    addEventoMouseSai(callback) {
+        const wrapperCallback = (e) => {
+            if (this.hasAttribute('disabled')) return;
+            let origem = e.currentTarget
+            callback(origem);
+        };
+        this.addEventListener('mouseleave', wrapperCallback);
+    }
+    addEventoMouseSobre(callback) {
+        const wrapperCallback = (e) => { 
+            if (this.hasAttribute('disabled')) return;
+            let origem = e.currentTarget
+            let mouseInfo = {
+                x: e.clientX,
+                y: e.clientY,
+                offsetX: e.offsetX,
+                offsetY: e.offsetY
+            }
+            callback(origem,mouseInfo);
+        };
+        this.addEventListener('mousemove', wrapperCallback);
+    }
+    
+    // ****************************************************************************
+    // Mensagens de Erro
+    // ****************************************************************************
+    
+    _montaMsgErroAtributos(listaInvalidos, listaGlobaisPermitidos) {
+       return `
+        <div style="display:block; border:calc(0.5vw * var(--fator-escala)) dashed red; background-color:#fff0f0; padding:calc(1vw * var(--fator-escala)); color:red; fontFamily:'monospace';">
+            <h3 style="margin: 0 0 calc(0.5vw * var(--fator-escala)) 0;">🚫 Erro de Atributo: &lt;${this.tagName.toLowerCase()}&gt;</h3>
+            <p style="margin: 0;">
+                Os seguintes atributos não são reconhecidos:
+                <strong><em>'${listaInvalidos.join(', ')}'</em></strong>.<br>Remova-os!
+            </p>
+            <p style="margin: calc(0.5vw * var(--fator-escala)) 0 0 0; font-size: 0.9em; color: #333;">
+                Atributos padrão do componente: <em>[${this.constructor.observedAttributes.join(', ')}]</em>
+            </p>
+            <p style="margin: calc(0.5vw * var(--fator-escala)) 0 0 0; font-size: 0.9em; color: #333;">
+                Outros atributos também aceitos: <em>[${listaGlobaisPermitidos.join(', ')}]</em>
+            </p>
+            <p style="margin: calc(0.5vw * var(--fator-escala)) 0 0 0; font-size: 0.9em; color: #333;">
+                Recarregue a página para restaurar o conteúdo original!
+            </p>
+        </div>`;
+    }
+}
+
+class Select extends BaseComponent {
+    static get observedAttributes() {
+        return ['rotulo', 'valor', 'required', 'disabled','posicaoh', 'posicaov'];
+    }
+
+    constructor() {
+        super();
+    }
+
+    // ****************************************************************************
+    // Métodos de construção do componente
+    // ****************************************************************************
+
+    /** @override */
+    init() {
+        if (this.base_initialized) return; // guard para evitar dupla criação
+        if (!this.hasAttribute('tabindex')) this.setAttribute('tabindex', '0'); // Torna o componente focável
+
+        // container raiz
+        const group = document.createElement('div');
+        group.className = 'algol-component-group';
+
+        // rotulo
+        const label = document.createElement('label');
+        label.className = 'algol-label';
+
+        // wrapper do select custom
+        const select = document.createElement('select');
+        select.className = 'algol-select';
+
+        // Move as <option> existentes para o select nativo
+        while (this.firstChild) {
+            const node = this.firstChild;
+            if (node.tagName === 'OPTION' || node.nodeType === Node.TEXT_NODE) {
+                select.append(node);
+            } else {
+                node.remove();
+            }
+        }
+
+        group.appendChild(label);
+        group.appendChild(select);
+        this.appendChild(group);
+
+        // refs
+        this.elems['root'] = group;
+        this.elems['label'] = label;
+        this.elems['select'] = select;
+
+        this.aplicaAtributos();
+        this._marcarOpcaoPadrao(); // para selecionar a opção padrão
+
+        this.base_initialized = true;
+    }
+    /** @override */
+    attachEvents() {
+        this.elems['select'].addEventListener('input', () => this._refletirValor());
+        this.elems['select'].addEventListener('change', () => this._refletirValor());
+    }
+
+    // ****************************************************************************
+    // Métodos de atualização
+    // ****************************************************************************
+   
+    /** @override */
+    reconstroi() {
+        console.log('reconstruindo select...');
+
+        // captura as opções atuais para restaurar depois
+        const opcoes = Array.from(this.elems['select'].options).map(option => option.cloneNode(true));
+        const valorAtual = this.elems['select'].value;
+
+        this.innerHTML = ''; // Limpa o componente para garantir reconstrução do zero
+        this.removeAttribute("style"); // limoa todos os estilos inline
+        this.elems.clear(); // limpa a lista de componente
+
+        // coloca as opções de volta
+        for (const opcao of opcoes) {
+            this.appendChild(opcao);
+        }
+        this.constroi();
+
+        // restaura o valor atual
+        this.valor = valorAtual; 
+        this.aplicaAtributo_valor();
+
+    }
+
+    // ****************************************************************************
+    // Ciclo de Vida de alterações do componente
+    // ****************************************************************************
+
+    /** @override */
+    mudaFilhosCallback() {
+        this.innerHTML = this._montaMsgErroConteudo();
+        this._ERRO = true;
+    }
+    /** @override */
+    mudaTextoCallback() {
+        this.innerHTML = this._montaMsgErroConteudo();
+        this._ERRO = true;
+    }
+    /** @override */
+    mudaAtributosCallback(nomeAtributo, valorAntigo) {
+        if (nomeAtributo === 'valor'){ // se a mudança foi no atributo valor... 
+            this.dispatchEvent(new CustomEvent('mudancaValor',{bubbles: false,detail: {antigo: valorAntigo, novo: this.valor}}));
+            this.aplicaAtributo_valor(); // não deve reconstruir, apenas atualizar o valor
+        }else {this.reconstroi();}
+    }
+    
+    // ****************************************************************************
+    // Utils
+    // ****************************************************************************
+
+    _marcarOpcaoPadrao() {
+        if (this.elems['select'].options.length > 0) {
+            let select = this.elems['select'];
+            select.selectedIndex = 0; // a princípio, a opção padrão é a primeira
+            // seleciona o primeiro <option> marcado como ativo
+            for(let i=0;i<select.options.length;i++){
+                const option = select.options[i];
+                if(option.hasAttribute('ativa')) {
+                    select.selectedIndex = i;
+                    break;
+                }
+            }
+            this._refletirValor(); // Atualiza o valor refletido
+        }
+    }
+
+    _refletirValor() {
+    const current = this.elems['select'].value;
+        if (this.valor !== current) {
+        this.valor = current;
+        this.dispatchEvent(new Event('input', { bubbles: true }));
+        this.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+    }
+
+    // ****************************************************************************
+    // Métodos dos atributos
+    // ****************************************************************************
+
+    aplicaAtributo_rotulo() {
+        const rotulo = this.getAttribute('rotulo');
+        this.elems['label'].textContent = rotulo;
+    }
+    aplicaAtributo_valor() {
+        // quando alterar externamente o atributo, aplica sem disparar eventos duplicados
+        const v = this.valor;
+        this.elems['select'].value = v;
+    }
+    aplicaAtributo_disabled() {
+        this.elems['select'].disabled = this.hasAttribute('disabled');
+        if (this.hasAttribute('disabled')) {
+            this.elems['select'].style.cursor = 'not-allowed';
+        } else {
+            this.elems['select'].style.cursor = '';
+        }
+    }
+    aplicaAtributo_required() {
+        this.elems['select'].toggleAttribute('required', this.hasAttribute('required'));
+    }
+    aplicaAtributo_posicaoh() {
+        const pos = this.getAttribute('posicaoh');       
+        if (!pos) return; // se não existe a propiedade 'posicaoh', abandona
+        const posValues = ['inicio','fim','centro','total']; // valores aceitos para 'posicaoh'
+        switch(pos){
+            case posValues[0]: this.style.justifySelf = 'start'; break;
+            case posValues[1]: this.style.justifySelf = 'end'; break;
+            case posValues[2]: this.style.justifySelf = 'center'; break;
+            case posValues[3]: this.style.justifySelf = 'stretch'; break;
+        }
+    }
+    aplicaAtributo_posicaov() {
+        const pos = this.getAttribute('posicaov');       
+        if (!pos) return; // se não existe a propiedade 'posicaov', abandona
+        const posValues = ['inicio','fim','centro','total']; // valores aceitos para 'posicaov'
+        switch(pos){
+            case posValues[0]: this.style.alignSelf = 'start'; break;
+            case posValues[1]: this.style.alignSelf = 'end'; break;
+            case posValues[2]: this.style.alignSelf = 'center'; break;
+            case posValues[3]: this.style.alignSelf = 'center'; break;
+        }
+    }
+
+    // ****************************************************************************
+    // Métodos dos eventos espcíficos deste componente
+    // ****************************************************************************
+
+    addEventoMudaValor(callback){
+        const wrapperCallback = (e) => {
+            if (this.hasAttribute('disabled')) {
+                e.preventDefault();
+                return;
+            }
+            let origem = e.currentTarget
+            let antigo = e.detail.antigo;
+            let novo = e.detail.novo;
+            callback(origem,antigo,novo);
+            return;
+            
+        };
+        this.addEventListener('mudancaValor', wrapperCallback);
+    }
+
+    // ****************************************************************************
+    // Mensagens de Erro
+    // ****************************************************************************
+    
+    _montaMsgErroConteudo() {
+       return `
+        <div style="display:block; border:calc(0.5vw * var(--fator-escala)) dashed red; background-color:#fff0f0; padding:calc(1vw * var(--fator-escala)); color:red; fontFamily:'monospace';">
+            <h3 style="margin: 0 0 calc(0.5vw * var(--fator-escala)) 0;">🚫 Erro de Conteúdo: &lt;${this.tagName.toLowerCase()}&gt;</h3>
+            <p style="margin: 0;">
+                Este componente não permite alteração de seu conteúdo interno!
+            </p>
+            <p style="margin: calc(0.5vw * var(--fator-escala)) 0 0 0; font-size: 0.9em; color: #333;">
+                Recarregue a página para restaurar o conteúdo original!
+            </p>
+        </div>`;
+    }
+}
+class BaseLayout extends HTMLElement {
+    static get observedAttributes() {return [];}
+
+    constructor() {
+        super();
+
+        this._ERRO = false;
+        this._observer = null; // MutationObserver para monitorar mudanças nos filhos
+        this._gerarAcessores(); // gera os acessores para os atributos observados
+        
+        this._base_initialized = false;
+        this._connected = false;
+    }
+
+    
+    // ****************************************************************************
+    // Métodos de inicialização
+    // ****************************************************************************
+    
+    _init(){ // @abstract
+        throw new Error("O método '_init()' deve ser implementado na classe filha.");
+    }
+    
+    _verificaFilhos(filhos){ // @abstract
+        throw new Error("O método '_verificaFilhos()' deve ser implementado na classe filha.");
+    }
+    
+    // _attachEvents(){ // @abstract
+    //     throw new Error("O método '_attachEvents()' deve ser implementado na classe filha.");
+    // }
+
+    _initObserver() {
+        this._observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => { // itera sobre as mutações observadas
+                if (mutation.type === 'childList') { // verifica se houve adição, remoção ou alteração de filhos
+                    console.log('Mutação!');
+                    
+                    this._verificaFilhos(Array.from(this.children));
+                }
+            });
+        });
+        
+        this._observer.observe(this, { childList: true });
+    }
+
+    /** gera dinamicamente os métodos getters e setters para os atributos */
+    _gerarAcessores() {
+        this.constructor.observedAttributes.forEach(attr => {
+            // Verifica se a propriedade já não existe para não sobrescrever métodos manuais
+            if (!(attr in this)) {
+                Object.defineProperty(this, attr, {
+                    get: () => this.getAttribute(attr),
+                    set: (val) => this.setAttribute(attr, val),
+                    configurable: true
+                });
+            }
+        });
+    }
+
+    // ****************************************************************************
+    // Aplicação de Atributos
+    // ****************************************************************************
+    
+    // Aplica os atributos do componente
+    _applyAttributes() {
+        // invoca as funções '_applyAttribute_...' para cada atributo'
+        this.constructor.observedAttributes.forEach(item => {
+            const nomeMetodo = `_applyAttribute_${item}`;
+            // Verifica se a função existe antes de invocar
+            if (typeof this[nomeMetodo] === 'function') {
+                this[nomeMetodo]();
+            } else {
+                console.error(`Faltando o método ${nomeMetodo} no componente.`);
+            }
+        });
+    }
+
+    // ****************************************************************************
+    // Ciclo de Vida
+    // ****************************************************************************
+    
+    connectedCallback() {
+        if (this._connected) return;
+
+        // validação de erros. se houver erros, sinalizará ao componente
+        this._validarAtributos();
+        
+        if(this._ERRO) return; // se houver erro sinalizado, substitui o conteúdo do componente por uma mensagem de erro
+
+        this._init();
+        this._verificaFilhos(Array.from(this.children));
+        this._applyAttributes();
+        this._connected = true;
+    }
+
+    disconnectedCallback() {
+        if (this._observer) this._observer.disconnect();
+        this._connected = false;
+    }
+
+     /** invocado automaticamente quando muda o valor de algum atributo observado ('observedAttributes'). */
+    attributeChangedCallback(name, oldV, newV) {
+        
+        // 1. Só age se o valor realmente mudou e se o componente já foi montado
+        if (oldV === newV || !this._connected) return;
+
+        // 2. Constrói o nome do método (ex: _applyAttribute_valor)
+        const nomeMetodo = `_applyAttribute_${name}`;
+        
+        // 3. Chama a função de aplicação específica
+        if (typeof this[nomeMetodo] === 'function') {
+            this[nomeMetodo]();
+        }
+        // lança um evento de mudança de atributo, para quem quiser escutar
+        this.dispatchEvent(new CustomEvent('mudancaAtributo', {
+            detail: {
+                attribute: name,
+                oldValue: oldV,
+                newValue: newV
+            },
+        }));
+    }
+
+    // ****************************************************************************
+    // Métodos de suporte
+    // ****************************************************************************
+
+    _validarAtributos() {
+        const observados = this.constructor.observedAttributes || [];
+        
+        // Atributos globais que devem ser permitidos para não quebrar o HTML padrão
+        // Você pode expandir essa lista conforme a necessidade
+        const globaisPermitidos = [
+            'id', 'class', 'style', 'tabindex', 'slot', 'hidden', 
+            'title', 'lang', 'dir', 'accesskey', 'draggable', 'spellcheck'
+        ];
+
+        const invalidos = [];
+        
+        // Itera sobre TODOS os atributos presentes e identifica os invalidos
+        Array.from(this.attributes).forEach(attr => {
+            const nome = attr.name;
+            // 1. É um atributo observado? OK.
+            if (observados.includes(nome)) return;
+            // 2. É um atributo global padrão? OK.
+            if (globaisPermitidos.includes(nome)) return;
+            // 3. É um atributo data-* ou aria-*? OK.
+            if (nome.startsWith('data-') || nome.startsWith('aria-')) return;
+            // 4. É um event listener inline (ex: onclick)?
+            if (nome.startsWith('on')) return;
+            // Se chegou aqui, é inválido
+            invalidos.push(nome);
+        });
+
+        if (invalidos.length > 0) {
+            // altera o código de erro
+            this.innerHTML = this._montaMsgErroAtributo(invalidos,globaisPermitidos);
+            // sinaliza ao compoente
+            this._ERRO = true;
+        }
+    }
+
+    /** Exibe o erro visualmente (substitui o conteúdo por texto vermelho) */
+    _montaMsgErroAtributo(listaInvalidos,listaGlobaisPermitidos) {
+        return `
+        <div style="display:block; border:calc(0.5vw * var(--fator-escala)) dashed red; background-color:#fff0f0; padding:calc(1vw * var(--fator-escala)); color:red; fontFamily:'monospace';">
+            <h3 style="margin: 0 0 calc(0.5vw * var(--fator-escala)) 0;">🚫 Erro de Atributo: &lt;${this.tagName.toLowerCase()}&gt;</h3>
+            <p style="margin: 0;">
+                Os seguintes atributos não são reconhecidos:
+                <strong><em>'${listaInvalidos.join(', ')}'</em></strong>.<br>Remova-os!
+            </p>
+            <p style="margin: calc(0.5vw * var(--fator-escala)) 0 0 0; font-size: 0.9em; color: #333;">
+                Atributos padrão do componente: <em>[${this.constructor.observedAttributes.join(', ')}]</em>
+            </p>
+            <p style="margin: calc(0.5vw * var(--fator-escala)) 0 0 0; font-size: 0.9em; color: #333;">
+                Outros atributos também aceitos: <em>[${listaGlobaisPermitidos.join(', ')}]</em>
+            </p>
+        </div>`;
+    }
+}
+
+class GridLayout extends BaseLayout {
+    static get observedAttributes() {return ['colunas', 'gap', 'posicaoh', 'posicaov'];}
+
+    constructor() {
+        super();
+    }
+
+    _init() {
+        if (this._base_initialized) return;
+
+        this.style.display = 'grid';
+        this.style.boxSizing = 'border-box';
+        this._initObserver(); // Inicializa o Observer para detectar novos itens inseridos via JS
+        
+        this._base_initialized = true;
+    }
+
+    // ****************************************************************************
+    // Aplicação de Atributos
+    // ****************************************************************************
+
+    _applyAttribute_colunas() {
+        const colunas = this.getAttribute('colunas') || '1fr';
+        this.style.gridTemplateColumns = colunas;
+    }
+
+    _applyAttribute_gap() {
+        const gap = this.getAttribute('gap');
+        if (gap) this.style.gap = gap;
+        else this.style.removeProperty('gap');
+    }
+
+    _applyAttribute_posicaoh() {
+        let filhos = Array.from(this.children); // obtém a lista de filhos
+        const pos = this.getAttribute('posicaoh');
+        if (pos){ // se existe a propiedade 'posicaoh'
+            const posValues = ['inicio','fim','centro','total']; // valores aceitos para 'posicaoh'
+            let alignValue = 'stretch'; // total
+            this.style.justifyItems = alignValue;
+            switch(pos){
+                case posValues[0]: alignValue = 'start'; break;
+                case posValues[1]: alignValue = 'end'; break;
+                case posValues[2]: alignValue = 'center'; break;
+            }
+            for (let i = 0; i < filhos.length; i++) {
+                const filho = filhos[i];
+                if(filho.tagName.toLowerCase()!=='algol-grid-item') continue; // ignora elementos que não são algol-grid-item
+                filho.style.display = 'grid';
+                filho.style.justifyItems = alignValue;
+            }
+        }else{ // se não existe a propriedade 'posicaoh'
+            for (let i = 0; i < filhos.length; i++) {
+                const filho = filhos[i];
+                if(filho.tagName.toLowerCase()!=='algol-grid-item') continue; // ignora elementos que não são algol-grid-item
+                filho.style.display = 'grid';
+                filho.style.justifyItems = 'center';
+
+            }
+        }
+    }
+
+    _applyAttribute_posicaov() {
+        let filhos = Array.from(this.children); // obtém a lista de filhos
+        const pos = this.getAttribute('posicaov');
+        if (pos){ // se existe a propiedade 'posicaov'
+            const posValues = ['inicio','fim','centro','total']; // valores aceitos para 'posicaov'
+            let alignValue = 'stretch'; // total
+            this.style.alignItems = alignValue;
+            switch(pos){
+                case posValues[0]: alignValue = 'start'; break;
+                case posValues[1]: alignValue = 'end'; break;
+                case posValues[2]: alignValue = 'center'; break;
+            }
+            for (let i = 0; i < filhos.length; i++) {
+                const filho = filhos[i];
+                if(filho.tagName.toLowerCase()!=='algol-grid-item') continue; // ignora elementos que não são algol-grid-item
+                filho.style.display = 'grid';
+                filho.style.alignItems = alignValue;
+            }
+        }else{ // se não existe a propriedade 'posicaov'
+            for (let i = 0; i < filhos.length; i++) {
+                const filho = filhos[i];
+                if(filho.tagName.toLowerCase()!=='algol-grid-item') continue; // ignora elementos que não são algol-grid-item
+                filho.style.display = 'grid';
+                filho.style.alignItems = 'center';
+
+            }
+        }
+    }
+
+    // ****************************************************************************
+    // Métodos de suporte
+    // ****************************************************************************
+
+    /** Faz uma varredura nos filhos do componente, de forma recursiva, em busca elementos fora de <algol-grid-item> */
+    _verificaFilhos(filhos){
+        // percorre todos os filhos do componente e verifica se são algol-grid-item        
+        for (let i = 0; i < filhos.length; i++) {
+            const filho = filhos[i];
+
+            // se for <algol-grid-item> ou uma div com id de erro (algol-error!), não precisa fazer nada!
+            if(filho.tagName.toLowerCase()==='algol-grid-item' || filho.id==='algol-error!') continue;
+            
+            // se o filho for outro <algol-grid-layout>, faz uma nova verificação (recursiva)
+            if (filho.tagName.toLowerCase() === 'algol-grid-layout') {
+                this._verificaFilhos(Array.from(filho.children));
+                continue;
+            }
+
+            let div = document.createRange().createContextualFragment(this._montaMsgErro(filho.tagName.toLowerCase()));
+            filho.replaceWith(div);
+        }
+
+        this._applyAttributes();
+    }
+
+    _verificaTipoFilho(filho){
+        let tagName = filho.tagName.toLowerCase();
+        if(tagName!=='algol-grid-item'){
+            this._montaMsgErro(filho);
+        }
+    }
+    
+    _montaMsgErro(nome) {
+        return `
+        <div id="algol-error!" style="display:block; border:calc(0.5vw * var(--fator-escala)) dashed purple; background-color:#fff0f0; padding:calc(1vw * var(--fator-escala)); color:purple; fontFamily:'monospace';">
+            <h3 style="margin: 0 0 calc(0.5vw * var(--fator-escala)) 0;">🚫 Erro de Layout: &lt;${this.tagName.toLowerCase()}&gt;</h3>
+            <p style="margin: 0;">
+                Envolva o elemento <code>&lt;${nome}&gt;</code> dentro de um <code>&lt;algol-grid-item&gt;</code><algol-grid-item></code>
+            </p>
+            
+        </div>`;
+    }
+
+}
+
+class GridItem extends BaseLayout {
+    static get observedAttributes() {return ['expandecoluna','expandelinha'];}
+
+    constructor() {
+        super();
+    }
+
+    _init() {
+        if (this._base_initialized) return;
+
+        this.style.display = 'grid';
+        this.style.boxSizing = 'border-box';
+        this._initObserver(); // Inicializa o Observer para detectar novos itens inseridos via JS
+        
+        this._base_initialized = true;
+    }
+
+    // ****************************************************************************
+    // Aplicação de Atributos
+    // ****************************************************************************
+
+    _applyAttribute_expandecoluna() {
+        const exp = this.getAttribute('expandecoluna');
+        if (exp){ // se existe a propiedade 'expandecoluna'
+            this.style.gridColumnEnd = 'span ' + exp;
+        } else this.style.removeProperty('grid-column-end');
+    }
+
+    _applyAttribute_expandelinha() {
+        const exp = this.getAttribute('expandelinha');
+        if (exp){ // se existe a propiedade 'expandelinha'
+            this.style.gridRowEnd = 'span ' + exp;
+        } else this.style.removeProperty('grid-row-end');
+    }
+
+    // ****************************************************************************
+    // Métodos de suporte
+    // ****************************************************************************
+
+    _verificaFilhos(filhos){
+
+    }
+}
+
+/** Instanciação dos componentes customizados */
+customElements.define('algol-select', Select);
+customElements.define('algol-grid-layout', GridLayout);
+customElements.define('algol-grid-item', GridItem);
+
+
+/** evita rolar a tela com os direcionais */
+window.addEventListener('keydown', function(event) {
+    if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
+        event.preventDefault();
+    }
+});
+
+
+// injeta as variáveis globais
+for (const chave in GLOBAL) {
+    document.documentElement.style.setProperty(`--${chave}`, GLOBAL[chave]);
+}
+// injeta a fonte global
+const style = document.createElement('style');
+style.textContent =
+`@font-face {
+    font-family: "Algol Font";
+    font-weight: normal;
+    font-style: normal;
+    src: url("${fontBase64}") format("woff");
+}`;
+document.head.appendChild(style);

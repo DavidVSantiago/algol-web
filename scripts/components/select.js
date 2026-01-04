@@ -59,34 +59,6 @@ class Select extends BaseComponent {
     }
 
     // ****************************************************************************
-    // Métodos de atualização
-    // ****************************************************************************
-   
-    /** @override */
-    reconstroi() {
-        console.log('reconstruindo select...');
-
-        // captura as opções atuais para restaurar depois
-        const opcoes = Array.from(this.elems['select'].options).map(option => option.cloneNode(true));
-        const valorAtual = this.elems['select'].value;
-
-        this.innerHTML = ''; // Limpa o componente para garantir reconstrução do zero
-        this.removeAttribute("style"); // limoa todos os estilos inline
-        this.elems.clear(); // limpa a lista de componente
-
-        // coloca as opções de volta
-        for (const opcao of opcoes) {
-            this.appendChild(opcao);
-        }
-        this.constroi();
-
-        // restaura o valor atual
-        this.valor = valorAtual; 
-        this.aplicaAtributo_valor();
-
-    }
-
-    // ****************************************************************************
     // Ciclo de Vida de alterações do componente
     // ****************************************************************************
 
@@ -104,8 +76,8 @@ class Select extends BaseComponent {
     mudaAtributosCallback(nomeAtributo, valorAntigo) {
         if (nomeAtributo === 'valor'){ // se a mudança foi no atributo valor... 
             this.dispatchEvent(new CustomEvent('mudancaValor',{bubbles: false,detail: {antigo: valorAntigo, novo: this.valor}}));
-            this.aplicaAtributo_valor(); // não deve reconstruir, apenas atualizar o valor
-        }else {this.reconstroi();}
+        }
+        this.aplicaAtributo(nomeAtributo);
     }
     
     // ****************************************************************************
@@ -210,13 +182,13 @@ class Select extends BaseComponent {
     
     _montaMsgErroConteudo() {
        return `
-        <div style="display:block; border:calc(0.5vw * var(--fator-escala)) dashed red; background-color:#fff0f0; padding:calc(1vw * var(--fator-escala)); color:red; fontFamily:'monospace';">
+        <div style="display:block; border:calc(0.5vw * var(--fator-escala)) dashed #d50; background-color:#fff0f0; padding:calc(1vw * var(--fator-escala)); color:#d50; fontFamily:'monospace';">
             <h3 style="margin: 0 0 calc(0.5vw * var(--fator-escala)) 0;">🚫 Erro de Conteúdo: &lt;${this.tagName.toLowerCase()}&gt;</h3>
             <p style="margin: 0;">
                 Este componente não permite alteração de seu conteúdo interno!
             </p>
             <p style="margin: calc(0.5vw * var(--fator-escala)) 0 0 0; font-size: 0.9em; color: #333;">
-                Recarregue a página para restaurar o conteúdo original!
+                -- Recarregue a página para restaurar o conteúdo original! --
             </p>
         </div>`;
     }

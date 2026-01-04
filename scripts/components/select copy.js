@@ -7,39 +7,14 @@ class Select extends BaseComponent {
         super();
     }
 
-    // observador de mudanças
-    _mutationObserver (mutations) {
-        // Flag para evitar rebuilds desnecessários se a mudança não for relevante
-        let mudancaRelevante = false;
-        for (const mutation of mutations) { // percorre todas as mutações
-
-            if (mutation.type === 'childList') { // Mudança na estrutura do DOM (elementos adicionados/removidos)
-                mudancaRelevante = true; break;
-            } else if (mutation.type === 'attributes') { // Mudança de atributos
-                if (mutation.attributeName === 'valor'){ // se a mudança foi no atributo valor...
-                    this.dispatchEvent(new CustomEvent('mudancaValor', {bubbles: false}));
-                    this._applyAttribute_valor(); // não deve reconstruir, apenas atualizar o valor
-                }else {mudancaRelevante = true; break;}
-            } else if (mutation.type === 'characterData') { // Mudança de texto
-                
-                mudancaRelevante = true; break;
-            }
-        }
-        if(mudancaRelevante) {
-            this.reaplicaAtributos();
-        }
-    }
-
     // ****************************************************************************
-    // Métodos de inicialização
+    // Métodos de construção do componente
     // ****************************************************************************
 
-     /** Faz a construção interna do componente */
-    _init() {
-        if (this._base_initialized) return; // guard para evitar dupla criação
+    /** @override */
+    init() {
+        if (this.base_initialized) return; // guard para evitar dupla criação
         if (!this.hasAttribute('tabindex')) this.setAttribute('tabindex', '0'); // Torna o componente focável
-
-        this.style.alignSelf = 'center';
 
         // container raiz
         const group = document.createElement('div');
@@ -68,19 +43,78 @@ class Select extends BaseComponent {
         this.appendChild(group);
 
         // refs
-        this._elems['root'] = group;
-        this._elems['label'] = label;
-        this._elems['select'] = select;
+        this.elems['root'] = group;
+        this.elems['label'] = label;
+        this.elems['select'] = select;
 
-        this._applyAttributes();
+        this.aplicaAtributos();
         this._marcarOpcaoPadrao(); // para selecionar a opção padrão
 
-        this._base_initialized = true;
+        this.base_initialized = true;
+    }
+    /** @override */
+    attachEvents() {
+        this.elems['select'].addEventListener('input', () => this._refletirValor());
+        this.elems['select'].addEventListener('change', () => this._refletirValor());
     }
 
+    // ****************************************************************************
+    // Métodos de atualização
+    // ****************************************************************************
+   
+    /** @override */
+    reconstroi() {
+        console.log('reconstruindo select...');
+
+        // captura as opções atuais para restaurar depois
+        const opcoes = Array.from(this.elems['select'].options).map(option => option.cloneNode(true));
+        const valorAtual = this.elems['select'].value;
+
+        this.innerHTML = ''; // Limpa o componente para garantir reconstrução do zero
+        this.removeAttribute("style"); // limoa todos os estilos inline
+        this.elems.clear(); // limpa a lista de componente
+
+        // coloca as opções de volta
+        for (const opcao of opcoes) {
+            this.appendChild(opcao);
+        }
+        this.constroi();
+
+        // restaura o valor atual
+        this.valor = valorAtual; 
+        this.aplicaAtributo_valor();
+
+    }
+
+    // ****************************************************************************
+    // Ciclo de Vida de alterações do componente
+    // ****************************************************************************
+
+    /** @override */
+    mudaFilhosCallback() {
+        this.innerHTML = this._montaMsgErroConteudo();
+        this._ERRO = true;
+    }
+    /** @override */
+    mudaTextoCallback() {
+        this.innerHTML = this._montaMsgErroConteudo();
+        this._ERRO = true;
+    }
+    /** @override */
+    mudaAtributosCallback(nomeAtributo, valorAntigo) {
+        if (nomeAtributo === 'valor'){ // se a mudança foi no atributo valor... 
+            this.dispatchEvent(new CustomEvent('mudancaValor',{bubbles: false,detail: {antigo: valorAntigo, novo: this.valor}}));
+            this.aplicaAtributo_valor(); // não deve reconstruir, apenas atualizar o valor
+        }else {this.reconstroi();}
+    }
+    
+    // ****************************************************************************
+    // Utils
+    // ****************************************************************************
+
     _marcarOpcaoPadrao() {
-        if (this._elems['select'].options.length > 0) {
-            let select = this._elems['select'];
+        if (this.elems['select'].options.length > 0) {
+            let select = this.elems['select'];
             select.selectedIndex = 0; // a princípio, a opção padrão é a primeira
             // seleciona o primeiro <option> marcado como ativo
             for(let i=0;i<select.options.length;i++){
@@ -94,17 +128,8 @@ class Select extends BaseComponent {
         }
     }
 
-    _attachEvents() {
-        this._elems['select'].addEventListener('input', () => this._refletirValor());
-        this._elems['select'].addEventListener('change', () => this._refletirValor());
-    }
-
-    // ****************************************************************************
-    // Utils
-    // ****************************************************************************
-
     _refletirValor() {
-    const current = this._elems['select'].value;
+    const current = this.elems['select'].value;
         if (this.valor !== current) {
         this.valor = current;
         this.dispatchEvent(new Event('input', { bubbles: true }));
@@ -116,28 +141,27 @@ class Select extends BaseComponent {
     // Métodos dos atributos
     // ****************************************************************************
 
-    _applyAttribute_rotulo() {
+    aplicaAtributo_rotulo() {
         const rotulo = this.getAttribute('rotulo');
-        this._elems['label'].textContent = rotulo;
+        this.elems['label'].textContent = rotulo;
     }
-    _applyAttribute_valor() {
+    aplicaAtributo_valor() {
         // quando alterar externamente o atributo, aplica sem disparar eventos duplicados
         const v = this.valor;
-        this._elems['select'].value = v;
+        this.elems['select'].value = v;
     }
-    _applyAttribute_disabled() {
-        this._elems['select'].disabled = this.hasAttribute('disabled');
+    aplicaAtributo_disabled() {
+        this.elems['select'].disabled = this.hasAttribute('disabled');
         if (this.hasAttribute('disabled')) {
-            this._elems['select'].style.cursor = 'not-allowed';
+            this.elems['select'].style.cursor = 'not-allowed';
         } else {
-            this._elems['select'].style.cursor = '';
+            this.elems['select'].style.cursor = '';
         }
     }
-
-    _applyAttribute_required() {
-        this._elems['select'].toggleAttribute('required', this.hasAttribute('required'));
+    aplicaAtributo_required() {
+        this.elems['select'].toggleAttribute('required', this.hasAttribute('required'));
     }
-    _applyAttribute_posicaoh() {
+    aplicaAtributo_posicaoh() {
         const pos = this.getAttribute('posicaoh');       
         if (!pos) return; // se não existe a propiedade 'posicaoh', abandona
         const posValues = ['inicio','fim','centro','total']; // valores aceitos para 'posicaoh'
@@ -148,7 +172,7 @@ class Select extends BaseComponent {
             case posValues[3]: this.style.justifySelf = 'stretch'; break;
         }
     }
-    _applyAttribute_posicaov() {
+    aplicaAtributo_posicaov() {
         const pos = this.getAttribute('posicaov');       
         if (!pos) return; // se não existe a propiedade 'posicaov', abandona
         const posValues = ['inicio','fim','centro','total']; // valores aceitos para 'posicaov'
@@ -160,74 +184,10 @@ class Select extends BaseComponent {
         }
     }
 
-     // ****************************************************************************
-    // Métodos dos eventos do componente
+    // ****************************************************************************
+    // Métodos dos eventos espcíficos deste componente
     // ****************************************************************************
 
-    // gerais
-    addEventoClique(callback){
-        const wrapperCallback = (e) => {
-            if (this.hasAttribute('disabled')) {
-                e.preventDefault();
-                return;
-            }
-            let origem = e.currentTarget
-            let mouseInfo = {
-                x: e.clientX,
-                y: e.clientY,
-                offsetX: e.offsetX,
-                offsetY: e.offsetY
-            }
-            callback(origem,mouseInfo);
-        };
-        this.addEventListener('click', wrapperCallback);
-    }
-    addEventoFoco(callback) {
-        const wrapperCallback = (e) => {
-            if (this.hasAttribute('disabled')) return;
-            let origem = e.currentTarget
-            callback(origem);
-        };
-        this.addEventListener('focus', wrapperCallback);
-    }
-    addEventoBlur(callback) {
-        const wrapperCallback = (e) => {
-            if (this.hasAttribute('disabled')) return;
-            let origem = e.currentTarget
-            callback(origem);
-        };
-        this.addEventListener('blur', wrapperCallback);
-    }
-    addEventoMouseEntra(callback) {
-        const wrapperCallback = (e) => {
-            if (this.hasAttribute('disabled')) return;
-            let origem = e.currentTarget
-            callback(origem);
-        };
-        this.addEventListener('mouseenter', wrapperCallback);
-    }
-    addEventoMouseSai(callback) {
-        const wrapperCallback = (e) => {
-            if (this.hasAttribute('disabled')) return;
-            let origem = e.currentTarget
-            callback(origem);
-        };
-        this.addEventListener('mouseleave', wrapperCallback);
-    }
-    addEventoMouseSobre(callback) {
-        const wrapperCallback = (e) => { 
-            if (this.hasAttribute('disabled')) return;
-            let origem = e.currentTarget
-            let mouseInfo = {
-                x: e.clientX,
-                y: e.clientY,
-                offsetX: e.offsetX,
-                offsetY: e.offsetY
-            }
-            callback(origem,mouseInfo);
-        };
-        this.addEventListener('mousemove', wrapperCallback);
-    }
     addEventoMudaValor(callback){
         const wrapperCallback = (e) => {
             if (this.hasAttribute('disabled')) {
@@ -235,14 +195,29 @@ class Select extends BaseComponent {
                 return;
             }
             let origem = e.currentTarget
-            let valor = this.valor;
-            callback(origem,valor);
+            let antigo = e.detail.antigo;
+            let novo = e.detail.novo;
+            callback(origem,antigo,novo);
             return;
             
         };
         this.addEventListener('mudancaValor', wrapperCallback);
     }
-}
 
-// static counter para ids
-Select._uidCounter = 0;
+    // ****************************************************************************
+    // Mensagens de Erro
+    // ****************************************************************************
+    
+    _montaMsgErroConteudo() {
+       return `
+        <div style="display:block; border:calc(0.5vw * var(--fator-escala)) dashed #d50; background-color:#fff0f0; padding:calc(1vw * var(--fator-escala)); color:#d50; fontFamily:'monospace';">
+            <h3 style="margin: 0 0 calc(0.5vw * var(--fator-escala)) 0;">🚫 Erro de Conteúdo: &lt;${this.tagName.toLowerCase()}&gt;</h3>
+            <p style="margin: 0;">
+                Este componente não permite alteração de seu conteúdo interno!
+            </p>
+            <p style="margin: calc(0.5vw * var(--fator-escala)) 0 0 0; font-size: 0.9em; color: #333;">
+                -- Recarregue a página para restaurar o conteúdo original! --
+            </p>
+        </div>`;
+    }
+}

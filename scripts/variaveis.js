@@ -8,7 +8,7 @@
 const GLOBAL = {
     'fator-escala': 1.0, // multiplicador de escala global recomenda-se que seja um valor entre 0.5 e 1.5 (padrão 1.0)
     'font-size': '1.1vw', // ajusta o tamanho da fonte global (padrão 1.1vw)
-    'line-height': '1.6vw', // ajusta a altura da linha global (padrão 1.6vw)
+    'line-height': '1.6vw', // ajusta a altura da linha de texto global (padrão 1.6vw)
     'border-radius-components': '0.5vw', // 
     'border-radius-layout': '1.0vw', // 
     'font-size-btn': '1.2vw', // 

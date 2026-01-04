@@ -73,7 +73,7 @@
 
             <algol-grid-layout>
                 <algol-grid-item>
-                    <algol-select id="comp" rotulo="Select" posicaoh="">
+                    <!-- <algol-select id="comp" rotulo="Select" posicaoh="">
                         <option disabled ativa> Selecione uma das opções</option>
                         <option disabled>--Grupo 1--</option>
                         <option value="A">Opção A</option>
@@ -84,7 +84,9 @@
                         <option disabled>--Grupo 3--</option>
                         <option value="E">Opção E</option>
                         <option value="F">Opção F</option>
-                    </algol-select>
+                    </algol-select> -->
+                    
+                    <!-- <algol-textarea id="comp" rotulo="Textarea" posicaoh="" valor="Teste de valor inicial do textarea."></algol-textarea> -->
                 </algol-grid-item>
                 <algol-grid-item>   
                     <div id="div">teste</div>
@@ -94,6 +96,24 @@
                 // temporário. apenas para teste
                 window.addEventListener('load', function (event) {
                     let comp = document.getElementById('comp');
+                    let div = document.getElementById('div');
+                    div.addEventListener('click', ()=>{
+                        div.innerHTML=`
+                            <algol-select id="comp" rotulo="Select" posicaoh="">
+                                <option disabled ativa> Selecione uma das opções</option>
+                                <option disabled>--Grupo 1--</option>
+                                <option value="A">Opção A</option>
+                                <option value="B">Opção B</option>
+                                <option disabled>--Grupo 2--</option>
+                                <option value="C">Opção C</option>
+                                <option value="D">Opção D</option>
+                                <option disabled>--Grupo 3--</option>
+                                <option value="E">Opção E</option>
+                                <option value="F">Opção F</option>
+                            </algol-select>
+                        `;
+                    });
+
                     // comp.addEventoClique((origem,mouseInfo)=>console.log(origem,mouseInfo));
                     // comp.addEventoFoco((origem)=>console.log(origem));
                     // comp.addEventoBlur((origem)=>console.log(origem));
@@ -102,7 +122,7 @@
                     // comp.addEventoMouseSobre((origem,mouseInfo)=>console.log(origem,mouseInfo));
                     // comp.addEventoCliqueSobe((origem,mouseInfo)=>console.log(origem,mouseInfo));
                     // comp.addEventoCliqueDesce((origem,mouseInfo)=>console.log(origem,mouseInfo));
-                    comp.addEventoMudaValor((origem,antigo,novo)=>console.log('Valor='+novo+'\nAntigo='+antigo));
+                    // comp.addEventoMudaValor((origem,antigo,novo)=>console.log('Valor='+novo+'\nAntigo='+antigo));
                 });
             </script>
 
