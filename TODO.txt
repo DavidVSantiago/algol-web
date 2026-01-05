@@ -1,6 +1,6 @@
-Ajustei a nova estrutura dos componentes. Agora eles já se encontram refinados.
-O template já está pronto. O componente 'select' tb.
-Preciso fazer os outros, começando com textarea
+Ajustar select
+- Ajustar os atributos para lingua portuguesa
+- ajustar a tag <option> para <opt>
 
 Criar os componentes:
    - AlgolTitle (para as variações h1,h2,h3,h4,h5,h6)

@@ -13,7 +13,7 @@ class Select extends BaseComponent {
 
     /** @override */
     init() {
-        if (this.base_initialized) return; // guard para evitar dupla criação
+        if (this.inicializado) return; // guard para evitar dupla criação
         if (!this.hasAttribute('tabindex')) this.setAttribute('tabindex', '0'); // Torna o componente focável
 
         // container raiz
@@ -50,40 +50,12 @@ class Select extends BaseComponent {
         this.aplicaAtributos();
         this._marcarOpcaoPadrao(); // para selecionar a opção padrão
 
-        this.base_initialized = true;
+        this.inicializado = true;
     }
     /** @override */
     attachEvents() {
         this.elems['select'].addEventListener('input', () => this._refletirValor());
         this.elems['select'].addEventListener('change', () => this._refletirValor());
-    }
-
-    // ****************************************************************************
-    // Métodos de atualização
-    // ****************************************************************************
-   
-    /** @override */
-    reconstroi() {
-        console.log('reconstruindo select...');
-
-        // captura as opções atuais para restaurar depois
-        const opcoes = Array.from(this.elems['select'].options).map(option => option.cloneNode(true));
-        const valorAtual = this.elems['select'].value;
-
-        this.innerHTML = ''; // Limpa o componente para garantir reconstrução do zero
-        this.removeAttribute("style"); // limoa todos os estilos inline
-        this.elems.clear(); // limpa a lista de componente
-
-        // coloca as opções de volta
-        for (const opcao of opcoes) {
-            this.appendChild(opcao);
-        }
-        this.constroi();
-
-        // restaura o valor atual
-        this.valor = valorAtual; 
-        this.aplicaAtributo_valor();
-
     }
 
     // ****************************************************************************
@@ -104,8 +76,8 @@ class Select extends BaseComponent {
     mudaAtributosCallback(nomeAtributo, valorAntigo) {
         if (nomeAtributo === 'valor'){ // se a mudança foi no atributo valor... 
             this.dispatchEvent(new CustomEvent('mudancaValor',{bubbles: false,detail: {antigo: valorAntigo, novo: this.valor}}));
-            this.aplicaAtributo_valor(); // não deve reconstruir, apenas atualizar o valor
-        }else {this.reconstroi();}
+        }
+        this.aplicaAtributo(nomeAtributo);
     }
     
     // ****************************************************************************

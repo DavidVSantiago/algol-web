@@ -48,46 +48,17 @@ class BaseComponent extends HTMLElement {
     attachEvents() { throw new Error("attachEvents deve ser implementado"); }
     
     constroi(){
-        // 1. PAUSA O OBSERVER
-        // Isso é crucial! Se não desconectar, as alterações feitas pelo init() (ex: innerHTML='')
-        // dispararão o observer novamente, criando um loop infinito.
         this.base_initialized = false; // reseta o estado de inicialização
         this._ERRO = false; // reseta o estado de erro antes de reconstruir
         if(this._textoInterno===null){ // captura o texto interno apenas primeira construção
             this._textoInterno = this.textContent.trim();
         }
-        try {
-            if(!this._validaAtributos()) return; // se houver atributos inválidos, abandona com erro!
-            this.init(); 
-            this.attachEvents();
-            this.aplicaAtributos(); // Aplica os valores atuais dos atributos
 
-        } catch (error) {
-            console.error("Erro ao reconstruir componente:", error);
-        } finally { 
-            // if (!this._ERRO) { // se não houve erro na reconstrução, religa o observer
-                
-            // }
-        }
-    }
+        if(!this._validaAtributos()) return; // se houver atributos inválidos, abandona com erro!
+        this.init(); 
+        this.attachEvents();
+        this.aplicaAtributos(); // Aplica os valores atuais dos atributos
 
-    // ****************************************************************************
-    // Métodos de atualização
-    // ****************************************************************************
-
-    reconstroi() {
-        console.log('reconstruindo...');
-        
-        this.innerHTML = ''; // Limpa o componente para garantir reconstrução do zero
-        this.removeAttribute("style"); // limoa todos os estilos inline
-        this.elems.clear(); // limpa a lista de componente
-        this.constroi();
-    }
-    reaplicaAtributos(){
-        console.log('reestilizando...');
-
-        this.removeAttribute("style");
-        this.aplicaAtributos();
     }
 
     // ****************************************************************************
@@ -107,12 +78,10 @@ class BaseComponent extends HTMLElement {
 
     /** @override */
     connectedCallback() {
-        this._observer.disconnect();
-
-        // se já havia sido conectado antes...
-        if (this._connected) this.reconstroi(); // reconstrói o componente
-        else this.constroi(); // Realiza a primeira construção
+        if (this._connected) return; // se já foi construído, não faz nada!
         
+        this._observer.disconnect();
+        this.constroi(); // Realiza a primeira construção        
         this._observer.observe(this, this._observerConfig);
 
         this._connected = true;
@@ -144,23 +113,20 @@ class BaseComponent extends HTMLElement {
     set textoInterno(valor) {
         if (valor !== this._textoInterno) {
             this._textoInterno = valor;
-            
-            // Opcional: Se o valor mudar manualmente via código, 
-            // você pode querer disparar o rebuild.
-            if (this._connected) {
-                this.reconstroi();
-            }
         }
     }
     aplicaAtributos() {
-        this.constructor.observedAttributes.forEach(item => {
-            const nomeMetodo = `aplicaAtributo_${item}`;
-            if (typeof this[nomeMetodo] === 'function') {
-                this[nomeMetodo]();
-            }else{
-                console.error(`DEV MSG: está faltando o método ${nomeMetodo}()`);
-            }
+        this.constructor.observedAttributes.forEach(atributo => {
+            this.aplicaAtributo(atributo);
         });
+    }
+    aplicaAtributo(atributo) {
+        const nomeMetodo = `aplicaAtributo_${atributo}`;
+        if (typeof this[nomeMetodo] === 'function') {
+            this[nomeMetodo]();
+        }else{
+            console.error(`DEV MSG: está faltando o método ${nomeMetodo}()`);
+        }
     }
 
     // ****************************************************************************
