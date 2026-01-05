@@ -7,14 +7,17 @@
     <title>Document</title>
     <link rel="stylesheet" href="algol-styles.css">
     <script src="scripts/variaveis.js" defer></script>
+    
     <script src="scripts/components/_base-component.js" defer></script>
     <script src="scripts/components/buttons.js" defer></script>
     <script src="scripts/components/inputs.js" defer></script>
     <script src="scripts/components/textarea.js" defer></script>
     <script src="scripts/components/select.js" defer></script>
+
     <script src="scripts/layouts/_base-layout.js" defer></script>
     <script src="scripts/layouts/grid-layout.js" defer></script>
     <script src="scripts/layouts/grid-item.js" defer></script>
+
     <script src="scripts/components.js" defer></script>
 
     <script defer>
@@ -71,11 +74,12 @@
                 eligendi
                 vero id aperiam debitis sapiente, ea quis nostrum nihil et ut vitae amet inventore temporibus.</p>
 
+            <form action="">
             <algol-grid-layout>
                 <algol-grid-item>
 
-                    <algol-select id="comp" rotulo="SELECT" posicaoh="total" posicaov="inicio">
-                        <option disabled selected>Selecione uma das opções...</option>
+                    <algol-select id="comp" rotulo="SELECT" posicaoh="total" posicaov="inicio" required>
+                        <option disabled selected value="">Selecione uma das opções...</option>
                         <option disabled>--Grupo 1--</option>
                         <option value="A">Opção A</option>
                         <option value="B">Opção B</option>
@@ -93,6 +97,8 @@
                     <div id="div">teste</div>
                 </algol-grid-item>
             </algol-grid-layout>
+            <input type="submit" value="Enviar">
+            </form>
             <script defer>
                 // temporário. apenas para teste
                 window.addEventListener('load', function (event) {

@@ -1,6 +1,4 @@
-Ajustar select
-- Ajustar os atributos para lingua portuguesa
-- ajustar a tag <option> para <opt>
+Ajustar os atributos do GridLayout e do GridItem
 
 Criar os componentes:
    - AlgolTitle (para as variações h1,h2,h3,h4,h5,h6)

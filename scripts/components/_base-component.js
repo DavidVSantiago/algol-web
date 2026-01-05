@@ -7,9 +7,14 @@ class BaseComponent extends HTMLElement {
         
         this.elems = {}; // cache de elementos internos do componente
         this.inicializado = false;
+
         this._gerarAcessores();
         
-        this.root = this.attachShadow({ mode: 'open' }); // usa shadow DOM, que isola o componente do restante da página
+        // usa shadow DOM, que isola o componente do restante da página
+        this.root = this.attachShadow({
+            mode: 'open',
+            delegatesFocus: true, // permite que o foco seja delegado para dentro do shadow DOM
+         }); 
     }
 
     // ****************************************************************************
@@ -20,11 +25,15 @@ class BaseComponent extends HTMLElement {
     render() { throw new Error("Método 'render' deve ser implementado."); }
     /** @abstract */
     attachEvents() { throw new Error("Método 'attachEvents' deve ser implementado."); }
+    /** @abstract */
+    postConfig() { throw new Error("Método 'postConfig' deve ser implementado."); }
 
-    postConfig(){
+    configSlot(){
         const slot = this.root.querySelector('slot');
         if(slot) slot.style.display = 'none'; // esconde o slot por padrão
         else throw new Error("O seu método render() deve incluir um <slot> para o conteúdo interno do componente.");
+
+        this.postConfig(); // invoca o metodo abstrato de pós-configuração
     }
 
     // ****************************************************************************
@@ -36,17 +45,14 @@ class BaseComponent extends HTMLElement {
         if (this.inicializado) return; // se já foi construído, não faz nada!
         
         this.render(); // Realiza a construção, uma única vez        
-        
-        this.postConfig(); // armazena o cache de elementos internos e faz configuraçẽos posteriores
+        this.configSlot(); // configura o slot e faz configuraçẽos posteriores
 
         // Aplica valores iniciais dos atributos
         this.constructor.observedAttributes.forEach(attr => {
             const val = this.getAttribute(attr);
             if (val !== null) this.attributeChangedCallback(attr, null, val);
         });
-
         this.attachEvents();
-
         this.inicializado = true;
     }
 
@@ -65,7 +71,7 @@ class BaseComponent extends HTMLElement {
             console.error(`DEV MSG: está faltando o método ${updateMethod}()`);
         }
     }
-s
+
     // ****************************************************************************
     // Geração de Acessores e Atributos
     // ****************************************************************************

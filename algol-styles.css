@@ -19,6 +19,8 @@
     --text-color-forms-disabled: var(--text-color-disabled);
     --text-color-forms-label: #868c93;
     --border-color-forms: var(--border-color);
+    --border-color-focus: #2196F3;
+    --border-color-focus-glow: #2196f34d;
 
     /* components buttons */
     --text-color-btn: var(--text-color);

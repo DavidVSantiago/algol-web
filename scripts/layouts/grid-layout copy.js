@@ -97,17 +97,18 @@ class GridLayout extends BaseLayout {
         // percorre todos os filhos do componente e verifica se são algol-grid-item        
         for (let i = 0; i < filhos.length; i++) {
             const filho = filhos[i];
+
+            // se for <algol-grid-item> ou uma div com id de erro (algol-error!), não precisa fazer nada!
+            if(filho.tagName.toLowerCase()==='algol-grid-item' || filho.id==='algol-error!') continue;
+            
             // se o filho for outro <algol-grid-layout>, faz uma nova verificação (recursiva)
             if (filho.tagName.toLowerCase() === 'algol-grid-layout') {
                 this._verificaFilhos(Array.from(filho.children));
                 continue;
             }
-            // se não for <algol-grid-item> ou uma div com id de erro (algol-error!), devemos aceitar apenas tags <algol-grid-item>
-            if(filho.tagName.toLowerCase()!=='algol-grid-item'){
-                if(filho.id==='algol-error!') continue; // ignora a div de erro já existente
-                let div = document.createRange().createContextualFragment(this._montaMsgErro(filho.tagName.toLowerCase()));
-                filho.replaceWith(div);
-            }
+
+            let div = document.createRange().createContextualFragment(this._montaMsgErro(filho.tagName.toLowerCase()));
+            filho.replaceWith(div);
         }
 
         this._applyAttributes();

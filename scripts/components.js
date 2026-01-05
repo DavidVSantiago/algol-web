@@ -16,15 +16,6 @@ customElements.define('algol-select', Select);
 customElements.define('algol-grid-layout', GridLayout);
 customElements.define('algol-grid-item', GridItem);
 
-
-/** evita rolar a tela com os direcionais */
-window.addEventListener('keydown', function(event) {
-    if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
-        event.preventDefault();
-    }
-});
-
-
 // injeta as variáveis globais
 for (const chave in GLOBAL) {
     document.documentElement.style.setProperty(`--${chave}`, GLOBAL[chave]);

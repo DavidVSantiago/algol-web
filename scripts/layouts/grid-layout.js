@@ -5,32 +5,79 @@ class GridLayout extends BaseLayout {
         super();
     }
 
-    _init() {
-        if (this._base_initialized) return;
+    // ****************************************************************************
+    // Métodos de construção do componente
+    // ****************************************************************************
 
-        this.style.display = 'grid';
-        this.style.boxSizing = 'border-box';
-        this._initObserver(); // Inicializa o Observer para detectar novos itens inseridos via JS
+    /** @override */
+    render() {
+        const css = `
+            <style>
+                
+            </style>
+        `;
+
+        const html = `
+            <slot></slot>        
+        `;
         
-        this._base_initialized = true;
+        this.root.innerHTML = css + html;
+    }
+
+    /** @override */
+    postConfig(){
+        this.elems.slot = this.root.querySelector('slot');
+    }
+    /** @override */
+    attachEvents() {        
+        // Quando o usuário adiciona/remove <option> no HTML, isso dispara.
+        this.elems.slot.addEventListener('slotchange', () => {
+            this._sincronizarGridItens();
+        });
     }
 
     // ****************************************************************************
-    // Aplicação de Atributos
+    // Utils
     // ****************************************************************************
 
-    _applyAttribute_colunas() {
+    // Copia os elementos do Slot (light DOM) para o shadow DOM
+    _sincronizarGridItens() {
+        const gridItems = this.elems.slot.assignedElements(); // pega um array dos elementos passados para o slot (light DOM)
+
+        // limpeza seletiva do shadow DOM, removendo apenas os nós que não são <slot> ou <style>
+        for(const node of this.root.children){
+            const tagName = node.tagName?.toLowerCase();
+            if (tagName !== 'slot' && tagName !== 'style') {
+                this.root.removeChild(node);
+            }
+        };
+
+        // Clona as options do usuário para dentro do shadow DOM
+        for(const gridItem of gridItems){
+            if (gridItem.tagName.toLowerCase() === 'algol-grid-item') { // garante que é uma tag <grid-item>
+                this.root.appendChild(gridItem.cloneNode(true));
+            }else{
+                console.warn("Elemento ignorado no <algol-grid-layout>: ", gridItem);
+            }
+        };
+    }
+
+    // ****************************************************************************
+    // Métodos dos atributos
+    // ****************************************************************************
+
+    update_colunas() {
         const colunas = this.getAttribute('colunas') || '1fr';
         this.style.gridTemplateColumns = colunas;
     }
 
-    _applyAttribute_gap() {
+    update_gap() {
         const gap = this.getAttribute('gap');
         if (gap) this.style.gap = gap;
         else this.style.removeProperty('gap');
     }
 
-    _applyAttribute_posicaoh() {
+    update_posicaoh() {
         let filhos = Array.from(this.children); // obtém a lista de filhos
         const pos = this.getAttribute('posicaoh');
         if (pos){ // se existe a propiedade 'posicaoh'
@@ -59,7 +106,7 @@ class GridLayout extends BaseLayout {
         }
     }
 
-    _applyAttribute_posicaov() {
+    update_posicaov() {
         let filhos = Array.from(this.children); // obtém a lista de filhos
         const pos = this.getAttribute('posicaov');
         if (pos){ // se existe a propiedade 'posicaov'
@@ -87,49 +134,4 @@ class GridLayout extends BaseLayout {
             }
         }
     }
-
-    // ****************************************************************************
-    // Métodos de suporte
-    // ****************************************************************************
-
-    /** Faz uma varredura nos filhos do componente, de forma recursiva, em busca elementos fora de <algol-grid-item> */
-    _verificaFilhos(filhos){
-        // percorre todos os filhos do componente e verifica se são algol-grid-item        
-        for (let i = 0; i < filhos.length; i++) {
-            const filho = filhos[i];
-
-            // se for <algol-grid-item> ou uma div com id de erro (algol-error!), não precisa fazer nada!
-            if(filho.tagName.toLowerCase()==='algol-grid-item' || filho.id==='algol-error!') continue;
-            
-            // se o filho for outro <algol-grid-layout>, faz uma nova verificação (recursiva)
-            if (filho.tagName.toLowerCase() === 'algol-grid-layout') {
-                this._verificaFilhos(Array.from(filho.children));
-                continue;
-            }
-
-            let div = document.createRange().createContextualFragment(this._montaMsgErro(filho.tagName.toLowerCase()));
-            filho.replaceWith(div);
-        }
-
-        this._applyAttributes();
-    }
-
-    _verificaTipoFilho(filho){
-        let tagName = filho.tagName.toLowerCase();
-        if(tagName!=='algol-grid-item'){
-            this._montaMsgErro(filho);
-        }
-    }
-    
-    _montaMsgErro(nome) {
-        return `
-        <div id="algol-error!" style="display:block; border:calc(0.5vw * var(--fator-escala)) dashed purple; background-color:#fff0f0; padding:calc(1vw * var(--fator-escala)); color:purple; fontFamily:'monospace';">
-            <h3 style="margin: 0 0 calc(0.5vw * var(--fator-escala)) 0;">🚫 Erro de Layout: &lt;${this.tagName.toLowerCase()}&gt;</h3>
-            <p style="margin: 0;">
-                Envolva o elemento <code>&lt;${nome}&gt;</code> dentro de um <code>&lt;algol-grid-item&gt;</code><algol-grid-item></code>
-            </p>
-            
-        </div>`;
-    }
-
 }

@@ -47,7 +47,7 @@ class Select extends BaseComponent {
                         line-height: calc(var(--line-height) * var(--fator-escala));
                     }
                 }
-                 /* Para o estado desabilitado */
+                /* Para o estado disabled */
                 :host([disabled]) {
                     .container {
                         select {
@@ -56,6 +56,10 @@ class Select extends BaseComponent {
                             cursor: not-allowed;
                         }
                     }
+                }
+                :host(:focus-within) select {
+                    border-color: var(--border-color-focus); /* Exemplo */
+                    box-shadow: 0 0 0 calc(0.1vw * var(--fator-escala)) var(--border-color-focus-glow) /* "Glow" externo */
                 }
             </style>
         `;
@@ -72,17 +76,15 @@ class Select extends BaseComponent {
     }
     /** @override */
     postConfig(){
-        super.postConfig(); // obrigatório chamar o postConfig da superclasse
-
         this.elems.container = this.root.querySelector('.container');
         this.elems.label = this.root.querySelector('label');
         this.elems.select = this.root.querySelector('select');
         this.elems.slot = this.root.querySelector('slot');
 
-        if (!this.hasAttribute('tabindex')) this.setAttribute('tabindex', '0'); // Torna o componente focável
-        // as partes do compoennte não devem receber foco individualmente
-        this.elems.label.setAttribute('tabindex', '-1');
-        this.elems.select.setAttribute('tabindex', '-1');
+        // criação de id único para o select e linkagem com o label
+        const idUnico = `select-${BaseComponent._idCont++}`;
+        this.elems.select.id = idUnico;
+        this.elems.label.setAttribute('for', idUnico);
     }
     /** @override */
     attachEvents() {
@@ -103,14 +105,14 @@ class Select extends BaseComponent {
     // Utils
     // ****************************************************************************
 
-    // Copia as options do Slot para o Select
+    // Copia as options do Slot (light DOM) para o Select (shadow DOM)
     _sincronizarOptions() {
         const select = this.elems.select;
         const options = this.elems.slot.assignedElements(); // pega um array dos elementos passados para o slot (light DOM)
         select.innerHTML = ''; // limpa as opções
         // Clona as options do usuário para dentro do shadow select
         for(const option of options){
-            if (option.tagName === 'OPTION') { // garante que é uma option
+            if (option.tagName.toLowerCase() === 'option') { // garante que é uma option
                 select.appendChild(option.cloneNode(true));
             }
         };
@@ -151,6 +153,10 @@ class Select extends BaseComponent {
             case 'total': this.style.alignSelf = 'stretch'; break;
         }
     }
+    update_required(val) {
+        // O atributo vem como string 'true', '', ou null
+        const isRequired= this.hasAttribute('required');
+        if (this.elems.select) this.elems.select.required = isRequired;
+    }
     
-
 }
