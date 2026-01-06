@@ -1,77 +1,56 @@
 class GridItem extends BaseLayout {
-    static get observedAttributes() {return ['expandecoluna','expandelinha'];}
+    static get observedAttributes() {return ['expandecoluna','expandelinha','posicaoh', 'posicaov'];}
 
     constructor() {
         super();
     }
 
     // ****************************************************************************
-    // Métodos de construção do componente
+    // Métodos de configuração do layout
     // ****************************************************************************
-
-    /** @override */
-    render() {
-        const css = `
-            <style>
-                
-            </style>
-        `;
-
-        const html = `
-            <slot></slot>        
-        `;
-        
-        this.root.innerHTML = css + html;
-    }
 
     /** @override */
     postConfig(){
-        this.elems.slot = this.root.querySelector('slot');
-    }
-    /** @override */
-    attachEvents() {        
-        // Quando o usuário adiciona/remove <option> no HTML, isso dispara.
-        this.elems.slot.addEventListener('slotchange', () => {
-            this._sincronizarGridItens();
-        });
-    }
-
-    // ****************************************************************************
-    // Utils
-    // ****************************************************************************
-
-    // Copia os elementos do Slot (light DOM) para o shadow DOM
-    _sincronizarGridItens() {
-        const elems = this.elems.slot.assignedElements(); // pega um array dos elementos passados para o slot (light DOM)
-
-        // limpeza seletiva do shadow DOM, removendo apenas os nós que não são <slot> ou <style>
-        for(const node of this.root.children){ // percorre os filhos do shadow DOM
-            const tagName = node.tagName?.toLowerCase();
-            if (tagName !== 'slot' && tagName !== 'style') {
-                this.root.removeChild(node); // remove do shadow DOM
-            }
-        };
-
-        // Clona as options do usuário para dentro do shadow DOM
-        for(const elem of elems){ // percorre os elementos do light DOM
-            this.root.appendChild(elem.cloneNode(true)); // adiciona ao shadow DOM
-        };
+        this.style.display = 'grid';
+        this.style.gap = '0';
     }
 
     // ****************************************************************************
     // Métodos dos atributos
     // ****************************************************************************
 
-    update_expandecoluna() {
-        const exp = this.getAttribute('expandecoluna');
-        if (exp){ // se existe a propiedade 'expandecoluna'
-            this.style.gridColumnEnd = 'span ' + exp;
-        } else this.style.removeProperty('grid-column-end');
+    update_expandecoluna(val) {
+        this.style.gridColumnEnd = 'span ' + val;
     }
-    update_expandelinha() {
-        const exp = this.getAttribute('expandelinha');
-        if (exp){ // se existe a propiedade 'expandelinha'
-            this.style.gridRowEnd = 'span ' + exp;
-        } else this.style.removeProperty('grid-row-end');
+
+    update_expandelinha(val) {
+        this.style.gridRowEnd = 'span ' + val;
+    }
+
+    update_posicaoh(val) {
+        const filhos = Array.from(this.children); // obtém a lista de filhos
+        const posValues = ['inicio','fim','centro','total']; // valores aceitos para 'posicaoh'
+        let justifyValue = '';
+        switch(val){
+            case posValues[0]: justifyValue = 'start'; break;
+            case posValues[1]: justifyValue = 'end'; break;
+            case posValues[2]: justifyValue = 'center'; break;
+            case posValues[3]: justifyValue = 'stretch'; break;
+            default: console.warn(`Valor '${val}' é inválido para posicaoh! Valores aceitos: 'inicio', 'centro', 'fim', 'total'.`); justifyValue = 'center';
+        }
+        this.style.justifySelf = justifyValue;
+    }
+        
+    update_posicaov(val) {
+        const filhos = Array.from(this.children); // obtém a lista de filhos
+        const posValues = ['inicio','fim','centro']; // valores aceitos para 'posicaov'
+        let alignValue = '';
+        switch(val){
+            case posValues[0]: alignValue = 'start'; break;
+            case posValues[1]: alignValue = 'end'; break;
+            case posValues[2]: alignValue = 'center'; break;
+            default: console.warn(`Valor '${val}' é inválido para posicaov! Valores aceitos: 'inicio', 'centro', 'fim'.`); alignValue = 'center';
+        }
+        this.style.alignSelf = alignValue;
     }
 }

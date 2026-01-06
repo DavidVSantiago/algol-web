@@ -132,6 +132,11 @@ class Select extends BaseComponent {
             this.elems.select.value = val;
         }
     }
+    update_required(val) {
+        // O atributo vem como string 'true', '', ou null
+        const isRequired= this.hasAttribute('required');
+        if (this.elems.select) this.elems.select.required = isRequired;
+    }
     update_disabled(val) {
         // O atributo vem como string 'true', '', ou null
         const isDisabled = this.hasAttribute('disabled');
@@ -143,6 +148,7 @@ class Select extends BaseComponent {
             case 'centro': this.style.justifySelf = 'center'; break;
             case 'fim': this.style.justifySelf = 'end'; break;
             case 'total': this.style.justifySelf = 'stretch'; break;
+            default: console.warn(`Valor '${val}' é inválido para posicaoh! Valores aceitos: 'inicio', 'centro', 'fim', 'total'.`);
         }
     }
     update_posicaov(val) {
@@ -150,13 +156,9 @@ class Select extends BaseComponent {
             case 'inicio': this.style.alignSelf = 'start'; break;
             case 'centro': this.style.alignSelf = 'center'; break;
             case 'fim': this.style.alignSelf = 'end'; break;
-            case 'total': this.style.alignSelf = 'stretch'; break;
+            default: console.warn(`Valor '${val}' é inválido para posicaov! Valores aceitos: 'inicio', 'centro', 'fim'.`);
         }
     }
-    update_required(val) {
-        // O atributo vem como string 'true', '', ou null
-        const isRequired= this.hasAttribute('required');
-        if (this.elems.select) this.elems.select.required = isRequired;
-    }
+    
     
 }

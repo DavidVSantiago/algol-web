@@ -75,10 +75,9 @@
                 vero id aperiam debitis sapiente, ea quis nostrum nihil et ut vitae amet inventore temporibus.</p>
 
             <form action="">
-            <algol-grid-layout>
-                <algol-grid-item>
-
-                    <algol-select id="comp" rotulo="SELECT" posicaoh="total" posicaov="inicio" required>
+            <algol-grid-layout colunas="1fr 1fr 1fr" gap="2vw" class="algol-bolha-01" posicaoh="total" posicaov="centro">
+                <algol-grid-item expandecoluna="2" posicaoh="centro" posicaov="fim">
+                    <algol-select id="comp" rotulo="SELECT" required>
                         <option disabled selected value="">Selecione uma das opções...</option>
                         <option disabled>--Grupo 1--</option>
                         <option value="A">Opção A</option>
@@ -86,16 +85,106 @@
                         <option disabled>--Grupo 2--</option>
                         <option value="C">Opção C</option>
                         <option value="D">Opção D</option>
-                        <option disabled>--Grupo 3--</option>
+                        <option disabled>--Grupo 3--</option>   
                         <option value="E">Opção E</option>
                         <option value="F">Opção F</option>
                     </algol-select>
-                    
-                    <!-- <algol-textarea id="comp" rotulo="Textarea" posicaoh="" valor="Teste de valor inicial do textarea."></algol-textarea> -->
                 </algol-grid-item>
-                <algol-grid-item>   
+                <algol-grid-item posicaoh="fim" posicaov="fim">   
+                    <div id="div">teste</div>
+                    <div id="div">teste</div>
+                    <p>PARAGRAFO</p>
+                    <div id="div">teste</div>
+                    <div id="div">teste</div>
+                    <p>PARAGRAFO</p>
+                    <div id="div">teste</div>
                     <div id="div">teste</div>
                 </algol-grid-item>
+                <algol-grid-item>
+                    <algol-select rotulo="SELECT" required>
+                        <option disabled selected value="">Selecione uma das opções...</option>
+                        <option disabled>--Grupo 1--</option>
+                        <option value="A">Opção A</option>
+                        <option value="B">Opção B</option>
+                        <option disabled>--Grupo 2--</option>
+                        <option value="C">Opção C</option>
+                        <option value="D">Opção D</option>
+                        <option disabled>--Grupo 3--</option>   
+                        <option value="E">Opção E</option>
+                        <option value="F">Opção F</option>
+                    </algol-select>
+                </algol-grid-item>
+                <algol-grid-item posicaoh="fim" posicaov="fim">
+                    <algol-select rotulo="SELECT" required>
+                        <option disabled selected value="">Selecione uma das opções...</option>
+                        <option disabled>--Grupo 1--</option>
+                        <option value="A">Opção A</option>
+                        <option value="B">Opção B</option>
+                        <option disabled>--Grupo 2--</option>
+                        <option value="C">Opção C</option>
+                        <option value="D">Opção D</option>
+                        <option disabled>--Grupo 3--</option>   
+                        <option value="E">Opção E</option>
+                        <option value="F">Opção F</option>
+                    </algol-select>
+                </algol-grid-item>
+                <algol-grid-item>
+                    <algol-select rotulo="SELECT" required>
+                        <option disabled selected value="">Selecione uma das opções...</option>
+                        <option disabled>--Grupo 1--</option>
+                        <option value="A">Opção A</option>
+                        <option value="B">Opção B</option>
+                        <option disabled>--Grupo 2--</option>
+                        <option value="C">Opção C</option>
+                        <option value="D">Opção D</option>
+                        <option disabled>--Grupo 3--</option>   
+                        <option value="E">Opção E</option>
+                        <option value="F">Opção F</option>
+                    </algol-select>
+                </algol-grid-item>
+                <algol-grid-item>
+                    <algol-select rotulo="SELECT" required>
+                        <option disabled selected value="">Selecione uma das opções...</option>
+                        <option disabled>--Grupo 1--</option>
+                        <option value="A">Opção A</option>
+                        <option value="B">Opção B</option>
+                        <option disabled>--Grupo 2--</option>
+                        <option value="C">Opção C</option>
+                        <option value="D">Opção D</option>
+                        <option disabled>--Grupo 3--</option>   
+                        <option value="E">Opção E</option>
+                        <option value="F">Opção F</option>
+                    </algol-select>
+                </algol-grid-item>
+                <algol-grid-item>
+                    <algol-select rotulo="SELECT" required>
+                        <option disabled selected value="">Selecione uma das opções...</option>
+                        <option disabled>--Grupo 1--</option>
+                        <option value="A">Opção A</option>
+                        <option value="B">Opção B</option>
+                        <option disabled>--Grupo 2--</option>
+                        <option value="C">Opção C</option>
+                        <option value="D">Opção D</option>
+                        <option disabled>--Grupo 3--</option>   
+                        <option value="E">Opção E</option>
+                        <option value="F">Opção F</option>
+                    </algol-select>
+                </algol-grid-item>
+                <algol-grid-item>
+                    <algol-select rotulo="SELECT" required>
+                        <option disabled selected value="">Selecione uma das opções...</option>
+                        <option disabled>--Grupo 1--</option>
+                        <option value="A">Opção A</option>
+                        <option value="B">Opção B</option>
+                        <option disabled>--Grupo 2--</option>
+                        <option value="C">Opção C</option>
+                        <option value="D">Opção D</option>
+                        <option disabled>--Grupo 3--</option>   
+                        <option value="E">Opção E</option>
+                        <option value="F">Opção F</option>
+                    </algol-select>
+                </algol-grid-item>
+                
             </algol-grid-layout>
             <input type="submit" value="Enviar">
             </form>
@@ -103,24 +192,6 @@
                 // temporário. apenas para teste
                 window.addEventListener('load', function (event) {
                     let comp = document.getElementById('comp');
-                    let div = document.getElementById('div');
-                    div.addEventListener('click', ()=>{
-                        div.innerHTML=`
-                            <algol-select id="comp" rotulo="Select" posicaoh="">
-                                <option disabled ativa> Selecione uma das opções</option>
-                                <option disabled>--Grupo 1--</option>
-                                <option value="A">Opção A</option>
-                                <option value="B">Opção B</option>
-                                <option disabled>--Grupo 2--</option>
-                                <option value="C">Opção C</option>
-                                <option value="D">Opção D</option>
-                                <option disabled>--Grupo 3--</option>
-                                <option value="E">Opção E</option>
-                                <option value="F">Opção F</option>
-                            </algol-select>
-                        `;
-                    });
-
                     // comp.addEventoClique((origem,mouseInfo)=>console.log(origem,mouseInfo));
                     // comp.addEventoFoco((origem)=>console.log(origem));
                     // comp.addEventoBlur((origem)=>console.log(origem));

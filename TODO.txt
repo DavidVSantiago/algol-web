@@ -1,4 +1,5 @@
 Ajustar os atributos do GridLayout e do GridItem
+- Pensar sobre os possíveis eventos de laout que eu poderia forncer. Talvez mudança de estrutura interna, mudança de layout, etc...
 
 Criar os componentes:
    - AlgolTitle (para as variações h1,h2,h3,h4,h5,h6)
