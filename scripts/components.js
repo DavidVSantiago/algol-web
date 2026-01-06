@@ -1,32 +1,26 @@
-/** Instanciação dos componentes customizados */
-customElements.define('algol-btn-primary', BtnPrimary);
-customElements.define('algol-btn-secondary', BtnSecondary);
-customElements.define('algol-btn-outline', BtnOutline);
-customElements.define('algol-btn-success', BtnSuccess);
-customElements.define('algol-btn-danger', BtnDanger);
-customElements.define('algol-btn-warning', BtnWarning);
-customElements.define('algol-btn-info', BtnInfo);
-customElements.define('algol-btn-link', BtnLink);
-customElements.define('algol-input-text', InputText);
-customElements.define('algol-input-email', InputEmail);
-customElements.define('algol-input-password', InputPassword);
-customElements.define('algol-input-number', InputNumber);
-customElements.define('algol-textarea', TextArea);
-customElements.define('algol-select', Select);
-customElements.define('algol-grid-layout', GridLayout);
-customElements.define('algol-grid-item', GridItem);
-
 // injeta as variáveis globais
+let cssVariables = ':root {\n';
 for (const chave in GLOBAL) {
-    document.documentElement.style.setProperty(`--${chave}`, GLOBAL[chave]);
+    cssVariables += `  --${chave}: ${GLOBAL[chave]};\n`;
 }
+cssVariables += '}';
+headStyle.textContent += cssVariables;
+
 // injeta a fonte global
-const style = document.createElement('style');
-style.textContent =
+headStyle.textContent +=
 `@font-face {
     font-family: "Algol Font";
     font-weight: normal;
     font-style: normal;
     src: url("${fontBase64}") format("woff");
 }`;
-document.head.appendChild(style);
+
+// injeta o ajuste da variável global do fator de escala 
+headStyle.textContent +=
+`@media (max-width: ${mobileBreakpoint}) {
+    :root {
+        --fator-escala: var(--fator-escala-break); /* Ajuste para o valor que desejar */
+    }
+}`;
+
+document.head.appendChild(headStyle); // injeta o estilo no head

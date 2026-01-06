@@ -1,43 +1,54 @@
 class GridItem extends BaseLayout {
-    static get observedAttributes() {return ['expandecoluna','expandelinha'];}
+    static get observedAttributes() {return ['expandecoluna','expandelinha','posicaoh', 'posicaov'];}
 
     constructor() {
         super();
     }
 
-    _init() {
-        if (this._base_initialized) return;
+    // ****************************************************************************
+    // Métodos de configuração do layout
+    // ****************************************************************************
 
+    /** @override */
+    postConfig(){
         this.style.display = 'grid';
-        this.style.boxSizing = 'border-box';
-        this._initObserver(); // Inicializa o Observer para detectar novos itens inseridos via JS
+        this.style.gap = '0';
+    }
+
+    // ****************************************************************************
+    // Métodos dos atributos
+    // ****************************************************************************
+
+    update_expandecoluna(val) {
+        this.style.gridColumnEnd = 'span ' + val;
+    }
+
+    update_expandelinha(val) {
+        this.style.gridRowEnd = 'span ' + val;
+    }
+
+    update_posicaoh(val) {
+        const posValues = ['inicio','fim','centro','total']; // valores aceitos para 'posicaoh'
+        let justifyValue = '';
+        switch(val){
+            case posValues[0]: justifyValue = 'start'; break;
+            case posValues[1]: justifyValue = 'end'; break;
+            case posValues[2]: justifyValue = 'center'; break;
+            case posValues[3]: justifyValue = 'stretch'; break;
+            default: console.warn(`Valor '${val}' é inválido para posicaoh! Valores aceitos: 'inicio', 'centro', 'fim', 'total'.`); justifyValue = 'center';
+        }
+        this.style.justifySelf = justifyValue;
+    }
         
-        this._base_initialized = true;
-    }
-
-    // ****************************************************************************
-    // Aplicação de Atributos
-    // ****************************************************************************
-
-    _applyAttribute_expandecoluna() {
-        const exp = this.getAttribute('expandecoluna');
-        if (exp){ // se existe a propiedade 'expandecoluna'
-            this.style.gridColumnEnd = 'span ' + exp;
-        } else this.style.removeProperty('grid-column-end');
-    }
-
-    _applyAttribute_expandelinha() {
-        const exp = this.getAttribute('expandelinha');
-        if (exp){ // se existe a propiedade 'expandelinha'
-            this.style.gridRowEnd = 'span ' + exp;
-        } else this.style.removeProperty('grid-row-end');
-    }
-
-    // ****************************************************************************
-    // Métodos de suporte
-    // ****************************************************************************
-
-    _verificaFilhos(filhos){
-
+    update_posicaov(val) {
+        const posValues = ['inicio','fim','centro']; // valores aceitos para 'posicaov'
+        let alignValue = '';
+        switch(val){
+            case posValues[0]: alignValue = 'start'; break;
+            case posValues[1]: alignValue = 'end'; break;
+            case posValues[2]: alignValue = 'center'; break;
+            default: console.warn(`Valor '${val}' é inválido para posicaov! Valores aceitos: 'inicio', 'centro', 'fim'.`); alignValue = 'center';
+        }
+        this.style.alignSelf = alignValue;
     }
 }

@@ -1,6 +1,6 @@
 class Select extends BaseComponent {
     static get observedAttributes() {
-        return ['rotulo', 'valor', 'required', 'disabled','posicaoh', 'posicaov'];
+        return ['rotulo', 'valor', 'required', 'disabled'];
     }
 
     constructor() {
@@ -142,23 +142,5 @@ class Select extends BaseComponent {
         const isDisabled = this.hasAttribute('disabled');
         if (this.elems.select) this.elems.select.disabled = isDisabled;
     }
-    update_posicaoh(val) {       
-        switch(val){
-            case 'inicio': this.style.justifySelf = 'start'; break;
-            case 'centro': this.style.justifySelf = 'center'; break;
-            case 'fim': this.style.justifySelf = 'end'; break;
-            case 'total': this.style.justifySelf = 'stretch'; break;
-            default: console.warn(`Valor '${val}' é inválido para posicaoh! Valores aceitos: 'inicio', 'centro', 'fim', 'total'.`);
-        }
-    }
-    update_posicaov(val) {
-        switch(val){
-            case 'inicio': this.style.alignSelf = 'start'; break;
-            case 'centro': this.style.alignSelf = 'center'; break;
-            case 'fim': this.style.alignSelf = 'end'; break;
-            default: console.warn(`Valor '${val}' é inválido para posicaov! Valores aceitos: 'inicio', 'centro', 'fim'.`);
-        }
-    }
-    
-    
 }
+customElements.define('algol-select', Select);
