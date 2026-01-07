@@ -15,6 +15,8 @@
     <script src="scripts/layouts/_base-layout.js" defer></script>
     <script src="scripts/layouts/grid-layout.js" defer></script>
     <script src="scripts/layouts/grid-item.js" defer></script>
+    <script src="scripts/components/title.js" defer></script>
+    <script src="scripts/components/image.js" defer></script>
     <script src="scripts/components.js" defer></script>
     
     <script defer>
@@ -72,12 +74,12 @@
                 vero id aperiam debitis sapiente, ea quis nostrum nihil et ut vitae amet inventore temporibus.</p>
             <section class="algol-bolha-01">
                 <h2>Tipografia</h2>
-                <h1>Título Principal H1</h1>
-                <h2>Título Secundário H2</h2>
-                <h3>Título H3</h3>
-                <h4>Título H4</h4>
-                <h5>Título H5</h5>
-                <h6>Título H6</h6>
+                <algol-title level="1">Título Principal H1</algol-title>
+                <algol-title level="2" text="Título Secundário H2"></algol-title>
+                <algol-title level="3">Título H3</algol-title>
+                <algol-title level="4">Título H4</algol-title>
+                <algol-title level="5">Título H5</algol-title>
+                <algol-title level="6">Título H6</algol-title>
                 <p>Este é um parágrafo de texto para você testar a fonte, o espaçamento entre linhas e as cores. É aqui que a mágica acontece.</p>
                 <p><strong>Texto em negrito</strong> e <em>texto em itálico</em>.</p>
             </section>
@@ -252,6 +254,12 @@
                     <p>O spinner de carregamento irá aparecer aqui. Você pode estilizar a cor e o tamanho dele via CSS.
                     </p>
                 </div>
+            </div>
+
+            <div class="algol-bolha-01">
+                <h2>Imagens</h2>
+                <algol-image src="https://placehold.co/600x400" alt="Imagem de exemplo"></algol-image>
+                <algol-image src="https://placehold.co/1200x400" alt="Imagem de exemplo fluida" fluid></algol-image>
             </div>
         </main>
     </div>

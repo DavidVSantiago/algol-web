@@ -13,66 +13,15 @@ class Select extends BaseComponent {
 
     /** @override */
     render() {
-        const css = `
-            <style>
-                :host {
-                    display: block; /* Garante que o componente respeite largura/altura */
-                }
-                .container {
-                    display: flex;
-                    flex-direction: column;
-                    gap: calc(0.3vw * var(--fator-escala));
-                    margin-bottom: calc(1.0vw * var(--fator-escala));
-                    width: 100%;
-
-                    label {
-                        color: var(--text-color-forms-label);
-                        font-size: calc(1.0vw * var(--fator-escala));
-                    }
-                    select {
-                        appearance: none;
-                        -webkit-appearance: none;
-                        outline: none;
-                        background: var(--bg-color-forms);
-                        color: var(--text-color);
-                        border: calc(0.1vw * var(--fator-escala)) solid var(--border-color-forms);
-                        border-radius: calc(var(--border-radius-components) * var(--fator-escala));
-                        padding: calc(0.8vw * var(--fator-escala)) calc(1.1vw * var(--fator-escala));
-                        width: 100%;
-                        font-family: 'Algol Font';
-                        cursor: inherit;
-                        font-weight: 100;
-                        font-style: normal;
-                        font-size: calc(1.1vw * var(--fator-escala));
-                        line-height: calc(var(--line-height) * var(--fator-escala));
-                    }
-                }
-                /* Para o estado disabled */
-                :host([disabled]) {
-                    .container {
-                        select {
-                            background-color: var(--bg-color-forms-disabled) !important;
-                            color: var(--text-color-forms-disabled) !important;
-                            cursor: not-allowed;
-                        }
-                    }
-                }
-                :host(:focus-within) select {
-                    border-color: var(--border-color-focus); /* Exemplo */
-                    box-shadow: 0 0 0 calc(0.1vw * var(--fator-escala)) var(--border-color-focus-glow) /* "Glow" externo */
-                }
-            </style>
-        `;
-
         const html = `
             <div class="container">
-                <label></label>
-                <select></select>
+                <label part="label"></label>
+                <select part="select"></select>
             </div>
             <slot></slot>
         `;
-        
-        this.root.innerHTML = css + html;
+
+        this.root.innerHTML = html;
     }
     /** @override */
     postConfig(){
@@ -94,13 +43,13 @@ class Select extends BaseComponent {
             this.dispatchEvent(new Event('change', { bubbles: true }));
             this.dispatchEvent(new Event('input', { bubbles: true }));
         });
-        
+
         // Quando o usuário adiciona/remove <option> no HTML, isso dispara.
         this.elems.slot.addEventListener('slotchange', () => {
             this._sincronizarOptions();
         });
     }
-    
+
     // ****************************************************************************
     // Utils
     // ****************************************************************************

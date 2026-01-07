@@ -1,0 +1,442 @@
+/* ******************************************************************************************* */
+/* TEMA ************************************************************************************** */
+/* ******************************************************************************************* */
+
+:root {
+    /* site base */
+    --bg-color: #0b0f13;
+    --text-color: #fff;
+    --text-color-disabled: #888;
+    --border-color: #1e2633;
+
+    /* layout */
+    --bg-color-section-bubble: #121821;
+    --border-color-section-bubble: var(--border-color);
+
+    /* components */
+    --bg-color-forms: #0c1219;
+    --bg-color-forms-disabled: #373e46;
+    --text-color-forms-disabled: var(--text-color-disabled);
+    --text-color-forms-label: #868c93;
+    --border-color-forms: var(--border-color);
+    --border-color-focus: #2196F3;
+    --border-color-focus-glow: #2196f34d;
+
+    /* components buttons */
+    --text-color-btn: var(--text-color);
+    --text-color-btn-clicked: #ddd;
+    --text-color-btn-disabled: var(--text-color-disabled);
+    --bg-color-btn-primary: #3b82f6;
+    --bg-color-btn-primary-hover: #2f67c2;
+    --bg-color-btn-success: #2ebe50;
+    --bg-color-btn-success-hover: #29a746;
+    --bg-color-btn-secondary: #334155;
+    --bg-color-btn-secondary-hover: #293444;
+    --bg-color-btn-danger: #dc3545;
+    --bg-color-btn-danger-hover: #c22f3d;
+    --bg-color-btn-warning: #e4ac07;
+    --bg-color-btn-warning-hover: #ca9907;
+    --bg-color-btn-info: #17a2b8;
+    --bg-color-btn-info-hover: #148c9e;
+    --bg-color-btn-outline: #0000;
+    --border-color-btn-outline: #3b82f6;
+    --bg-color-btn-outline-hover: #2f67c2;
+    --bg-color-btn-link: #0000;
+    --text-color-btn-link: #3b82f6;
+    --text-color-btn-link-hover: #3674d6;
+    --text-color-btn-link-active: #fff;
+
+    /* components input-number */
+    --bg-color-btn-spinner: #f0f0f0;
+    --bg-color-btn-spinner-hover: #b0b0b0;
+    --text-color-btn-spinner: #0b0f13;
+    --bg-color-btn-spinner-disabled: #b8b8b8;
+    --text-color-btn-spinner-disabled: #525252;
+    --border-color-btn-spinner: #ccc;
+    --border-color-btn-spinner-disabled: #999;
+}
+
+
+/* ******************************************************************************************* */
+/* NORMALIZAÇÃO ****************************************************************************** */
+/* ******************************************************************************************* */
+* {
+    box-sizing: border-box;
+}
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type="number"] {
+    -moz-appearance: textfield;
+}
+
+/* Estilos de base para melhor visualização */
+body {
+    font-family: 'Algol Font';
+    font-weight: 100;
+    font-style: normal;
+    font-size: calc(var(--font-size) * var(--fator-escala));
+    line-height: calc(var(--line-height) * var(--fator-escala));
+    margin: calc(1vw * var(--fator-escala));
+    color: var(--text-color);
+    background-color: var(--bg-color);
+}
+
+main {
+    margin: 0 auto;
+    padding: calc(1.0vw * var(--fator-escala));
+}
+
+h1 {
+    font-size: calc(2.0vw * var(--fator-escala));
+}
+h2 {
+    font-size: calc(1.8vw * var(--fator-escala));
+}
+h3 {
+    font-size: calc(1.6vw * var(--fator-escala));
+}
+h4 {
+    font-size: calc(1.4vw  * var(--fator-escala));
+}
+h5 {
+    font-size: calc(1.2vw  * var(--fator-escala));
+}
+h6 {
+    font-size: calc(1.0vw * var(--fator-escala));
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    margin-top: calc(1vw * var(--fator-escala));
+    margin-bottom: calc(2vw * var(--fator-escala));
+    font-weight: 600;
+}
+
+/* ******************************************************************************************* */
+/* Componentes ******************************************************************************* */
+/* ******************************************************************************************* */
+
+/* Estilização dos botões */
+algol-btn-primary,
+algol-btn-secondary,
+algol-btn-outline,
+algol-btn-success,
+algol-btn-danger,
+algol-btn-warning,
+algol-btn-info,
+algol-btn-link {
+    .algol-btn {
+        display: inline-flex;
+        align-items: center;
+        width: fit-content;
+        justify-self: start;
+        border: none;
+        border-radius: calc(var(--border-radius-components) * var(--fator-escala));
+        cursor: pointer;
+        color: var(--text-color-btn);
+        font-family: 'Algol Font';
+        font-weight: 200;
+        font-size: calc(var(--font-size-btn)* var(--fator-escala));
+        padding: calc(0.8vw * var(--fator-escala)) calc(1.1vw * var(--fator-escala));
+    }
+
+    .algol-btn:active {
+        color: var(--text-color-btn-clicked);
+    }
+
+    .algol-btn:disabled,
+    .algol-btn:disabled:hover,
+    .algol-btn:disabled:active {
+        background-color: var(--bg-color-forms-disabled);
+        color: var(--text-color-btn-disabled);
+        border: none;
+    }
+
+    .algol-btn-primary {
+        background-color: var(--bg-color-btn-primary);
+    }
+
+    .algol-btn-primary:hover {
+        background-color: var(--bg-color-btn-primary-hover);
+    }
+
+    .algol-btn-success {
+        background-color: var(--bg-color-btn-success);
+    }
+
+    .algol-btn-success:hover {
+        background-color: var(--bg-color-btn-success-hover);
+    }
+
+    .algol-btn-secondary {
+        background-color: var(--bg-color-btn-secondary);
+    }
+
+    .algol-btn-secondary:hover {
+        background-color: var(--bg-color-btn-secondary-hover);
+    }
+
+    .algol-btn-danger {
+        background-color: var(--bg-color-btn-danger);
+    }
+
+    .algol-btn-danger:hover {
+        background-color: var(--bg-color-btn-danger-hover);
+    }
+
+    .algol-btn-warning {
+        background-color: var(--bg-color-btn-warning);
+    }
+
+    .algol-btn-warning:hover {
+        background-color: var(--bg-color-btn-warning-hover);
+    }
+
+    .algol-btn-info {
+        background-color: var(--bg-color-btn-info);
+    }
+
+    .algol-btn-info:hover {
+        background-color: var(--bg-color-btn-info-hover);
+    }
+
+    .algol-btn-outline {
+        background-color: var(--bg-color-btn-outline);
+        border: solid calc(0.2vw * var(--fator-escala)) var(--border-color-btn-outline);
+    }
+
+    .algol-btn-outline:hover {
+        border-color: var(--bg-color-btn-outline-hover);
+    }
+
+    .algol-btn-link {
+        background-color: var(--bg-color-btn-link);
+        color: var(--text-color-btn-link);
+        text-decoration: underline;
+        padding: calc(0.5vw * var(--fator-escala)) calc(1.0vw * var(--fator-escala));
+    }
+
+    .algol-btn-link:hover {
+        color: var(--text-color-btn-link-hover);
+    }
+
+    .algol-btn-link:active {
+        color: var( --text-color-btn-link-active);
+    }
+
+    .algol-btn-big {
+        font-size: calc(1.3vw * var(--fator-escala));
+        padding: calc(1.0vw * var(--fator-escala)) calc(1.3vw * var(--fator-escala));
+    }
+
+    .algol-btn-small {
+        font-size: calc(1.1vw * var(--fator-escala));
+        padding: calc(0.5vw * var(--fator-escala)) calc(0.8vw * var(--fator-escala));
+    }
+}
+
+/* Estilização dos inputs */
+algol-input-text,
+algol-input-email,
+algol-input-password,
+algol-input-number,
+algol-textarea,
+algol-select {
+    .algol-component-group {
+        /* background-color: wheat; */
+        display: flex;
+        flex-direction: column;
+        gap: calc(0.3vw * var(--fator-escala));
+        margin-bottom: calc(1.0vw * var(--fator-escala));
+        /* border: solid 0.1vw red; */
+        width: 100%;
+
+        .algol-rotulo {
+            color: var(--text-color-forms-label);
+            font-size: calc(1.0vw * var(--fator-escala));
+        }
+
+        .algol-input,
+        .algol-textarea {
+            width: 100%;
+            padding: calc(0.8vw * var(--fator-escala)) calc(1.1vw * var(--fator-escala));
+            background: var(--bg-color-forms);
+            color: var(--text-color);
+            border: calc(0.1vw * var(--fator-escala)) solid var(--border-color-forms);
+            border-radius: calc(var(--border-radius-components) * var(--fator-escala));
+            outline: none;
+            font-size: calc(1.1vw * var(--fator-escala));
+        }
+
+        .algol-input:disabled,
+        .algol-textarea:disabled {
+            background: var(--bg-color-forms-disabled);
+            color: var(--text-color-forms-disabled);
+        }
+    }
+}
+
+algol-input-number {
+    .algol-input-container {
+        display: flex;
+        flex-direction: row;
+
+        .algol-spinner-buttons {
+            display: flex;
+            flex-direction: column;
+
+            .algol-spinner-up,
+            .algol-spinner-down {
+                width: calc(2.0vw * var(--fator-escala));
+                height: 100%;
+                background-color: var(--bg-color-btn-spinner);
+                color: var(--text-color-btn-spinner);
+                text-align: center;
+                border: none;
+                cursor: pointer;
+                font-size: calc(1.0vw * var(--fator-escala));
+                padding: 0;
+            }
+
+            .algol-spinner-up {
+                border-bottom: solid calc(0.1vw * var(--fator-escala)) var(--border-color-btn-spinner);
+            }
+
+            .algol-spinner-down {
+                border-top: solid calc(0.1vw * var(--fator-escala)) var(--border-color-btn-spinner);
+            }
+
+            .algol-spinner-up:hover,
+            .algol-spinner-down:hover {
+                background-color: var(--bg-color-btn-spinner-hover);
+            }
+
+            .algol-spinner-up:active,
+            .algol-spinner-down:active {
+                background-color: var(--bg-color-btn-spinner-hover);
+            }
+        }
+    }
+}
+
+algol-input-number[disabled] {
+
+    .algol-spinner-up,
+    .algol-spinner-down {
+        background-color: var(--bg-color-btn-spinner-disabled) !important;
+        color: var(--text-color-btn-spinner-disabled) !important;
+    }
+    .algol-spinner-up {
+        border-bottom-color:var(--border-color-btn-spinner-disabled) !important;
+    }
+
+    .algol-spinner-down {
+        border-top-color:var(--border-color-btn-spinner-disabled) !important;
+    }
+}
+
+/* Estilização dos select */
+
+algol-select {
+    display: block;
+
+    &::part(label) {
+        color: var(--text-color-forms-label);
+        font-size: calc(1.0vw * var(--fator-escala));
+    }
+
+    &::part(select) {
+        appearance: none;
+        -webkit-appearance: none;
+        outline: none;
+        background: var(--bg-color-forms);
+        color: var(--text-color);
+        border: calc(0.1vw * var(--fator-escala)) solid var(--border-color-forms);
+        border-radius: calc(var(--border-radius-components) * var(--fator-escala));
+        padding: calc(0.8vw * var(--fator-escala)) calc(1.1vw * var(--fator-escala));
+        width: 100%;
+        font-family: 'Algol Font';
+        cursor: inherit;
+        font-weight: 100;
+        font-style: normal;
+        font-size: calc(1.1vw * var(--fator-escala));
+        line-height: calc(var(--line-height) * var(--fator-escala));
+    }
+}
+
+algol-select:focus-within::part(select) {
+    border-color: var(--border-color-focus);
+    box-shadow: 0 0 0 calc(0.1vw * var(--fator-escala)) var(--border-color-focus-glow);
+}
+
+algol-select[disabled] {
+    &::part(select) {
+        background-color: var(--bg-color-forms-disabled);
+        color: var(--text-color-forms-disabled);
+        cursor: not-allowed;
+    }
+}
+
+algol-title {
+    display: block;
+    &::part(title) {
+        margin-top: calc(1vw * var(--fator-escala));
+        margin-bottom: calc(2vw * var(--fator-escala));
+        font-weight: 600;
+    }
+}
+
+algol-image {
+    display: block;
+    margin-top: calc(1vw * var(--fator-escala));
+    margin-bottom: calc(1vw * var(--fator-escala));
+    &::part(image) {
+        max-width: 100%;
+        height: auto;
+    }
+
+    .fluid {
+        width: 100%;
+    }
+}
+
+/* ******************************************************************************************* */
+/* LAYOUT ************************************************************************************ */
+/* ******************************************************************************************* */
+
+/* Groups **************************************************************** */
+.algol-bolha-01 {
+    margin-top: calc(2.0vw * var(--fator-escala));
+    padding: calc(1.0vw * var(--fator-escala));
+    background-color: var(--bg-color-section-bubble);
+    border: calc(0.1vw * var(--fator-escala)) solid var(--border-color-section-bubble);
+    border-radius: calc(var(--border-radius-layout) * var(--fator-escala));
+}
+
+/* ****************************************************************** */
+
+/* Estilos para os spinners */
+/* .spinner {
+    display: inline-block;
+    width: 50px;
+    height: 50px;
+    border: 4px solid rgba(0, 0, 0, 0.1);
+    border-top-color: #0647fb;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+} */
+
+/* @keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+} */
