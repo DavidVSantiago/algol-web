@@ -3,10 +3,9 @@ class BaseLayout extends HTMLElement {
     
     constructor() {
         super();
-        
+
         this.elems = {}; // cache de elementos internos do componente
         this.inicializado = false;
-        this._gerarAcessores();
         
         // usa light DOM para permitir estilos herdados e manipulação direta dos elementos filhos
         this.root = this; 
@@ -60,7 +59,6 @@ class BaseLayout extends HTMLElement {
         this.postConfig(); // invoca o metodo abstrato de pós-configuração
         this._ativarMonitoramentoDeConteudo();
 
-
         // Aplica valores iniciais dos atributos
         for(const attr of this.constructor.observedAttributes){
             const val = this.getAttribute(attr);
@@ -71,37 +69,29 @@ class BaseLayout extends HTMLElement {
     
     /** @override */
     disconnectedCallback() {
-        // Importante: Para o observer quando o componente sai da página
         this._desativarMonitoramentoDeConteudo();
     }
 
     /** @override */
     attributeChangedCallback(name, oldValue, newValue) {
         if (oldValue === newValue) return;
-        const updateMethod = `update_${name}`;
-        if (typeof this[updateMethod] === 'function') {
-            this[updateMethod](newValue);
-        }else{
-            console.error(`DEV MSG: está faltando o método ${updateMethod}()`);
-        }
+        // 1. Tenta pegar a configuração do   mapa estático da classe filha
+        const map = this.constructor.ATTR_MAP;
+
+        if (map && map[name]) { // se existir mapa e o atributo
+            const config = map[name]; // obtem o atributo
+            
+            // Suporta formato simples: 'atrib': '--variavel'
+            // Ou formato objeto: 'atrib': { var: '--variavel', prefix: 'span ' }
+            const cssVar = typeof config === 'string' ? config : config.var;
+            const prefix = (typeof config === 'object' && config.prefix) ? config.prefix : '';
+            const suffix = (typeof config === 'object' && config.suffix) ? config.suffix : '';
+            
+            this.style.setProperty(cssVar, prefix + newValue + suffix);
+            return;
+        }   
     }
     
-    // ****************************************************************************
-    // Geração de Acessores e Atributos
-    // ****************************************************************************
-
-    _gerarAcessores() {
-        for (const attr of this.constructor.observedAttributes) {
-            if (!(attr in this)) {
-                Object.defineProperty(this, attr, {
-                    get: () => this.getAttribute(attr),
-                    set: (val) => this.setAttribute(attr, val),
-                    configurable: true
-                });
-            }
-        };
-    }
-
     // ****************************************************************************
     // Eventos de Grid Layout
     // ****************************************************************************

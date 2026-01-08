@@ -1,6 +1,6 @@
 class Select extends BaseComponent {
     static get observedAttributes() {
-        return ['rotulo', 'valor', 'required', 'disabled','posicaoh', 'posicaov'];
+        return ['rotulo', 'valor', 'required', 'disabled'];
     }
 
     constructor() {
@@ -21,13 +21,13 @@ class Select extends BaseComponent {
                 .container {
                     display: flex;
                     flex-direction: column;
-                    gap: calc(0.3vw * var(--fator-escala));
-                    margin-bottom: calc(1.0vw * var(--fator-escala));
+                    gap: calc(0.3vw * var(--scale-factor));
+                    margin-bottom: calc(1.0vw * var(--scale-factor));
                     width: 100%;
 
                     label {
                         color: var(--text-color-forms-label);
-                        font-size: calc(1.0vw * var(--fator-escala));
+                        font-size: calc(1.0vw * var(--scale-factor));
                     }
                     select {
                         appearance: none;
@@ -35,16 +35,16 @@ class Select extends BaseComponent {
                         outline: none;
                         background: var(--bg-color-forms);
                         color: var(--text-color);
-                        border: calc(0.1vw * var(--fator-escala)) solid var(--border-color-forms);
-                        border-radius: calc(var(--border-radius-components) * var(--fator-escala));
-                        padding: calc(0.8vw * var(--fator-escala)) calc(1.1vw * var(--fator-escala));
+                        border: calc(0.1vw * var(--scale-factor)) solid var(--border-color-forms);
+                        border-radius: calc(var(--border-radius-components) * var(--scale-factor));
+                        padding: calc(0.8vw * var(--scale-factor)) calc(1.1vw * var(--scale-factor));
                         width: 100%;
                         font-family: 'Algol Font';
                         cursor: inherit;
                         font-weight: 100;
                         font-style: normal;
-                        font-size: calc(1.1vw * var(--fator-escala));
-                        line-height: calc(var(--line-height) * var(--fator-escala));
+                        font-size: calc(1.1vw * var(--scale-factor));
+                        line-height: calc(var(--line-height) * var(--scale-factor));
                     }
                 }
                 /* Para o estado disabled */
@@ -59,7 +59,7 @@ class Select extends BaseComponent {
                 }
                 :host(:focus-within) select {
                     border-color: var(--border-color-focus); /* Exemplo */
-                    box-shadow: 0 0 0 calc(0.1vw * var(--fator-escala)) var(--border-color-focus-glow) /* "Glow" externo */
+                    box-shadow: 0 0 0 calc(0.1vw * var(--scale-factor)) var(--border-color-focus-glow) /* "Glow" externo */
                 }
             </style>
         `;
@@ -142,23 +142,5 @@ class Select extends BaseComponent {
         const isDisabled = this.hasAttribute('disabled');
         if (this.elems.select) this.elems.select.disabled = isDisabled;
     }
-    update_posicaoh(val) {       
-        switch(val){
-            case 'inicio': this.style.justifySelf = 'start'; break;
-            case 'centro': this.style.justifySelf = 'center'; break;
-            case 'fim': this.style.justifySelf = 'end'; break;
-            case 'total': this.style.justifySelf = 'stretch'; break;
-            default: console.warn(`Valor '${val}' é inválido para posicaoh! Valores aceitos: 'inicio', 'centro', 'fim', 'total'.`);
-        }
-    }
-    update_posicaov(val) {
-        switch(val){
-            case 'inicio': this.style.alignSelf = 'start'; break;
-            case 'centro': this.style.alignSelf = 'center'; break;
-            case 'fim': this.style.alignSelf = 'end'; break;
-            default: console.warn(`Valor '${val}' é inválido para posicaov! Valores aceitos: 'inicio', 'centro', 'fim'.`);
-        }
-    }
-    
-    
 }
+customElements.define('algol-select', Select);

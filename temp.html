@@ -19,8 +19,6 @@
     <script src="scripts/layouts/grid-layout.js" defer></script>
     <script src="scripts/layouts/grid-item.js" defer></script>
 
-    <script src="scripts/components.js" defer></script>
-
     <script defer>
         // temporário. apenas para teste
         window.addEventListener('load', function (event) {
@@ -76,10 +74,9 @@
                 vero id aperiam debitis sapiente, ea quis nostrum nihil et ut vitae amet inventore temporibus.
             </p>
 
-            <algol-grid-layout id="layout" posicaoh="total" posicaohbreak="centro" posicaov="fim" posicaohbreak="fim" posicaovbreak="fim" colunas="1fr 1fr 1fr" colunasbreak="1fr 1fr" gap="1vw" gapbreak="5vw" class="algol-bolha-01">
-                <algol-grid-item expandecoluna="1" expandecolunabreak="2" >   
-                    <algol-select id="comp" rotulo="SELECT" required>
-                        <option disabled selected value="">Selecione uma das opções...</option>
+            <algol-grid-layout id="layout" posh="stretch" poshbreak="center" posv="end" posvbreak="end" cols="1fr 1fr 1fr" colsbreak="1fr 1fr" gap="1vw" gapbreak="5vw" class="algol-bolha-01">
+                <algol-grid-item id="item" colspan="1" colspanbreak="2" >   
+                    <algol-select id="comp" label="SELECT" placeholder="Selecione uma opção..." required>
                         <option disabled>--Grupo 1--</option>
                         <option value="A">Opção A</option>
                         <option value="B">Opção B</option>
@@ -90,8 +87,7 @@
                         <option value="E">Opção E</option>
                         <option value="F">Opção F</option>
                     </algol-select>
-                    <algol-select id="comp" rotulo="SELECT" required>
-                        <option disabled selected value="">Selecione uma das opções...</option>
+                    <algol-select id="comp" label="SELECT" required>
                         <option disabled>--Grupo 1--</option>
                         <option value="A">Opção A</option>
                         <option value="B">Opção B</option>
@@ -103,7 +99,7 @@
                         <option value="F">Opção F</option>
                     </algol-select>
                 </algol-grid-item>
-                <algol-grid-item>   
+                <algol-grid-item colspan="2" colspanbreak="1" >   
                     <div id="div">teste</div>
                     <div id="div">teste</div>
                     <p>PARAGRAFO</p>

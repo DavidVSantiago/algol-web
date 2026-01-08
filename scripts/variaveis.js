@@ -3,11 +3,11 @@
 // ----------------------------
 
 /** CUIDADO!! Não altere as chaves!! altere apenas os valores
-  * OBS: com exceção de 'fator-escala', altere o valor, mas MANTENHA A UNIDADE 'vw'!! ex: '1.2vw', '0.9vw', ...
+  * OBS: com exceção de 'scale-factor', altere o valor, mas MANTENHA A UNIDADE 'vw'!! ex: '1.2vw', '0.9vw', ...
 */
-const GLOBAL = {
-    'fator-escala': 1.0, // multiplicador de escala global. recomenda-se que seja um valor entre 0.5 e 1.5 (padrão 1.0)
-    'fator-escala-break': 3.0, // multiplicador de escala global para telas menores que 'mobileBreakpoint'
+var GLOBAL = {
+    'scale-factor': 1.0, // multiplicador de escala global. recomenda-se que seja um valor entre 0.5 e 1.5 (padrão 1.0)
+    'scale-factor-break': 3.0, // multiplicador de escala global para telas menores que 'mobileBreakpoint'
     'font-size': '1.1vw', // ajusta o tamanho da fonte global (padrão 1.1vw)
     'line-height': '1.6vw', // ajusta a altura da linha de texto global (padrão 1.6vw)
     'border-radius-components': '0.5vw', // 
@@ -15,7 +15,7 @@ const GLOBAL = {
     'font-size-btn': '1.2vw', //
   }
 
-const mobileBreakpoint = '600px'; // breakpoint para celular (padrão 700px) 
+var mobileBreakpoint = '600px'; // breakpoint para celular (padrão 700px) 
 
 // ----------------------------
 // FONTE GLOBAL DO LAYOUT
@@ -32,9 +32,36 @@ const fontBase64 = "data:application/font-woff;base64,d09GRgABAAAAAE3AABIAAAAAg4
 //  PERIGO!! DAQUI PRA BAIXO NÃO ALTERAR NADA!! *************************************************************************
 // **********************************************************************************************************************
 
-/** Setters GLOBAIS */
+// function setFatorEscala(valor) {document.documentElement.style.setProperty('--scale-factor', valor);}
 
-function setFatorEscala(valor) {document.documentElement.style.setProperty('--fator-escala', valor);}
+/** Função de injeção das variáveis GLOBAIS */
+function injectGlobalVariablesStyles() {
+    if (document.getElementById('algol-global-variables-style')) return; // Já injetado
+
+    const style = document.createElement('style');
+    style.id = 'algol-global-variables-style';
+
+    style.textContent = ':root {';
+    for (const chave in GLOBAL) {
+        style.textContent += `  --${chave}: ${GLOBAL[chave]};`;
+    }
+    style.textContent += '}';
+    style.textContent +=
+    `@media (max-width: ${mobileBreakpoint}) {
+        :root {
+            --scale-factor: var(--scale-factor-break); /* Ajuste para o valor que desejar */
+        }
+    }`;
+    // injeta a fonte global
+    style.textContent +=
+    `@font-face {
+        font-family: "Algol Font";
+        font-weight: normal;
+        font-style: normal;
+        src: url("${fontBase64}") format("woff");
+    }`;
+    document.head.appendChild(style);
+}
+injectGlobalVariablesStyles();
 
 // **********************************************************************************************************************
-const headStyle = document.createElement('style'); // estilo a ser injetado no head

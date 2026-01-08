@@ -1,16 +1,19 @@
 class BaseComponent extends HTMLElement {
+    static formAssociated = true; // Habilita participação em formulários nativos (<form>)
+
     static _idCont = 0;
     static get observedAttributes() { return []; } 
     
     constructor() {
-        super();
         
+        super();
         this.elems = {}; // cache de elementos internos do componente
         this.inicializado = false;
 
-        this._gerarAcessores();
+        this._internals = this.attachInternals(); // API de Formulários, para notifica ao <form>
+        this._gerarAcessoresAutomaticos(); // Gera getters/setters baseados nos mapas implementados nas classes filhas
         
-        // usa shadow DOM, que isola o componente do restante da página
+        // usa shadow DOM, que isola o componente do restante da página 
         this.root = this.attachShadow({
             mode: 'open',
             delegatesFocus: true, // permite que o foco seja delegado para dentro do shadow DOM
@@ -18,7 +21,7 @@ class BaseComponent extends HTMLElement {
     }
 
     // ****************************************************************************
-    // Métodos de construção do componente
+    // Métodos de construção do componente 
     // ****************************************************************************
 
     /** @abstract */
@@ -60,32 +63,43 @@ class BaseComponent extends HTMLElement {
     attributeChangedCallback(name, oldValue, newValue) {
         if (oldValue === newValue) return;
 
-        // se a mudança foi no atributo valor, dispara um evento a ser usado nos eventos estilizados do componente
-        // if (nomeAtributo === 'valor') this.dispatchEvent(new CustomEvent('mudancaValor',{bubbles: false,detail: {antigo: oldValue, novo: newValue}}));
-        
-        // Procura método específico: 'update_rotulo', 'update_valor', etc.
-        const updateMethod = `update_${name}`;
-        if (typeof this[updateMethod] === 'function') {
-            this[updateMethod](newValue);
-        }else{
-            console.error(`DEV MSG: está faltando o método ${updateMethod}()`);
+        // 1. Prioridade: Mapa de Propriedades (Lógica Funcional)
+        const propMap = this.constructor.PROP_MAP;
+        if (propMap && propMap[name]) {
+            const method = propMap[name];
+            if (typeof this[method] === 'function') {
+                this[method](newValue);
+                return;
+            }
+        }
+
+        // 2. Segunda opção: Mapa de Atributos (Lógica de Estilo - CSS)
+        const attrMap = this.constructor.ATTR_MAP;
+        if (attrMap && attrMap[name]) {
+            const config = attrMap[name];
+            const cssVar = typeof config === 'string' ? config : config.var;
+            this.style.setProperty(cssVar, newValue);
+            return;
         }
     }
 
     // ****************************************************************************
-    // Geração de Acessores e Atributos
+    // Utils
     // ****************************************************************************
+    
+    // Gera getters e setters para não precisarmos escrever manualmente
+    _gerarAcessoresAutomaticos() {
+        const props = Object.keys(this.constructor.PROP_MAP || {});
+        const attrs = Object.keys(this.constructor.ATTR_MAP || {});
+        const all = [...new Set([...props, ...attrs])];
 
-    _gerarAcessores() {
-        for (const attr of this.constructor.observedAttributes) {
-            if (!(attr in this)) {
-                Object.defineProperty(this, attr, {
-                    get: () => this.getAttribute(attr),
-                    set: (val) => this.setAttribute(attr, val),
-                    configurable: true
-                });
-            }
-        };
+        all.forEach(attr => {
+            if (attr in this) return; // evita recriação
+            Object.defineProperty(this, attr, {
+                get: () => this.getAttribute(attr),
+                set: (val) => { if (val === null || val === false) this.removeAttribute(attr); else this.setAttribute(attr, val);}
+            });
+        });
     }
 
     // ****************************************************************************

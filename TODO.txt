@@ -1,4 +1,4 @@
-Refazer o select com base nas novas boas práticas
+Testar todas a funções do select, pedir pra ia fazer um caso de teste
 
 Criar os componentes:
    - AlgolTitle (para as variações h1,h2,h3,h4,h5,h6)

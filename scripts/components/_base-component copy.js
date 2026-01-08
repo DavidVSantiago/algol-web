@@ -5,37 +5,16 @@ class BaseComponent extends HTMLElement {
     constructor() {
         super();
         
-        this.elems = new Map(); // lista de elementos internos do componente
+        this.elems = {}; // cache de elementos internos do componente
+        this.inicializado = false;
+
         this._gerarAcessores();
-        this._ERRO = false;
-        this._textoInterno = null;
-        this._connected = false;
-        this.base_initialized = false;
         
-        // Configuração do Observer: o mais abrangente possível
-        this._observerConfig = {
-            attributes: true,       // Observa mudanças em atributos
-            childList: true,        // Observa adição/remoção de filhos
-            characterData: true,    // Observa mudanças de texto (innerText/textContent)
-            subtree: true,          // Não bserva filhos dos filhos (profundidade)
-            attributeOldValue: true
-        };
-
-        // define o observador de mudanças
-        this._observer = new MutationObserver(this.mutationObserver.bind(this));
-    }
-
-    // observador de mudanças
-    mutationObserver (mutations) {
-        for (const mutation of mutations) { // percorre todas as mutações
-            this._observer.disconnect(); // disabilita o observer temporariamente
-
-            if (mutation.type === 'childList')  this.mudaFilhosCallback();
-            else if (mutation.type === 'attributes') this.mudaAtributosCallback(mutation.attributeName, mutation.oldValue);
-            else if (mutation.type === 'characterData') this.mudaTextoCallback();
-
-            this._observer.observe(this, this._observerConfig);// reabilita o observer
-        }
+        // usa shadow DOM, que isola o componente do restante da página
+        this.root = this.attachShadow({
+            mode: 'open',
+            delegatesFocus: true, // permite que o foco seja delegado para dentro do shadow DOM
+         }); 
     }
 
     // ****************************************************************************
@@ -43,34 +22,19 @@ class BaseComponent extends HTMLElement {
     // ****************************************************************************
 
     /** @abstract */
-    init() { throw new Error("init deve ser implementado"); }
+    render() { throw new Error("Método 'render' deve ser implementado."); }
     /** @abstract */
-    attachEvents() { throw new Error("attachEvents deve ser implementado"); }
-    
-    constroi(){
-        this.base_initialized = false; // reseta o estado de inicialização
-        this._ERRO = false; // reseta o estado de erro antes de reconstruir
-        if(this._textoInterno===null){ // captura o texto interno apenas primeira construção
-            this._textoInterno = this.textContent.trim();
-        }
+    attachEvents() { throw new Error("Método 'attachEvents' deve ser implementado."); }
+    /** @abstract */
+    postConfig() { throw new Error("Método 'postConfig' deve ser implementado."); }
 
-        if(!this._validaAtributos()) return; // se houver atributos inválidos, abandona com erro!
-        this.init(); 
-        this.attachEvents();
-        this.aplicaAtributos(); // Aplica os valores atuais dos atributos
+    configSlot(){
+        const slot = this.root.querySelector('slot');
+        if(slot) slot.style.display = 'none'; // esconde o slot por padrão
+        else throw new Error("O seu método render() deve incluir um <slot> para o conteúdo interno do componente.");
 
+        this.postConfig(); // invoca o metodo abstrato de pós-configuração
     }
-
-    // ****************************************************************************
-    // Ciclo de Vida de alterações do componente
-    // ****************************************************************************
-
-    /** @abstract */
-    mudaFilhosCallback() { throw new Error("mudaFilhosCallback() deve ser implementado"); }
-    /** @abstract */
-    mudaTextoCallback() { throw new Error("mudaTextoCallback() deve ser implementado"); }
-    /** @abstract */
-    mudaAtributosCallback(nomeAtributo, valorAntigo) {throw new Error("mudaAtributosCallback() deve ser implementado");}
 
     // ****************************************************************************
     // Ciclo de Vida de HTMLElement
@@ -78,18 +42,34 @@ class BaseComponent extends HTMLElement {
 
     /** @override */
     connectedCallback() {
-        if (this._connected) return; // se já foi construído, não faz nada!
+        if (this.inicializado) return; // se já foi construído, não faz nada!
         
-        this._observer.disconnect();
-        this.constroi(); // Realiza a primeira construção        
-        this._observer.observe(this, this._observerConfig);
+        this.render(); // Realiza a construção, uma única vez        
+        this.configSlot(); // configura o slot e faz configuraçẽos posteriores
 
-        this._connected = true;
+        // Aplica valores iniciais dos atributos
+        this.constructor.observedAttributes.forEach(attr => {
+            const val = this.getAttribute(attr);
+            if (val !== null) this.attributeChangedCallback(attr, null, val);
+        });
+        this.attachEvents();
+        this.inicializado = true;
     }
+
     /** @override */
-    disconnectedCallback() {
-        // Limpa o observer ao remover o elemento do DOM para evitar memory leaks
-        this._observer.disconnect();
+    attributeChangedCallback(name, oldValue, newValue) {
+        if (oldValue === newValue) return;
+
+        // se a mudança foi no atributo valor, dispara um evento a ser usado nos eventos estilizados do componente
+        // if (nomeAtributo === 'valor') this.dispatchEvent(new CustomEvent('mudancaValor',{bubbles: false,detail: {antigo: oldValue, novo: newValue}}));
+        
+        // Procura método específico: 'update_rotulo', 'update_valor', etc.
+        const updateMethod = `update_${name}`;
+        if (typeof this[updateMethod] === 'function') {
+            this[updateMethod](newValue);
+        }else{
+            console.error(`DEV MSG: está faltando o método ${updateMethod}()`);
+        }
     }
 
     // ****************************************************************************
@@ -97,7 +77,7 @@ class BaseComponent extends HTMLElement {
     // ****************************************************************************
 
     _gerarAcessores() {
-        this.constructor.observedAttributes.forEach(attr => {
+        for (const attr of this.constructor.observedAttributes) {
             if (!(attr in this)) {
                 Object.defineProperty(this, attr, {
                     get: () => this.getAttribute(attr),
@@ -105,52 +85,7 @@ class BaseComponent extends HTMLElement {
                     configurable: true
                 });
             }
-        });
-    }
-    get textoInterno() {
-        return this._textoInterno;
-    }
-    set textoInterno(valor) {
-        if (valor !== this._textoInterno) {
-            this._textoInterno = valor;
-        }
-    }
-    aplicaAtributos() {
-        this.constructor.observedAttributes.forEach(atributo => {
-            this.aplicaAtributo(atributo);
-        });
-    }
-    aplicaAtributo(atributo) {
-        const nomeMetodo = `aplicaAtributo_${atributo}`;
-        if (typeof this[nomeMetodo] === 'function') {
-            this[nomeMetodo]();
-        }else{
-            console.error(`DEV MSG: está faltando o método ${nomeMetodo}()`);
-        }
-    }
-
-    // ****************************************************************************
-    // Validações
-    // ****************************************************************************
-
-    _validaAtributos() {
-        const observados = this.constructor.observedAttributes || [];
-        const globaisPermitidos = ['id', 'class', 'style', 'tabindex', 'slot', 'hidden', 'title', 'lang', 'dir', 'accesskey', 'draggable', 'spellcheck'];
-        const invalidos = [];
-        Array.from(this.attributes).forEach(attr => {
-            const nome = attr.name;
-            if (observados.includes(nome)) return;
-            if (globaisPermitidos.includes(nome)) return;
-            if (nome.startsWith('data-') || nome.startsWith('aria-')) return;
-            if (nome.startsWith('on')) return;
-            invalidos.push(nome);
-        });
-        if (invalidos.length > 0) {
-            this.innerHTML = this._montaMsgErroAtributos(invalidos, globaisPermitidos);
-            this._ERRO = true;
-            return false;
-        }
-        return true;
+        };
     }
 
     // ****************************************************************************
@@ -221,27 +156,4 @@ class BaseComponent extends HTMLElement {
         this.addEventListener('mousemove', wrapperCallback);
     }
     
-    // ****************************************************************************
-    // Mensagens de Erro
-    // ****************************************************************************
-    
-    _montaMsgErroAtributos(listaInvalidos, listaGlobaisPermitidos) {
-       return `
-        <div style="display:block; border:calc(0.5vw * var(--fator-escala)) dashed red; background-color:#fff0f0; padding:calc(1vw * var(--fator-escala)); color:red; fontFamily:'monospace';">
-            <h3 style="margin: 0 0 calc(0.5vw * var(--fator-escala)) 0;">🚫 Erro de Atributo: &lt;${this.tagName.toLowerCase()}&gt;</h3>
-            <p style="margin: 0;">
-                Os seguintes atributos não são reconhecidos:
-                <strong><em>'${listaInvalidos.join(', ')}'</em></strong>.<br>Remova-os!
-            </p>
-            <p style="margin: calc(0.5vw * var(--fator-escala)) 0 0 0; font-size: 0.9em; color: #333;">
-                Atributos padrão do componente: <em>[${this.constructor.observedAttributes.join(', ')}]</em>
-            </p>
-            <p style="margin: calc(0.5vw * var(--fator-escala)) 0 0 0; font-size: 0.9em; color: #333;">
-                Outros atributos também aceitos: <em>[${listaGlobaisPermitidos.join(', ')}]</em>
-            </p>
-            <p style="margin: calc(0.5vw * var(--fator-escala)) 0 0 0; font-size: 0.9em; color: #333;">
-                -- Recarregue a página para restaurar o conteúdo original! --
-            </p>
-        </div>`;
-    }
 }
