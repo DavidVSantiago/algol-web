@@ -106,8 +106,8 @@ class BaseComponent extends HTMLElement {
     // Métodos dos eventos padrão de um componente
     // ****************************************************************************
 
-    addEventoClique(callback){
-        const wrapperCallback = (e) => {
+    addEventCLick(callback){
+        this._eventCLickWrapperCallback = (e) => {
             if (this.hasAttribute('disabled')) {
                 e.preventDefault();
                 return;
@@ -121,7 +121,13 @@ class BaseComponent extends HTMLElement {
             }
             callback(origem,mouseInfo);
         };
-        this.addEventListener('click', wrapperCallback);
+        this.addEventListener('click', this._eventCLickWrapperCallback);
+    }
+    removeEventCLick() {
+        if (this._eventCLickWrapperCallback) {
+            this.removeEventListener('click', this._eventCLickWrapperCallback);
+            this._eventCLickWrapperCallback = null;
+        }
     }
     addEventoFoco(callback) {
         const wrapperCallback = (e) => {

@@ -1,5 +1,11 @@
-Testar todas a funções do select, pedir pra ia fazer um caso de teste
+Reimplementar todos os eventos no padrão ouro dispatchEvent:
 
-Criar os componentes:
-   - AlgolTitle (para as variações h1,h2,h3,h4,h5,h6)
-   - AlgolImage (com todas as características de responsividade)
+// Despacha o evento customizado que contém seus dados extras
+        this.dispatchEvent(new CustomEvent('algol-click', {
+            bubbles: true,
+            composed: true,
+            detail: {
+                origem: this,
+                mouse: { x: e.clientX, y: e.clientY }
+            }
+        }));
