@@ -23,8 +23,8 @@ class GridLayout extends BaseLayout {
     postConfig(){
         this.style.display = 'grid';
         // por padrão, os elementos da grade são alinhados ao centro
-        this.style.setProperty('--grid-layout-posh', 'center');
-        this.style.setProperty('--grid-layout-posv', 'center');
+        if (!this.style.getPropertyValue('--grid-layout-posh')) this.style.setProperty('--grid-layout-posh', 'center');
+        if (!this.style.getPropertyValue('--grid-layout-posv')) this.style.setProperty('--grid-layout-posv', 'center');
     }
 
     // ****************************************************************************
@@ -32,11 +32,7 @@ class GridLayout extends BaseLayout {
     // ****************************************************************************
     
     static injectStyles() {
-        if (document.getElementById('algol-grid-layout-style')) return; // Já injetado
-
-        const style = document.createElement('style');
-        style.id = 'algol-grid-layout-style';
-        style.textContent = `
+        const css = `
             algol-grid-layout{
                 grid-template-columns: var(--grid-layout-cols, none);
                 gap: var(--grid-layout-gap, none);
@@ -44,14 +40,14 @@ class GridLayout extends BaseLayout {
                 align-items: var(--grid-layout-posv, none);
             }
                 
-            @media (max-width: ${mobileBreakpoint}) {
+            @media (max-width: ${MOBILE_BREAKPOINT}) {
                 algol-grid-layout[colsbreak] {grid-template-columns: var(--grid-layout-cols-break) !important;}
                 algol-grid-layout[gapbreak] {gap: var(--grid-layout-gap-break) !important;}
                 algol-grid-layout[poshbreak] {justify-items: var(--grid-layout-posh-break) !important;}
                 algol-grid-layout[posvbreak] {align-items: var(--grid-layout-posv-break) !important;}
             }
         `;
-        document.head.appendChild(style);
+        BaseLayout._injectStyleOnHead('algol-grid-layout-style', css);
     }
 }
 

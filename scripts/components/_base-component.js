@@ -56,6 +56,7 @@ class BaseComponent extends HTMLElement {
             if (val !== null) this.attributeChangedCallback(attr, null, val);
         });
         this.attachEvents();
+        this._registerBaseEvents();
         this.inicializado = true;
     }
 
@@ -103,77 +104,70 @@ class BaseComponent extends HTMLElement {
     }
 
     // ****************************************************************************
-    // Métodos dos eventos padrão de um componente
+    // Registro dos eventos padrão de um componente
     // ****************************************************************************
 
-    addEventCLick(callback){
-        this._eventCLickWrapperCallback = (e) => {
-            if (this.hasAttribute('disabled')) {
-                e.preventDefault();
-                return;
-            }
-            let origem = e.currentTarget
-            let mouseInfo = {
-                x: e.clientX,
-                y: e.clientY,
-                offsetX: e.offsetX,
-                offsetY: e.offsetY
-            }
-            callback(origem,mouseInfo);
-        };
-        this.addEventListener('click', this._eventCLickWrapperCallback);
+    _registerBaseEvents(){
+        // registra o evento de click
+        this.addEventListener('click', (e) => {
+            if (this.hasAttribute('disabled')) {e.stopImmediatePropagation();return;} // interrompe o evento se o componente estiver desabilitado
+            // dispara o evento estilizado de clique
+            this.dispatchEvent(new CustomEvent('algol-click', { bubbles: true,composed: true,
+                detail: {
+                    origin: this,
+                    mouse: {
+                        x: e.clientX, y: e.clientY,
+                        offsetX: e.offsetX, offsetY: e.offsetY
+                    }
+                }
+            }));
+        });
+        // registra evento de foco
+        this.addEventListener('focus', (e) => {
+            if (this.hasAttribute('disabled')) {e.stopImmediatePropagation();return;} // interrompe o evento se o componente estiver desabilitado
+            // dispara o evento estilizado de foco
+            this.dispatchEvent(new CustomEvent('algol-focus', { bubbles: true,composed: true,
+                detail: {origin: this,}
+            }));
+        });
+        // registra evento de blur
+        this.addEventListener('blur', (e) => {
+            if (this.hasAttribute('disabled')) {e.stopImmediatePropagation();return;} // interrompe o evento se o componente estiver desabilitado
+            // dispara o evento estilizado de blur
+            this.dispatchEvent(new CustomEvent('algol-blur', { bubbles: true,composed: true,
+                detail: {origin: this,}
+            }));
+        });
+        // registra evento de mouseenter
+        this.addEventListener('mouseenter', (e) => {
+            if (this.hasAttribute('disabled')) {e.stopImmediatePropagation();return;} // interrompe o evento se o componente estiver desabilitado
+            // dispara o evento estilizado de mouseenter
+            this.dispatchEvent(new CustomEvent('algol-mouseenter', { bubbles: true,composed: true,
+                detail: {origin: this,}
+            }));
+        });
+        // registra evento de mouseleave
+        this.addEventListener('mouseleave', (e) => {
+            if (this.hasAttribute('disabled')) {e.stopImmediatePropagation();return;} // interrompe o evento se o componente estiver desabilitado
+            // dispara o evento estilizado de mouseleave
+            this.dispatchEvent(new CustomEvent('algol-mouseleave', { bubbles: true,composed: true,
+                detail: {origin: this,}
+            }));
+        });
+        // registra evento de mousemove
+        this.addEventListener('mousemove', (e) => {
+            if (this.hasAttribute('disabled')) {e.stopImmediatePropagation();return;} // interrompe o evento se o componente estiver desabilitado
+            // dispara o evento estilizado de mousemove
+            this.dispatchEvent(new CustomEvent('algol-mousemove', { bubbles: true,composed: true,
+                detail: {
+                    origin: this,
+                    mouse: {
+                        x: e.clientX, y: e.clientY,
+                        offsetX: e.offsetX, offsetY: e.offsetY
+                    }
+                }
+            }));
+        });
+
     }
-    removeEventCLick() {
-        if (this._eventCLickWrapperCallback) {
-            this.removeEventListener('click', this._eventCLickWrapperCallback);
-            this._eventCLickWrapperCallback = null;
-        }
-    }
-    addEventoFoco(callback) {
-        const wrapperCallback = (e) => {
-            if (this.hasAttribute('disabled')) return;
-            let origem = e.currentTarget
-            callback(origem);
-        };
-        this.addEventListener('focus', wrapperCallback);
-    }
-    addEventoBlur(callback) {
-        const wrapperCallback = (e) => {
-            if (this.hasAttribute('disabled')) return;
-            let origem = e.currentTarget
-            callback(origem);
-        };
-        this.addEventListener('blur', wrapperCallback);
-    }
-    addEventoMouseEntra(callback) {
-        const wrapperCallback = (e) => {
-            if (this.hasAttribute('disabled')) return;
-            let origem = e.currentTarget
-            callback(origem);
-        };
-        this.addEventListener('mouseenter', wrapperCallback);
-    }
-    addEventoMouseSai(callback) {
-        const wrapperCallback = (e) => {
-            if (this.hasAttribute('disabled')) return;
-            let origem = e.currentTarget
-            callback(origem);
-        };
-        this.addEventListener('mouseleave', wrapperCallback);
-    }
-    addEventoMouseSobre(callback) {
-        const wrapperCallback = (e) => { 
-            if (this.hasAttribute('disabled')) return;
-            let origem = e.currentTarget
-            let mouseInfo = {
-                x: e.clientX,
-                y: e.clientY,
-                offsetX: e.offsetX,
-                offsetY: e.offsetY
-            }
-            callback(origem,mouseInfo);
-        };
-        this.addEventListener('mousemove', wrapperCallback);
-    }
-    
 }

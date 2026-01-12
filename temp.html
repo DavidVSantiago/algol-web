@@ -28,8 +28,8 @@
             const MAXIMO = 3.0;
 
             function atualizarCSS() {
-            // Aplica o valor arredondado à variável global CSS
-                setFatorEscala(fatorAtual.toFixed(1));
+                // Aplica o valor arredondado à variável global CSS
+                document.documentElement.style.setProperty("--scale-factor", fatorAtual.toFixed(1));
             }
 
             window.addEventListener('keydown', (e) => {
@@ -76,7 +76,7 @@
             <form action="" id="form">
             <algol-grid-layout id="layout" posh="stretch" poshbreak="center" posv="center" posvbreak="end" cols="1fr 1fr 1fr" colsbreak="1fr 1fr" gap="1vw" gapbreak="5vw" class="algol-bolha-01">
                 <algol-grid-item id="item" colspan="1" colspanbreak="2" >   
-                    <algol-select id="elem" required>
+                    <algol-select id="elem" label='NOVO' required>
                         <option disabled>--Grupo 1--</option>
                         <option value="A">Opção A</option>  
                         <option value="B">Opção B</option>
@@ -116,27 +116,11 @@
             <script defer>
                 // temporário. apenas para teste
                 window.addEventListener('load', function (event) {
-                    // let layout = document.getElementById('layout');
-                    // layout.addEventoMudaConteudo((origem,alvo,mutations)=>{
-                    //     console.log(origem);
-                    //     console.log(alvo);
-                    //     console.log(mutations);
-                    // });
-                    let elem = document.getElementById('elem');
-                    // elem.addEventoClique((origem,mouseInfo)=>console.log(origem,mouseInfo));
-                    // elem.addEventoFoco((origem)=>console.log(origem));
-                    // elem.addEventoBlur((origem)=>console.log(origem));
-                    // elem.addEventoMouseEntra((origem)=>console.log(origem));
-                    // elem.addEventoMouseSai((origem)=>console.log(origem));
-                    elem.addEventValue((origin,oldValue,newValue)=>{
-                        console.log('Origem: '+origin);
-                        console.log('antigo: '+oldValue);
-                        console.log('novo: '+newValue);
+                    let elem = document.getElementById('layout');
+                    elem.addEventListener('algol-layout-update',(e)=>{
+                        console.log(e.detail.origin);
+                        console.log(e.detail.mutations);
                     });
-                    // elem.addEventoMouseSobre((origem,mouseInfo)=>console.log(origem,mouseInfo));
-                    // elem.addEventoCliqueSobe((origem,mouseInfo)=>console.log(origem,mouseInfo));
-                    // elem.addEventoCliqueDesce((origem,mouseInfo)=>console.log(origem,mouseInfo));
-                    // elem.addEventoMudaValor((origem,antigo,novo)=>console.log('Valor='+novo+'\nAntigo='+antigo));
                 });
             </script>
 

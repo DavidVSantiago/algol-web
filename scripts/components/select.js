@@ -39,21 +39,15 @@ class Select extends BaseComponent {
         const idUnico = `select-${BaseComponent._idCont++}`;
         this.elems.select.id = idUnico;
         this.elems.label.setAttribute('for', idUnico);
+
     }
     /** @override */
-    attachEvents() {
-        this.elems.select.addEventListener('change', (e) => {
-            this._oldValue = this.value // guarda o valor antigo
-            this.value =e.target.value; // reflete no atributo
-
-            this._internals.setFormValue(this.value); // informa o que será enviado pro form
-            this._atualizarValidacao(); // atualiza a validação
-        });
-        
+    attachEvents(){
         // Quando o usuário adiciona/remove <option> no HTML, isso dispara.
         this.elems.slot.addEventListener('slotchange', () => {
             this._sincronizarOptions();
         });
+        this._registerEvents(); // registra os eventos estilizados deste componente
     }
 
     // ****************************************************************************
@@ -119,21 +113,28 @@ class Select extends BaseComponent {
     }
 
     // ****************************************************************************
-    // Métodos dos eventos do componente
+    // Registro dos eventos do select
     // ****************************************************************************
 
-    addEventValue(callback){
-        const wrapperCallback = (e) => {
-            if (this.hasAttribute('disabled')) {
-                e.preventDefault();
-                return;
-            }
-            let origin = e.currentTarget;
-            let oldValue = this._oldValue;
-            let newValue = e.target.value;
-            callback(origin,oldValue,newValue); // função do usuário
-        };
-        this.elems.select.addEventListener('change', wrapperCallback);
+    _registerEvents(){
+        // registra o evento de mudança de valor do select
+        this.elems.select.addEventListener('change', (e)=>{
+            if (this.hasAttribute('disabled')) {e.stopImmediatePropagation();return;} // interrompe o evento se o componente estiver desabilitado
+            
+            const oldValue = this.value // guarda o valor antigo
+            this.value =e.target.value; // reflete no atributo
+            this._internals.setFormValue(this.value); // informa o que será enviado pro form
+            this._atualizarValidacao(); // atualiza a validação
+            
+            // dispara o evento estilizado de clique
+            this.dispatchEvent(new CustomEvent('algol-select-value', { bubbles: true,composed: true,
+                detail: {
+                    origin: this,
+                    oldValue,
+                    newValue: e.target.value
+                }
+            }));
+        });
     }
 }
 

@@ -5,17 +5,17 @@
 /** CUIDADO!! Não altere as chaves!! altere apenas os valores
   * OBS: com exceção de 'scale-factor', altere o valor, mas MANTENHA A UNIDADE 'vw'!! ex: '1.2vw', '0.9vw', ...
 */
-var GLOBAL = {
+const GLOBAL = {
     'scale-factor': 1.0, // multiplicador de escala global. recomenda-se que seja um valor entre 0.5 e 1.5 (padrão 1.0)
-    'scale-factor-break': 3.0, // multiplicador de escala global para telas menores que 'mobileBreakpoint'
+    'scale-factor-break': 3.0, // multiplicador de escala global para telas menores que 'MOBILE_BREAKPOINT'
     'font-size': '1.1vw', // ajusta o tamanho da fonte global (padrão 1.1vw)
     'line-height': '1.6vw', // ajusta a altura da linha de texto global (padrão 1.6vw)
-    'border-radius-components': '0.5vw', // 
-    'border-radius-layout': '1.0vw', // 
+    'border-radius-components': '0.5vw', //
+    'border-radius-layout': '1.0vw', //
     'font-size-btn': '1.2vw', //
   }
 
-var mobileBreakpoint = '600px'; // breakpoint para celular (padrão 700px) 
+const MOBILE_BREAKPOINT = '600px'; // breakpoint para celular (padrão 700px) 
 
 // ----------------------------
 // FONTE GLOBAL DO LAYOUT
@@ -47,7 +47,7 @@ function injectGlobalVariablesStyles() {
     }
     style.textContent += '}';
     style.textContent +=
-    `@media (max-width: ${mobileBreakpoint}) {
+    `@media (max-width: ${MOBILE_BREAKPOINT}) {
         :root {
             --scale-factor: var(--scale-factor-break); /* Ajuste para o valor que desejar */
         }
