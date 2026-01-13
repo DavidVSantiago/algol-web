@@ -1,124 +1,185 @@
 class TextArea extends BaseComponent {
-    static get observedAttributes() {
-        return ['valor', 'placeholder', 'rotulo', 'disabled', 'posicaoh', 'posicaov',
-                'linhas', 'maxcaracteres', 'apenasleitura', 'required', 'fixo'];
+    // Mapa de atributos válidos (chaves) e seus respectivos métodos (valores)
+    static get PROP_MAP() {
+        return {
+            'label': 'update_label',
+            'value': 'update_value',
+            'placeholder': 'update_placeholder',
+            'fixed': 'update_fixed',
+            'lines': 'update_lines',
+            'maxlength': 'update_maxlength',
+            'disabled': 'update_disabled',
+            'required': 'update_required',
+            'readonly': 'update_readonly',
+        };
     }
-
+    static get observedAttributes() {return Object.keys(this.PROP_MAP);} // retorna a chaves do mapa de atributos
     constructor() {super();}
 
     // ****************************************************************************
     // Métodos de construção do componente
     // ****************************************************************************
 
-    /** @override */
-    init() {
-        if (this.base_initialized) return; // guard para evitar dupla criação
-        if (!this.hasAttribute('tabindex')) this.setAttribute('tabindex', '0'); // Torna o componente focável
-
-        this.style.alignSelf = 'center';
-        
-        // rotulo (segue padrão atual do inputs.js usando <div> com classe)
-        const rotulo = document.createElement('div');
-        rotulo.className = 'algol-rotulo';
-        rotulo.setAttribute('tabindex', '-1'); // para não receber foco
-        
-        // textarea
-        const ta = document.createElement('textarea');
-        ta.className = 'algol-textarea';
-        ta.setAttribute('tabindex', '-1'); // para não receber foco
-        
-        // garantir id único evitando
-        if (!ta.id) {
-            // inicializa o contador no próprio Input (classe base) se necessário
-            if (typeof TextArea._uidCounter === 'undefined') TextArea._uidCounter = 0;
-            ta.id = `algol-textarea-${++TextArea._uidCounter}`;
-        }
-        
-        // container
-        const group = document.createElement('div');
-        group.className = 'algol-component-group';
-        group.setAttribute('tabindex', '-1'); // para não receber foco
-
-        // monta a árvore
-        group.appendChild(rotulo);
-        group.appendChild(ta);
-        this.appendChild(group);
-
-        // salva as refs globais
-        this.elems['root'] = group;
-        this.elems['rotulo'] = rotulo;
-        this.elems['textarea'] = ta;
-
-        this.base_initialized = true;
+    /** @override */    
+    render() {
+        this.root.adoptedStyleSheets = [algol_textarea_sheet]; // aplica o estilo do componente (compartilhado)
+        this.root.innerHTML = `
+            <div class="container">
+                <label></label>
+                <textarea></textarea>
+            </div>
+            <slot></slot>
+        `;
     }
     /** @override */
-    attachEvents() {
-        /* reflete o valor digitado no input no atributo valor do componente */
-        this.elems['textarea'].addEventListener('input', () => {
-            const val = this.elems['textarea'].value;
-            if (this.valor !== val) this.valor = val;
-            this.dispatchEvent(new Event('input', { bubbles: true, composed: true }));
-        });
-        this.elems['textarea'].addEventListener('change',() => {
-            const val = this.elems['textarea'].value;
-            if (this.valor !== val) this.valor = val;
-            this.dispatchEvent(new Event('change', { bubbles: true, composed: true }));
-        });
+    postConfig(){
+        // salva as referências globais dos componentes
+        this.elems.container = this.root.querySelector('.container');
+        this.elems.label = this.root.querySelector('label');
+        this.elems.textarea = this.root.querySelector('textarea');
+        this.elems.slot = this.root.querySelector('slot');
 
-        // faz com que o enter no componente leve o foco para o input
-        this.addEventListener('keydown', (e) => {
-            if (this.hasAttribute('disabled')) return;
-            if (e.key === 'Enter') {
-                this.elems['textarea'].focus();
-                return;
+        // criação de id único para o textarea e linkagem com o label
+        const idUnico = `textarea-${BaseComponent._idCont++}`;
+        this.elems.textarea.id = idUnico;
+        this.elems.label.setAttribute('for', idUnico);
+
+    }
+    /** @override */
+    attachEvents(){
+        /* Escuta alterações do slot */
+        this.elems.slot.addEventListener('slotchange', () => {
+            // Se já tiver valor setado via atributo/JS, ignoramos o slot para não sobrescrever o que o usuário digitou
+            // Mas se o value estiver vazio, puxamos do slot.
+            if (this.getAttribute('value') === null && this.elems.slot.assignedNodes().length > 0) {
+                const nodes = this.elems.slot.assignedNodes(); // obtém os elementos internos da tag
+                // filtra e obtem apenas o que for texto (específico para <textarea>)
+                const textoInicial = nodes.map(n => n.textContent).join('');
+                if (textoInicial.trim() !== '') {
+                    this.value = textoInicial;
+                }
             }
-        });  
+        });
+        /* reflete o valor digitado no input no atributo valor do componente */
+        this.elems.textarea.addEventListener('input', (e) => {
+            const novoValor = e.target.value; // obtém o valor do textarea
+            if (this.value !== novoValor) {
+                this.value = novoValor; // Mantém a propriedade da classe sincronizada
+            }
+            this._internals.setFormValue(novoValor); // Informa ao formulário nativo (API Internals)
+            this._atualizarValidacao();
+        });
+
+        /* 3. LÓGICA DE VALIDAÇÃO */
+        this.elems.textarea.addEventListener('change',() => {
+            this._atualizarValidacao(); 
+        });
     }
 
     // ****************************************************************************
-    // Métodos de atualização
-    // ****************************************************************************
-   
-    // área para possível sobrescrita do método 'reconstroi'
-
-    // ****************************************************************************
-    // Ciclo de Vida de alterações do componente
+    // Métodos dos atributos
     // ****************************************************************************
 
-    /** @override */
-    mudaFilhosCallback() {
-        // decidir o que fazer quando o conteúdo interno do componente for alterado
+    update_label(val) {if (this.elems.label) this.elems.label.textContent = val;}
+    update_value(val) {
+        const valorSeguro = val === null || val === undefined ? '' : val; // Se o valor for nulo/undefined, transformamos em string vazia
+        if (this.elems.textarea && this.elems.textarea.value !== valorSeguro){
+            this.elems.textarea.value = valorSeguro;
+            this._internals.setFormValue(valorSeguro); // informa o que será enviado pro form
+            this._atualizarValidacao(); // atualiza a validação
+        }
     }
-    /** @override */
-    mudaTextoCallback() {
-        // decidir o que fazer quando o texto interno do componente for alterado
+    update_placeholder(val) {if (this.elems.textarea) this.elems.textarea.placeholder = val;    }
+    update_required(val) {if (this.elems.textarea) this.elems.textarea.required = this.hasAttribute('required'); this._atualizarValidacao();}
+    update_readonly(val) {if (this.elems.textarea)this.elems.textarea.readOnly = this.hasAttribute('readonly');}
+    update_disabled(val) {if (this.elems.textarea) this.elems.textarea.disabled = this.hasAttribute('disabled');}
+    update_fixed(val) {if (this.elems.textarea) this.elems.textarea.style.resize = this.hasAttribute('fixed') ? 'none' : 'vertical';}
+    update_lines(val) {
+        if (this.elems.textarea) {
+            if (val) this.elems.textarea.rows = val;
+            else this.elems.textarea.removeAttribute('rows');
+        }
     }
-    /** @override */
-    mudaAtributosCallback(nomeAtributo, valorAntigo) {
-        // decidir o que fazer quando algum atributo for alterado
+    update_maxlength(val) {
+        if (this.elems.textarea) {
+            if (val) this.elems.textarea.maxLength = val;
+            else this.elems.textarea.removeAttribute('maxlength');
+        }
     }
     
     // ****************************************************************************
     // Utils
     // ****************************************************************************
 
-    // área para métodos utilitários do componente
-
-    // ****************************************************************************
-    // Métodos dos atributos
-    // ****************************************************************************
-
-    // implementar um método 'aplicaAtributo_...' para cada atributo observado
-
-    // ****************************************************************************
-    // Métodos dos eventos espcíficos deste componente
-    // ****************************************************************************
-
-    // implementar os métodos para adicionar eventos específicos deste componente
-
-    // ****************************************************************************
-    // Mensagens de Erro
-    // ****************************************************************************
-    
-    // implementar os métodos que montam as mensagens de erro para conteúdo inválido
+    // Atualiza a validação de form do elemento customizado
+    _atualizarValidacao() {
+        if (!this.elems.textarea) return;
+        // Pega a validade nativa do textarea escondido
+        const validadeInterna = this.elems.textarea.validity; // obtem a validade do select interno
+        if (!validadeInterna.valid) { // Se for inválido
+            this._internals.setValidity( // seta a validade do elemento customizado
+                { 
+                    valueMissing: validadeInterna.valueMissing,
+                    valid: false,
+                    tooLong: validadeInterna.tooLong,
+                }, 
+                this.elems.textarea.validationMessage, 
+                this.elems.textarea, // onde a 'bolha' de erro deve aparecer
+            );
+        } else this._internals.setValidity({}); // Se for válido, limpa o erro
+    }
 }
+
+// ----------------------------------------------------------------------------------------------------------------------------------
+// 1. CSS Fora da Classe, Mais performático e limpo (adoptedStyleSheets)
+const algol_textarea_sheet = new CSSStyleSheet();
+algol_textarea_sheet.replaceSync(`
+    :host {
+        display: block; /* Garante que o componente respeite largura/altura */
+    }
+    .container {
+        display: flex;
+        flex-direction: column;
+        gap: calc(0.3vw * var(--scale-factor));
+        margin-bottom: calc(1.0vw * var(--scale-factor));
+        width: 100%;
+    }
+    .container label {
+        color: var(--text-color-forms-label);
+        font-size: calc(1.0vw * var(--scale-factor));
+    }
+    .container textarea {
+        appearance: none;
+        -webkit-appearance: none;
+        outline: none;
+        box-sizing: border-box;
+        width: 100%;
+        background: var(--bg-color-forms);
+        color: var(--text-color);
+        border: calc(0.1vw * var(--scale-factor)) solid var(--border-color-forms);
+        border-radius: calc(var(--border-radius-components) * var(--scale-factor));
+        padding: calc(0.8vw * var(--scale-factor)) calc(1.1vw * var(--scale-factor));
+       
+        font-family: 'Algol Font';
+        font-weight: 100;
+        font-size: calc(1.1vw * var(--scale-factor));
+        line-height: calc(var(--line-height) * var(--scale-factor));
+
+        /* Comportamento padrão de resize (sobrescrito pelo JS se tiver fixed) */
+        resize: vertical; 
+        min-height: calc(3.5vw * var(--scale-factor)); /* Altura mínima decente */
+    }
+    /* Para o estado disabled */
+    :host([disabled]) .container textarea{
+        background-color: var(--bg-color-forms-disabled) !important;
+        color: var(--text-color-forms-disabled) !important;
+        cursor: not-allowed;
+    }
+    :host(:focus-within) textarea {
+        border-color: var(--border-color-focus); /* Exemplo */
+        box-shadow: 0 0 0 calc(0.1vw * var(--scale-factor)) var(--border-color-focus-glow) /* "Glow" externo */
+    }
+`);
+
+// ----------------------------------------------------------------------------------------------------------------------------------
+customElements.define('algol-textarea', TextArea); // Registra o componente customizado

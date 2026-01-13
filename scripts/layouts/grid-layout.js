@@ -7,9 +7,9 @@ class GridLayout extends BaseLayout {
             'gap':       '--grid-layout-gap',
             'gapbreak':  '--grid-layout-gap-break',
             'posh':      '--grid-layout-posh',
-            'poshbreak': '--grid-layout-posh-break',
+            'poshbreak': '--grid-layout-poshbreak',
             'posv':      '--grid-layout-posv',
-            'posvbreak': '--grid-layout-posv-break'
+            'posvbreak': '--grid-layout-posvbreak'
         };
     }
     static get observedAttributes() {return Object.keys(GridLayout.ATTR_MAP);} // retorna a chaves do mapa de atributos
@@ -43,8 +43,8 @@ class GridLayout extends BaseLayout {
             @media (max-width: ${MOBILE_BREAKPOINT}) {
                 algol-grid-layout[colsbreak] {grid-template-columns: var(--grid-layout-cols-break) !important;}
                 algol-grid-layout[gapbreak] {gap: var(--grid-layout-gap-break) !important;}
-                algol-grid-layout[poshbreak] {justify-items: var(--grid-layout-posh-break) !important;}
-                algol-grid-layout[posvbreak] {align-items: var(--grid-layout-posv-break) !important;}
+                algol-grid-layout[poshbreak] {justify-items: var(--grid-layout-poshbreak) !important;}
+                algol-grid-layout[posvbreak] {align-items: var(--grid-layout-posvbreak) !important;}
             }
         `;
         BaseLayout._injectStyleOnHead('algol-grid-layout-style', css);

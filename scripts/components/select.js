@@ -18,7 +18,7 @@ class Select extends BaseComponent {
 
     /** @override */    
     render() {
-        this.root.adoptedStyleSheets = [sheet]; // aplica o estilo do componente (compartilhado)
+        this.root.adoptedStyleSheets = [algol_select_sheet]; // aplica o estilo do componente (compartilhado)
         this.root.innerHTML = `
             <div class="container">
                 <label></label>
@@ -47,7 +47,24 @@ class Select extends BaseComponent {
         this.elems.slot.addEventListener('slotchange', () => {
             this._sincronizarOptions();
         });
-        this._registerEvents(); // registra os eventos estilizados deste componente
+        // registra o evento de mudança de valor do select
+        this.elems.select.addEventListener('change', (e)=>{
+            if (this.hasAttribute('disabled')) {e.stopImmediatePropagation();return;} // interrompe o evento se o componente estiver desabilitado
+            
+            const oldValue = this.value // guarda o valor antigo
+            this.value =e.target.value; // reflete no atributo
+            this._internals.setFormValue(this.value); // informa o que será enviado pro form
+            this._atualizarValidacao(); // atualiza a validação
+            
+            // dispara o evento estilizado de clique
+            this.dispatchEvent(new CustomEvent('algol-select-value', { bubbles: true,composed: true,
+                detail: {
+                    origin: this,
+                    oldValue,
+                    newValue: e.target.value
+                }
+            }));
+        });
     }
 
     // ****************************************************************************
@@ -111,37 +128,12 @@ class Select extends BaseComponent {
             );
         } else this._internals.setValidity({}); // Se for válido, limpa o erro
     }
-
-    // ****************************************************************************
-    // Registro dos eventos do select
-    // ****************************************************************************
-
-    _registerEvents(){
-        // registra o evento de mudança de valor do select
-        this.elems.select.addEventListener('change', (e)=>{
-            if (this.hasAttribute('disabled')) {e.stopImmediatePropagation();return;} // interrompe o evento se o componente estiver desabilitado
-            
-            const oldValue = this.value // guarda o valor antigo
-            this.value =e.target.value; // reflete no atributo
-            this._internals.setFormValue(this.value); // informa o que será enviado pro form
-            this._atualizarValidacao(); // atualiza a validação
-            
-            // dispara o evento estilizado de clique
-            this.dispatchEvent(new CustomEvent('algol-select-value', { bubbles: true,composed: true,
-                detail: {
-                    origin: this,
-                    oldValue,
-                    newValue: e.target.value
-                }
-            }));
-        });
-    }
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------
 // 1. CSS Fora da Classe, Mais performático e limpo (adoptedStyleSheets)
-const sheet = new CSSStyleSheet();
-sheet.replaceSync(`
+const algol_select_sheet = new CSSStyleSheet();
+algol_select_sheet.replaceSync(`
     :host {
         display: block; /* Garante que o componente respeite largura/altura */
     }
@@ -160,6 +152,7 @@ sheet.replaceSync(`
         appearance: none;
         -webkit-appearance: none;
         outline: none;
+        box-sizing: border-box;
         background: var(--bg-color-forms);
         color: var(--text-color);
         border: calc(0.1vw * var(--scale-factor)) solid var(--border-color-forms);

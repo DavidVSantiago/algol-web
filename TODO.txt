@@ -1,11 +1,1 @@
-Reimplementar todos os eventos no padrão ouro dispatchEvent:
-
-// Despacha o evento customizado que contém seus dados extras
-        this.dispatchEvent(new CustomEvent('algol-click', {
-            bubbles: true,
-            composed: true,
-            detail: {
-                origem: this,
-                mouse: { x: e.clientX, y: e.clientY }
-            }
-        }));
+Inmplementar os outros componentes, seguindo a estrutura do select

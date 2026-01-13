@@ -249,7 +249,6 @@ algol-input-text,
 algol-input-email,
 algol-input-password,
 algol-input-number,
-algol-textarea,
 algol-select {
     .algol-component-group {
         /* background-color: wheat; */
@@ -265,8 +264,7 @@ algol-select {
             font-size: calc(1.0vw * var(--scale-factor));
         }
 
-        .algol-input,
-        .algol-textarea {
+        .algol-input {
             width: 100%;
             padding: calc(0.8vw * var(--scale-factor)) calc(1.1vw * var(--scale-factor));
             background: var(--bg-color-forms);
@@ -277,8 +275,7 @@ algol-select {
             font-size: calc(1.1vw * var(--scale-factor));
         }
 
-        .algol-input:disabled,
-        .algol-textarea:disabled {
+        .algol-input:disabled {
             background: var(--bg-color-forms-disabled);
             color: var(--text-color-forms-disabled);
         }

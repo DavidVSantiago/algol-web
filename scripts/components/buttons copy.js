@@ -1,6 +1,6 @@
 class BtnBase extends BaseComponent {
     static get observedAttributes() {
-        return ['tamanho','disabled'];
+        return ['tamanho','posicaoh','posicaov','disabled'];
     }
     constructor() {
         super();

@@ -7,9 +7,9 @@ class GridItem extends BaseLayout {
             'rowspan':      { var: '--grid-item-rowspan',       prefix: 'span ' },
             'rowspanbreak': { var: '--grid-item-rowspan-break', prefix: 'span ' },
             'posh':      '--grid-item-posh',
-            'poshbreak': '--grid-item-posh-break',
+            'poshbreak': '--grid-item-poshbreak',
             'posv':      '--grid-item-posv',
-            'posvbreak': '--grid-item-posv-break'
+            'posvbreak': '--grid-item-posvbreak'
         };
     }
     static get observedAttributes() {return Object.keys(GridItem.ATTR_MAP);} // retorna a chaves do mapa de atributos
@@ -39,8 +39,8 @@ class GridItem extends BaseLayout {
             @media (max-width: ${MOBILE_BREAKPOINT}) {
                 algol-grid-item[colspanbreak] {grid-column-end: var(--grid-item-colspan-break) !important;}
                 algol-grid-item[rowspanbreak] {grid-row-end: var(--grid-item-rowspan-break) !important;}
-                algol-grid-item[poshbreak] {justify-self: var(--grid-item-posh-break) !important;}
-                algol-grid-item[posvbreak] {align-self: var(--grid-item-posv-break) !important;}
+                algol-grid-item[poshbreak] {justify-self: var(--grid-item-poshbreak) !important;}
+                algol-grid-item[posvbreak] {align-self: var(--grid-item-posvbreak) !important;}
             }
         `;
 
