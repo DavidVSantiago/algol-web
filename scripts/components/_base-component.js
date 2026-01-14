@@ -33,8 +33,7 @@ class BaseComponent extends HTMLElement {
 
     configSlot(){
         const slot = this.root.querySelector('slot');
-        if(slot) slot.style.display = 'none'; // esconde o slot por padrão
-        else throw new Error("O seu método render() deve incluir um <slot> para o conteúdo interno do componente.");
+        if(!slot) throw new Error("O seu método render() deve incluir um <slot> para o conteúdo interno do componente.");
 
         this.postConfig(); // invoca o metodo abstrato de pós-configuração
     }

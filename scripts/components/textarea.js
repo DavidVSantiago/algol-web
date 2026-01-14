@@ -137,6 +137,7 @@ algol_textarea_sheet.replaceSync(`
     :host {
         display: block; /* Garante que o componente respeite largura/altura */
     }
+    slot{display: none;}
     .container {
         display: flex;
         flex-direction: column;

@@ -1,68 +1,69 @@
-class BtnBase extends BaseComponent {
-    static get observedAttributes() {
-        return ['tamanho','disabled'];
+class Button extends BaseComponent {
+    // Mapa de propriedades
+    static get PROP_MAP() {
+        return {
+            'size':     'update_size',     // small, mid (default), big
+            'type':     'update_type',     // submit, reset, button
+            'disabled': 'update_disabled', // desabilita interações
+            'loading':  'update_loading',  // estado de carregamento
+            'name':     'update_name',     // identificador para forms
+            'value':    'update_value'     // valor enviado (útil para lógica JS)
+        };
     }
-    constructor() {
-        super();
-        this._variantClass = 'algol-btn-primary'; // botão padrão
+    static get ATTR_MAP() {
+        return {
+            'bgcolor': '--bg-color-btn', // cor do fundo botão
+            'color': '--text-color-btn', // cor do texto do botão
+        };
     }
+    static get observedAttributes() {const props = Object.keys(this.PROP_MAP);const attrs = Object.keys(this.ATTR_MAP);return [...props, ...attrs];}
+    constructor() {super();}
     
     // ****************************************************************************
-    // Métodos de inicialização
+    // Métodos de construção
     // ****************************************************************************
-       
-    /** Faz a construção interna do componente */
-    _init() {
-        if (this._base_initialized) return;
-        if (!this.hasAttribute('tabindex')) this.setAttribute('tabindex', '0'); // Torna o componente focável
-    
-        this.style.display = 'grid'
 
-        // Cria o <button>
-        const btn = document.createElement('button');
-        btn.setAttribute('tabindex', '-1'); // para não receber foco
-        btn.className = `algol-btn ${this._variantClass}`; // define a classe base + a variante (definida da classe derivada)
-        btn.id = `algol-btn-${++BaseComponent._idCont}`; // define o id unico
-        
-        // Evita seleção de texto no botão (e no host), com fallbacks
-        btn.style.cssText = '-webkit-user-select:none; -ms-user-select:none; user-select:none; -webkit-touch-callout:none;';
-        this.style.cssText = '-webkit-user-select:none; -ms-user-select:none; user-select:none;';
-        btn.setAttribute('unselectable', 'on');            // IE <= 10
-        btn.onselectstart = () => false;  
-        btn.style.width = '100%';
-        btn.style.justifyContent = 'center';
-        btn.innerHTML = this._textoInterno;
-
-        this.appendChild(btn); // adiciona o botão ao componente
-
-        this._elems.set('button',btn); // salva uma referência global do botão
-
-        this._base_initialized = true; // marca como inicializado
+    /** @override */
+    render() {
+        this.root.adoptedStyleSheets = [algol_button_sheet];
+        this.root.innerHTML = `
+            <button part="button">
+                <span class="loader"></span>
+                <span class="content"><slot></slot></span>
+            </button>
+        `;
     }
 
-    _attachEvents() {
-        const btn = this._elems.get('button'); // obtem o botão
-        if (!btn) return; // guard
-        
-        // Apenas bloqueamos interação quando o botão estiver desabilitado.
-        let onClick = (e) => {
-            if (this.hasAttribute('disabled')) {
-                e.preventDefault();
+    /** @override */
+    postConfig(){
+        // salva as referências globais dos componentes
+        this.elems.button = this.root.querySelector('button');
+        this.elems.content = this.root.querySelector('.content');
+        this.elems.slot = this.root.querySelector('slot');
+
+        // criação de id único
+        const idUnico = `button-${BaseComponent._idCont++}`;
+        this.elems.button.id = idUnico;
+    }
+
+    /** @override */
+    attachEvents() {
+        // O BaseComponent já gerencia o evento de clique global ('algol-click') e a trava de 'disabled'.
+        // Aqui, precisamos apenas garantir a integração com FORMULÁRIOS.
+        this.elems.button.addEventListener('click', (e) => {
+            // Se estiver loading, bloqueia cliques extras
+            if (this.hasAttribute('loading')) {
                 e.stopImmediatePropagation();
+                e.preventDefault();
                 return;
             }
-            // Caso contrário, deixe o evento propagar normalmente.
-        };
-
-        btn.addEventListener('click', onClick,{ capture: true });
-
-        // para fazer o enter ou espaço funcionar como clique
-        this.addEventListener('keydown', (e) => {
-            if (this.hasAttribute('disabled')) return;
-            // Enter (13) ou Espaço (32)
-            if (e.key === 'Enter' || e.code === 'Space') {
-                e.preventDefault(); // Evita scroll da página com o Espaço
-                this.click();       // Dispara o evento de clique do próprio elemento
+            // Integração com <form> nativo (Submissão e Reset)
+            // Como estamos no Shadow DOM, o botão não submete o form automaticamente.
+            // Precisamos fazer isso via ElementInternals.
+            if (this._internals.form) {
+                const type = this.getAttribute('type');
+                if (type === 'submit') this._internals.form.requestSubmit(); 
+                else if (type === 'reset') this._internals.form.reset();
             }
         });
     }
@@ -71,145 +72,124 @@ class BtnBase extends BaseComponent {
     // Métodos dos atributos
     // ****************************************************************************
     
-    _applyAttribute_tamanho() {
-        const btn = this._elems.get('button'); // obtem o botão
-        btn.classList.remove('algol-btn-small', 'algol-btn-big');// remove as classes responsáveis pelo tamanho
-        // reaplica-as condicionalmente
-        const tamValue = this.getAttribute('tamanho');
-        if (!tamValue) return; // se não existe a propiedade 'tamanho', abandona
-        const tamanho = ['pequeno','grande']; // valores aceitos para 'tamanho'
-        switch(tamValue){
-            case tamanho[0]: btn.classList.add('algol-btn-small'); break;
-            case tamanho[1]: btn.classList.add('algol-btn-big'); break;
-        }
-    }
-    _applyAttribute_posicaoh() {
-        const pos = this.getAttribute('posicaoh');       
-        if (!pos) return; // se não existe a propiedade 'posicaoh', abandona
-        const posValues = ['inicio','fim','centro','total']; // valores aceitos para 'posicaoh'
-        switch(pos){
-            case posValues[0]: this.style.justifySelf = 'start'; break;
-            case posValues[1]: this.style.justifySelf = 'end'; break;
-            case posValues[2]: this.style.justifySelf = 'center'; break;
-            case posValues[3]: this.style.justifySelf = 'stretch'; break;
-        }
-    }
-    _applyAttribute_posicaov() {
-        const pos = this.getAttribute('posicaov');       
-        if (!pos) return; // se não existe a propiedade 'posicaov', abandona
-        const posValues = ['inicio','fim','centro','total']; // valores aceitos para 'posicaov'
-        switch(pos){
-            case posValues[0]: this.style.alignSelf = 'start'; break;
-            case posValues[1]: this.style.alignSelf = 'end'; break;
-            case posValues[2]: this.style.alignSelf = 'center'; break;
-            case posValues[3]: this.style.alignSelf = 'stretch'; break;
-        }
-    }
-    _applyAttribute_disabled() {
-        const btn = this._elems.get('button'); // obtem o botão
-        btn.disabled = this.hasAttribute('disabled');
-        if (this.hasAttribute('disabled')) {
-            btn.style.cursor = 'not-allowed';
+    update_disabled(val) { if(this.elems.button) this.elems.button.disabled = this.hasAttribute('disabled'); }
+    update_loading(val) { // Adiciona classe para mostrar o spinner e esconder o texto
+        if(!this.elems.button) return;
+        if (this.hasAttribute('loading')) {
+            this.elems.button.classList.add('loading');
+            this.elems.button.disabled = true; // Trava nativa enquanto carrega
         } else {
-            btn.style.cursor = '';
+            this.elems.button.classList.remove('loading');
+            this.elems.button.disabled = this.hasAttribute('disabled'); // Restaura o estado disabled original (se houver)
         }
     }
-
-    // ****************************************************************************
-    // Métodos dos eventos do componente
-    // ****************************************************************************
-
-    /** envie um callback que receba dois argumentos:
-     * @param origem - elemento onde o evento ocorreu.
-     * @param mouseInfo - objeto com as informações de pos do mouse durante o clique.
-     */
-    addEventoClique(callback){
-        const wrapperCallback = (e) => {
-            if (this.hasAttribute('disabled')) {
-                e.preventDefault();
-                return;
-            }
-            let origem = e.currentTarget
-            let mouseInfo = {
-                x: e.clientX,
-                y: e.clientY,
-                offsetX: e.offsetX,
-                offsetY: e.offsetY
-            }
-            callback(origem,mouseInfo);
-        };
-        this.addEventListener('click', wrapperCallback);
+    update_size(val) {
+        // Apenas validação, o estilo é resolvido via CSS
+        if (!['small', 'mid', 'big'].includes(val)) this.setAttribute('size', 'mid'); // Fallback
     }
-    addEventoFoco(callback) {
-        const wrapperCallback = (e) => {
-            if (this.hasAttribute('disabled')) return;
-            let origem = e.currentTarget
-            callback(origem);
-        };
-        this.addEventListener('focus', wrapperCallback);
+    update_type(val) {
+        // Validação básica de tipo, o tipo real é gerenciado no evento 'click' usando internals
+        if (!['button', 'submit', 'reset'].includes(val)) {this.setAttribute('type', 'button');} // fallback
+        
     }
-    addEventoBlur(callback) {
-        const wrapperCallback = (e) => {
-            if (this.hasAttribute('disabled')) return;
-            let origem = e.currentTarget
-            callback(origem);
-        };
-        this.addEventListener('blur', wrapperCallback);
-    }
-    addEventoMouseEntra(callback) {
-        const wrapperCallback = (e) => {
-            if (this.hasAttribute('disabled')) return;
-            let origem = e.currentTarget
-            callback(origem);
-        };
-        this.addEventListener('mouseenter', wrapperCallback);
-    }
-    addEventoMouseSai(callback) {
-        const wrapperCallback = (e) => {
-            if (this.hasAttribute('disabled')) return;
-            let origem = e.currentTarget
-            callback(origem);
-        };
-        this.addEventListener('mouseleave', wrapperCallback);
-    }
-    addEventoMouseSobre(callback) {
-        const wrapperCallback = (e) => {
-            if (this.hasAttribute('disabled')) return;
-            let origem = e.currentTarget
-            let mouseInfo = {
-                x: e.clientX,
-                y: e.clientY,
-                offsetX: e.offsetX,
-                offsetY: e.offsetY
-            }
-            callback(origem,mouseInfo);
-        };
-        this.addEventListener('mousemove', wrapperCallback);
-    }
+    update_name(val) {} 
+    update_value(val) {}
 }
 
-// Subclasses: definem apenas a variante, não renderizam no constructor
-class BtnPrimary extends BtnBase {
-    constructor() { super(); }
-}
-class BtnSecondary extends BtnBase {
-    constructor() { super(); this._variantClass = 'algol-btn-secondary'; }
-}
-class BtnOutline extends BtnBase {
-    constructor() { super(); this._variantClass = 'algol-btn-outline'; }
-}
-class BtnSuccess extends BtnBase {
-    constructor() { super(); this._variantClass = 'algol-btn-success'; }
-}
-class BtnDanger extends BtnBase {
-    constructor() { super(); this._variantClass = 'algol-btn-danger'; }
-}
-class BtnWarning extends BtnBase {
-    constructor() { super(); this._variantClass = 'algol-btn-warning'; }
-}
-class BtnInfo extends BtnBase {
-    constructor() { super(); this._variantClass = 'algol-btn-info'; }
-}
-class BtnLink extends BtnBase {
-    constructor() { super(); this._variantClass = 'algol-btn-link'; }
-}
+// ----------------------------------------------------------------------------------------------------------------------------------
+// 1. CSS Fora da Classe, Mais performático e limpo (adoptedStyleSheets)
+const algol_button_sheet = new CSSStyleSheet();
+algol_button_sheet.replaceSync(`
+    :host {
+        display: block;
+    }
+
+    button {
+        /* Reset básico de button */
+        appearance: none;
+        outline: none;
+        border: none;
+        user-select: none; // evita seleção de texto
+        cursor: pointer;
+        width: 100%;
+
+        /* Layout */
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: calc(0.6vw * var(--scale-factor)) calc(1.2vw * var(--scale-factor));
+        min-height: calc(2.4vw * var(--scale-factor));
+        border-radius: calc(var(--border-radius-components) * var(--scale-factor));
+        background-color: var(--bg-color-btn);
+        color: var(--text-color-btn);
+        font-family: 'Algol Font';
+        font-weight: 200;
+        font-size: calc(var(--font-size-btn)* var(--scale-factor));
+        transition: filter 0.2s, transform 0.1s; 
+    }
+
+    /* --- Hover e Active --------------------------------------------------------------- */
+    button:hover:not(:disabled) {
+        filter: brightness(1.1); /* Clareia levemente */
+    }
+    button:active:not(:disabled) {
+        transform: translateY(calc(0.09vw * var(--scale-factor))); /* Efeito de clique */
+        filter: brightness(0.9);
+    }
+
+    /* --- Tamanhos (Size) ---------------------------------------------------------------*/
+    :host([size="small"]) button {
+        padding: calc(0.4vw * var(--scale-factor)) calc(0.8vw * var(--scale-factor));
+    }
+
+    :host([size="mid"]) button { /* Padrão */
+        padding: calc(0.6vw * var(--scale-factor)) calc(1.2vw * var(--scale-factor));
+    }
+
+    :host([size="big"]) button {
+        padding: calc(0.8vw * var(--scale-factor)) calc(1.6vw * var(--scale-factor));
+    }
+
+    /* --- Estado Disabled ------------------------------------------------------------- */
+    button:disabled {
+        background-color: var(--bg-color-forms-disabled, #ccc);
+        color: var(--text-color-forms-disabled, #666);
+        cursor: not-allowed;
+        opacity: 0.7;
+    }
+
+    /* --- Estado Loading (Spinner) ---------------------------------------------------- */
+    .loader {
+        display: none;
+        width: calc(1.5vw * var(--scale-factor));
+        height: calc(1.5vw * var(--scale-factor));
+        border: calc(0.2vw * var(--scale-factor)) solid transparent;
+        border-top-color: currentColor;
+        border-radius: 50%;
+        animation: spin 0.6s linear infinite;
+        position: absolute;
+    }
+
+    /* Quando tem a classe loading */
+    button.loading .content {
+        visibility: hidden;
+        opacity: 0; /* Transição suave opcional */
+    }
+    button.loading .loader {
+        display: block;
+        pointer-events: none; /* Garante que o loader não bloqueie eventos de mouse */
+    }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+    
+    /* Foco acessível */
+    :host(:focus-within) button {
+         box-shadow: 0 0 0 calc(0.2vw * var(--scale-factor)) var(--border-color-focus-glow);
+    }
+`);
+
+// ----------------------------------------------------------------------------------------------------------------------------------
+customElements.define('algol-button', Button); // Registra o componente customizado
+

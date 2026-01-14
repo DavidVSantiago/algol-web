@@ -6,12 +6,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <link rel="stylesheet" href="algol-styles.css">
+    <!-- <script src="algol-web-min.js" defer></script> -->
 
     <script src="scripts/variaveis.js" defer></script>
     
     <script src="scripts/components/_base-component.js" defer></script>
-    <!-- <script src="scripts/components/buttons.js" defer></script> -->
     <!-- <script src="scripts/components/inputs.js" defer></script> -->
+    <script src="scripts/components/buttons.js" defer></script>
     <script src="scripts/components/textarea.js" defer></script>
     <script src="scripts/components/select.js" defer></script>
 
@@ -91,17 +92,17 @@
                 <algol-grid-item colspan="2" colspanbreak="1" >   
                     <algol-textarea id="textarea" label="Área de Texto" maxlength="40" lines="4" placeholder="Digite o seu texto aqui..." required ></algol-textarea>
                 </algol-grid-item>
-                <algol-grid-item>   
-                    <p>CONTEUDO A</p>
+                <algol-grid-item poshbreak="stretch">   
+                    <algol-button size="big" id="btn1" bgcolor="#fbb" color="#400" >BOTÃO</algol-button>
+                </algol-grid-item>
+                <algol-grid-item poshbreak="stretch">   
+                    <algol-button type="submit" id="btn2">SUBMIT</algol-button>
+                </algol-grid-item>
+                <algol-grid-item poshbreak="stretch">   
+                    <algol-button type="reset" size="small" id="btn3">RESET</algol-button>
                 </algol-grid-item>
                 <algol-grid-item>   
-                    <p>CONTEUDO B</p>
-                </algol-grid-item>
-                <algol-grid-item>   
-                    <p>CONTEUDO C</p>
-                </algol-grid-item>
-                <algol-grid-item>   
-                    <input type="submit" value="Enviar">
+                    CONTEUDO
                 </algol-grid-item>
                 
             </algol-grid-layout>
@@ -109,10 +110,16 @@
             <script defer>
                 // temporário. apenas para teste
                 window.addEventListener('load', function (event) {
-                    let elem = document.getElementById('layout');
-                    elem.addEventListener('algol-layout-update',(e)=>{
-                        console.log(e.detail.origin);
-                        console.log(e.detail.mutations);
+                    let btn1 = document.getElementById('btn1');
+                    let btn2 = document.getElementById('btn2');
+                    let btn3 = document.getElementById('btn3');
+                    btn3.addEventListener('algol-click',(e)=>{
+                        btn1.loading = true; // ativa o estado de carregamento
+                        btn2.disabled = true; // ativa o estado de carregamento
+                        setTimeout(()=>{
+                            btn1.removeAttribute('loading');
+                            btn2.removeAttribute('disabled');
+                        },3000);
                     });
                 });
             </script>
