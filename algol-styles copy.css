@@ -126,6 +126,43 @@ h6 {
 /* Componentes ******************************************************************************* */
 /* ******************************************************************************************* */
 
+/* Estilização dos inputs */
+algol-input-text,
+algol-input-email,
+algol-input-password,
+algol-input-number,
+algol-select {
+    .algol-component-group {
+        /* background-color: wheat; */
+        display: flex;
+        flex-direction: column;
+        gap: calc(0.3vw * var(--scale-factor));
+        margin-bottom: calc(1.0vw * var(--scale-factor));
+        /* border: solid 0.1vw red; */
+        width: 100%;
+
+        .algol-rotulo {
+            color: var(--text-color-forms-label);
+            font-size: calc(1.0vw * var(--scale-factor));
+        }
+
+        .algol-input {
+            width: 100%;
+            padding: calc(0.8vw * var(--scale-factor)) calc(1.1vw * var(--scale-factor));
+            background: var(--bg-color-forms);
+            color: var(--text-color);
+            border: calc(0.1vw * var(--scale-factor)) solid var(--border-color-forms);
+            border-radius: calc(var(--border-radius-components) * var(--scale-factor));
+            outline: none;
+            font-size: calc(1.1vw * var(--scale-factor));
+        }
+
+        .algol-input:disabled {
+            background: var(--bg-color-forms-disabled);
+            color: var(--text-color-forms-disabled);
+        }
+    }
+}
 
 algol-input-number {
     .algol-input-container {
@@ -183,6 +220,35 @@ algol-input-number[disabled] {
 
     .algol-spinner-down {
         border-top-color:var(--border-color-btn-spinner-disabled) !important;
+    }
+}
+
+/* Estilização dos select */
+algol-select {
+    select {
+        /* normalize */
+        appearance: none;
+        -webkit-appearance: none;
+        background: var(--bg-color-forms);
+        color: var(--text-color);
+        border: calc(0.1vw * var(--scale-factor)) solid var(--border-color-forms);
+        border-radius: calc(var(--border-radius-components) * var(--scale-factor));
+        outline: none;
+        padding: calc(0.8vw * var(--scale-factor)) calc(1.1vw * var(--scale-factor));
+        width: 100%;
+        font-family: 'Algol Font';
+        cursor: inherit;
+        font-weight: 100;
+        font-style: normal;
+        font-size: calc(1.1vw * var(--scale-factor));
+        line-height: calc(var(--line-height) * var(--scale-factor));
+    }
+}
+
+algol-select[disabled] {
+    select {
+        background-color: var(--bg-color-forms-disabled) !important;
+        color: var(--text-color-forms-disabled) !important;
     }
 }
 

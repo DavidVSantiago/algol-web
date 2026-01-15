@@ -69,8 +69,6 @@ class TextArea extends BaseComponent {
             this._internals.setFormValue(novoValor); // Informa ao formulário nativo (API Internals)
             this._atualizarValidacao();
         });
-
-        /* 3. LÓGICA DE VALIDAÇÃO */
         this.elems.textarea.addEventListener('change',() => {
             this._atualizarValidacao(); 
         });

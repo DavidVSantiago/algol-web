@@ -11,7 +11,7 @@
     <script src="scripts/variaveis.js" defer></script>
     
     <script src="scripts/components/_base-component.js" defer></script>
-    <!-- <script src="scripts/components/inputs.js" defer></script> -->
+    <script src="scripts/components/inputs.js" defer></script>
     <script src="scripts/components/buttons.js" defer></script>
     <script src="scripts/components/textarea.js" defer></script>
     <script src="scripts/components/select.js" defer></script>
@@ -93,13 +93,14 @@
                     <algol-textarea id="textarea" label="Área de Texto" maxlength="40" lines="4" placeholder="Digite o seu texto aqui..." required ></algol-textarea>
                 </algol-grid-item>
                 <algol-grid-item poshbreak="stretch">   
-                    <algol-button size="big" id="btn1" bgcolor="#fbb" color="#400" >BOTÃO</algol-button>
+                    <!-- <algol-button size="big" id="btn1" bgcolor="#fbb" color="#400" >BOTÃO</algol-button> -->
+                    <algol-input id="input" required label="Input" placeholder="Digite aqui..." >CONTEUDO DO SLOT</algol-input>
                 </algol-grid-item>
                 <algol-grid-item poshbreak="stretch">   
                     <algol-button type="submit" id="btn2">SUBMIT</algol-button>
                 </algol-grid-item>
                 <algol-grid-item poshbreak="stretch">   
-                    <algol-button type="reset" size="small" id="btn3">RESET</algol-button>
+                    <!-- <algol-button type="reset" size="small" id="btn3">RESET</algol-button> -->
                 </algol-grid-item>
                 <algol-grid-item>   
                     CONTEUDO
@@ -110,17 +111,17 @@
             <script defer>
                 // temporário. apenas para teste
                 window.addEventListener('load', function (event) {
-                    let btn1 = document.getElementById('btn1');
-                    let btn2 = document.getElementById('btn2');
-                    let btn3 = document.getElementById('btn3');
-                    btn3.addEventListener('algol-click',(e)=>{
-                        btn1.loading = true; // ativa o estado de carregamento
-                        btn2.disabled = true; // ativa o estado de carregamento
-                        setTimeout(()=>{
-                            btn1.removeAttribute('loading');
-                            btn2.removeAttribute('disabled');
-                        },3000);
-                    });
+                    // let btn1 = document.getElementById('btn1');
+                    // let btn2 = document.getElementById('btn2');
+                    // let btn3 = document.getElementById('btn3');
+                    // btn3.addEventListener('algol-click',(e)=>{
+                    //     btn1.loading = true; // ativa o estado de carregamento
+                    //     btn2.disabled = true; // ativa o estado de carregamento
+                    //     setTimeout(()=>{
+                    //         btn1.removeAttribute('loading');
+                    //         btn2.removeAttribute('disabled');
+                    //     },3000);
+                    // });
                 });
             </script>
 

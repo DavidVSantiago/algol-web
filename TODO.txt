@@ -1,1 +1,9 @@
-Inmplementar os outros componentes, seguindo a estrutura do select
+Inmplementar:
+- input number
+- input date
+- input time
+- input color
+- input range
+- input file
+- input radio (implementar como um select, onde os slots são as opções do radio)
+- input checkbox (idem)
