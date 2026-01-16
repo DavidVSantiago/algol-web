@@ -6,9 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <link rel="stylesheet" href="algol-styles.css">
-    <!-- <script src="algol-web-min.js" defer></script> -->
+    <script src="obs.js" defer></script>
 
-    <script src="scripts/variaveis.js" defer></script>
+    <!-- <script src="scripts/variaveis.js" defer></script>
     
     <script src="scripts/components/_base-component.js" defer></script>
     <script src="scripts/components/inputs.js" defer></script>
@@ -18,7 +18,7 @@
 
     <script src="scripts/layouts/_base-layout.js" defer></script>
     <script src="scripts/layouts/grid-layout.js" defer></script>
-    <script src="scripts/layouts/grid-item.js" defer></script>
+    <script src="scripts/layouts/grid-item.js" defer></script> -->
 
     <script defer>
         // temporário. apenas para teste
@@ -75,7 +75,7 @@
                 vero id aperiam debitis sapiente, ea quis nostrum nihil et ut vitae amet inventore temporibus.
             </p>
             <form action="" id="form">
-            <algol-grid-layout id="layout" posh="stretch" poshbreak="center" posv="center" posvbreak="end" cols="1fr 1fr 1fr" colsbreak="1fr 1fr" gap="1vw" gapbreak="5vw" class="algol-bolha-01">
+            <algol-grid-layout id="layout" posh="stretch" poshbreak="center" posv="center" cols="1fr 1fr 1fr" colsbreak="1fr 1fr" gap="1vw" gapbreak="5vw" class="algol-bolha-01">
                 <algol-grid-item id="item" colspan="1" colspanbreak="2" >   
                     <algol-select id="elem" label='NOVO' required>
                         <option disabled>--Grupo 1--</option>
@@ -94,13 +94,14 @@
                 </algol-grid-item>
                 <algol-grid-item poshbreak="stretch">   
                     <!-- <algol-button size="big" id="btn1" bgcolor="#fbb" color="#400" >BOTÃO</algol-button> -->
-                    <algol-input id="input" required label="Input" placeholder="Digite aqui..." >CONTEUDO DO SLOT</algol-input>
+                    <algol-input id="input" type="text" required label="Input" placeholder="Digite aqui..." >CONTEUDO DO SLOT</algol-input>
                 </algol-grid-item>
                 <algol-grid-item poshbreak="stretch">   
-                    <algol-button type="submit" id="btn2">SUBMIT</algol-button>
+                    <algol-input-number id="inputnumber" min="-6" max="6" type="text" required label="Input" placeholder="Digite aqui..." >CONTEUDO DO SLOT</algol-input-number>
                 </algol-grid-item>
-                <algol-grid-item poshbreak="stretch">   
+                <algol-grid-item poshbreak="stretch">
                     <!-- <algol-button type="reset" size="small" id="btn3">RESET</algol-button> -->
+                    <algol-button type="submit" id="btn2">SUBMIT</algol-button>
                 </algol-grid-item>
                 <algol-grid-item>   
                     CONTEUDO
