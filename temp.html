@@ -5,10 +5,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-    <link rel="stylesheet" href="algol-styles.css">
-    <!-- <script src="obs.js" defer></script> -->
+    
+    <link rel="stylesheet" href="algol-styles-min.css">
+    <script src="min.js" defer></script>
+    <link rel="preload" 
+        href="imgs/landscape.webp"
+        as="image"
+        fetchpriority="high">
 
-    <script src="scripts/variaveis.js" defer></script>
+    <!-- <script src="scripts/variaveis.js" defer></script>
     
     <script src="scripts/components/_base-component.js" defer></script>
     <script src="scripts/components/inputs.js" defer></script>
@@ -19,7 +24,7 @@
 
     <script src="scripts/layouts/_base-layout.js" defer></script>
     <script src="scripts/layouts/grid-layout.js" defer></script>
-    <script src="scripts/layouts/grid-item.js" defer></script>
+    <script src="scripts/layouts/grid-item.js" defer></script> -->
 
     <script defer>
         // temporário. apenas para teste
@@ -91,7 +96,7 @@
                     </algol-select>
                 </algol-grid-item>
                 <algol-grid-item colspan="2" colspanbreak="1" >
-                    <algol-image></algol-image>   
+                    <algol-image id="img" src="imgs/landscape.webp" alt="landscape" width="400" height="200" expand></algol-image>   
                     <algol-textarea id="textarea" label="Área de Texto" maxlength="40" lines="4" placeholder="Digite o seu texto aqui..." required ></algol-textarea>
                 </algol-grid-item>
                 <algol-grid-item poshbreak="stretch">   
