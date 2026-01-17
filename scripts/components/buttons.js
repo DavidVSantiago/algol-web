@@ -152,8 +152,8 @@ algol_button_sheet.replaceSync(`
 
     /* --- Estado Disabled ------------------------------------------------------------- */
     button:disabled {
-        background-color: var(--bg-color-forms-disabled, #ccc);
-        color: var(--text-color-forms-disabled, #666);
+        background-color: var(--bg-color-forms-disabled);
+        color: var(--text-color-forms-disabled);
         cursor: not-allowed;
         opacity: 0.7;
     }

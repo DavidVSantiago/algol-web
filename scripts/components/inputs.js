@@ -137,15 +137,7 @@ class InputNumber extends Input {
     // Mapa de atributos válidos (chaves) e seus respectivos métodos (valores)
     static get PROP_MAP() {
         return {
-            'label': 'update_label',
-            'value': 'update_value',
-            'placeholder': 'update_placeholder',
-            'disabled': 'update_disabled',
-            'required': 'update_required',
-            'type': 'update_type',
-            'minlength': 'update_minlength',
-            'maxlength': 'update_maxlength',
-
+            ...super.PROP_MAP, // Herda tudo de Input
             // exclusivos de input number
             'min': 'update_min',
             'max': 'update_max',
@@ -295,6 +287,289 @@ class InputNumber extends Input {
 
 }
 
+class InputDate extends Input {
+    // Mapa de atributos válidos (chaves) e seus respectivos métodos (valores)
+    static get PROP_MAP() {
+        return {
+            ...super.PROP_MAP, // Herda tudo de Input
+            'min': 'update_min',
+            'max': 'update_max',
+        };
+    }
+    static get observedAttributes() {return Object.keys(this.PROP_MAP);} // retorna a chaves do mapa de atributos
+    constructor() {super();}
+
+    // ****************************************************************************
+    // Métodos de construção do componente
+    // ****************************************************************************
+    
+    /** @override */
+    postConfig(){
+        super.postConfig();
+        this.elems.input.type = 'date';
+    }
+
+    /** @override */
+    attachEvents(){
+        super.attachEvents();
+    }
+
+    // ****************************************************************************
+    // Métodos dos atributos
+    // ****************************************************************************
+    
+    update_min(val) {
+        if (!this.elems.input) return;
+        if (!val) { // se não houver valor, remove o atributo
+            this.elems.input.removeAttribute('min');
+            this._atualizarValidacao();
+            return;
+        }
+        let valorFinal = val;
+        // verifica formato brasileiro DD/MM/AAAA e atualiza o valor final
+        if (/^\d{2}\/\d{2}\/\d{4}$/.test(val)) {
+            const [dia, mes, ano] = val.split('/');
+            valorFinal = `${ano}-${mes}-${dia}`; // Converte para ISO (AAAA-MM-DD)
+        }
+        this.elems.input.min = valorFinal;
+        this._atualizarValidacao();
+    }
+
+    update_max(val) {
+        if (!this.elems.input) return;
+        if (!val) { // se não houver valor, remove o atributo
+            this.elems.input.removeAttribute('max');
+            this._atualizarValidacao();
+            return;
+        }
+        let valorFinal = val;
+        // verifica formato brasileiro DD/MM/AAAA e atualiza o valor final
+        if (/^\d{2}\/\d{2}\/\d{4}$/.test(val)) {
+            const [dia, mes, ano] = val.split('/');
+            valorFinal = `${ano}-${mes}-${dia}`; // Converte para ISO (AAAA-MM-DD)
+        }
+        this.elems.input.max = valorFinal;
+        this._atualizarValidacao();
+    }
+
+    // ****************************************************************************
+    // Validação Específica para Datas
+    // ****************************************************************************
+
+    /** @override */
+    _atualizarValidacao() {
+        if (!this.elems.input) return;
+
+        const validadeInterna = this.elems.input.validity;
+
+        if (!validadeInterna.valid) {
+            // Mapeamento de flags específicas para DATA/NÚMERO
+            const flags = {
+                valueMissing: validadeInterna.valueMissing,     // Required
+                rangeUnderflow: validadeInterna.rangeUnderflow, // Data anterior ao 'min'
+                rangeOverflow: validadeInterna.rangeOverflow,   // Data posterior ao 'max'
+                badInput: validadeInterna.badInput,             // Data inválida (ex: 31/02)
+                stepMismatch: validadeInterna.stepMismatch      // Fora do 'step' (se usar)
+            };
+
+            this._internals.setValidity(
+                flags,
+                this.elems.input.validationMessage, // Mensagem nativa ("Selecione uma data válida...")
+                this.elems.input
+            );
+        } else {
+            this._internals.setValidity({});
+        }
+    }
+}
+
+class InputTime extends Input {
+    // Mapa de atributos
+    static get PROP_MAP() {
+        return {
+            ...super.PROP_MAP, // Herda label, required, disabled, etc.
+            'min': 'update_min',
+            'max': 'update_max',
+            'step': 'update_step' // Controla a precisão (segundos/milissegundos)
+        };
+    }
+    static get observedAttributes() {return Object.keys(this.PROP_MAP);}
+    constructor() {super();}
+
+    // ****************************************************************************
+    // Ciclo de Vida
+    // ****************************************************************************
+    
+    /** @override */
+    postConfig(){
+        super.postConfig(); // Configura container, label, input, slot...
+        this.elems.input.type = 'time';
+    }
+
+    /** @override */
+    attachEvents(){
+        super.attachEvents(); // Ganha validação e update_value de graça
+    }
+
+    // ****************************************************************************
+    // Métodos dos atributos
+    // ****************************************************************************
+    
+    update_min(val) {
+        if (!this.elems.input) return;
+        // Time usa formato HH:MM ou HH:MM:SS. Não requer conversão complexa de data.
+        if (val) this.elems.input.min = val;
+        else this.elems.input.removeAttribute('min');
+        this._atualizarValidacao();
+    }
+
+    update_max(val) {
+        if (!this.elems.input) return;
+        if (val) this.elems.input.max = val;
+        else this.elems.input.removeAttribute('max');
+        this._atualizarValidacao();
+    }
+
+    // O atributo STEP é crucial para Time.
+    // step="60" (padrão) -> Mostra apenas HH:MM
+    // step="1" -> Mostra HH:MM:SS
+    update_step(val) {
+        if (!this.elems.input) return;
+        if (val) this.elems.input.step = val;
+        else this.elems.input.removeAttribute('step');
+        this._atualizarValidacao();
+    }
+
+    // ****************************************************************************
+    // Validação Específica (Idêntica à de Data)
+    // ****************************************************************************
+
+    /** @override */
+    _atualizarValidacao() {
+        if (!this.elems.input) return;
+
+        const validadeInterna = this.elems.input.validity;
+
+        if (!validadeInterna.valid) {
+            const flags = {
+                valueMissing: validadeInterna.valueMissing,     // Required
+                rangeUnderflow: validadeInterna.rangeUnderflow, // Hora anterior ao 'min'
+                rangeOverflow: validadeInterna.rangeOverflow,   // Hora posterior ao 'max'
+                badInput: validadeInterna.badInput,             // Hora inválida
+                stepMismatch: validadeInterna.stepMismatch      // Fora do 'step' (ex: digitou segundos sem step=1)
+            };
+
+            this._internals.setValidity(
+                flags,
+                this.elems.input.validationMessage, 
+                this.elems.input
+            );
+        } else {
+            this._internals.setValidity({});
+        }
+    }
+}
+
+class InputColor extends Input {
+    // Mapa de atributos (Color é simples: só label, value e disabled importam)
+    static get PROP_MAP() {
+        return {
+            'label': 'update_label',
+            'value': 'update_value',
+            'disabled': 'update_disabled'
+        };
+    }
+    static get observedAttributes() {return Object.keys(this.PROP_MAP);}
+    constructor() {super();}
+
+    // ****************************************************************************
+    // Ciclo de Vida
+    // ****************************************************************************
+    
+    /** @override */    
+    render() {
+        this.root.adoptedStyleSheets = [algol_input_sheet]; // aplica o estilo do componente (compartilhado)
+        this.root.innerHTML = `
+            <div class="container">
+                <label></label>
+                <input type="color" style="display:none">
+                <div class="color-border" tabindex="0">
+                   <div class="color-box"></div>
+                </div>
+            </div>
+            <slot></slot>
+        `;
+    }
+
+    /** @override */
+    postConfig(){
+        super.postConfig();
+        
+        this.elems.colorBorder = this.root.querySelector('.color-border');
+        this.elems.colorBox = this.root.querySelector('.color-box');
+
+        // CORREÇÃO: Remove a associação automática do label com o input escondido
+        this.elems.label.removeAttribute('for');
+
+        if (!this.value){
+            this.value = '#f00'; // cor padrão inicial
+            this.elems.input.value = '#f00';
+        }
+        this._atualizarVisual(this.value);
+    }
+
+    /** @override */
+    attachEvents(){
+        super.attachEvents();
+        this.elems.colorBox.addEventListener('click', (e) => {
+            if (this.hasAttribute('disabled')) return;
+            this.elems.input.click(); // abre o seletor de cor nativo
+        });
+        // ao digitar no input color, atualiza a cor do box REAL-TIME
+        this.elems.input.addEventListener('input', (e) => {
+            const novaCor = e.target.value;
+            this._atualizarVisual(novaCor);
+        });
+        // ao mudar o valor do input color, atualiza a cor do box
+        this.elems.input.addEventListener('change', (e) => {
+             this._atualizarVisual(e.target.value);
+        });
+
+    }
+
+    // ****************************************************************************
+    // Métodos dos atributos
+    // ****************************************************************************
+    
+    /** @override */
+    update_value(val) {
+        if (!this.elems.input) return;
+        super.update_value(val);
+        this._atualizarVisual(val);
+    }
+    update_disabled(val) {}
+
+    // ****************************************************************************
+    // Utils
+    // ****************************************************************************
+
+    _atualizarVisual(cor) {
+        if(this.elems.colorBox) {
+            this.elems.colorBox.style.backgroundColor = cor;
+        }
+    }
+
+    // ****************************************************************************
+    // Validação
+    // ****************************************************************************
+
+    /** @override */
+    _atualizarValidacao() {
+        // Input color é sempre válido (validity.valid é sempre true),
+        if (this._internals) this._internals.setValidity({});
+    }
+}
+
 // ----------------------------------------------------------------------------------------------------------------------------------
 // 1. CSS Fora da Classe, Mais performático e limpo (adoptedStyleSheets)
 const algol_input_sheet = new CSSStyleSheet();
@@ -389,8 +664,52 @@ algol_input_sheet.replaceSync(`
         border-color: var(--border-color-focus); /* Exemplo */
         box-shadow: 0 0 0 calc(0.1vw * var(--scale-factor)) var(--border-color-focus-glow) /* "Glow" externo */
     }
+
+    /* --- ESTILOS ESPECÍFICOS PARA INPUT COLOR --- */
+    
+    :host(:focus-within) .color-border{
+        border-color: var(--border-color-focus); /* Exemplo */
+        box-shadow: 0 0 0 calc(0.1vw * var(--scale-factor)) var(--border-color-focus-glow) /* "Glow" externo */
+    }
+
+    .color-border{
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: calc(5vw * var(--scale-factor));
+        height: calc(3vw * var(--scale-factor));
+        background: var(--bg-color-forms);
+        border: calc(0.15vw * var(--scale-factor)) solid var(--border-color-forms);
+        border-radius: calc(var(--border-radius-components) * var(--scale-factor));
+    }
+    :host([disabled]) .color-border{
+        background: var(--bg-color-forms-disabled) !important;
+        cursor: not-allowed;
+    }
+    
+    .color-box{
+        cursor: pointer;
+        width: calc(4vw * var(--scale-factor));
+        height: calc(2vw * var(--scale-factor));
+        background-color: #f00;
+        }
+    :host(:not([disabled])) .color-box:hover, :host(:not([disabled])) .color-border:hover{
+        filter: brightness(0.9); /* leve escurecida */
+    }
+    :host(:not([disabled])) .color-box:active{
+        transform: translateY(calc(0.09vw * var(--scale-factor))); /* Efeito de clique */
+        filter: brightness(0.8);
+    }
+    :host([disabled]) .color-box{
+        background: var(--text-color-disabled) !important;
+        cursor: not-allowed;
+    }
+
 `);
 
 // ----------------------------------------------------------------------------------------------------------------------------------
 customElements.define('algol-input', Input); // Registra o componente customizado
 customElements.define('algol-input-number', InputNumber); // Registra o componente customizado
+customElements.define('algol-input-date', InputDate);
+customElements.define('algol-input-time', InputTime);
+customElements.define('algol-input-color', InputColor); 

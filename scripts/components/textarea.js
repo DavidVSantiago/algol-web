@@ -69,7 +69,7 @@ class TextArea extends BaseComponent {
             this._internals.setFormValue(novoValor); // Informa ao formulário nativo (API Internals)
             this._atualizarValidacao();
         });
-        this.elems.textarea.addEventListener('change',() => {
+        this.elems.textarea.addEventListener('change',(e) => {
             this._atualizarValidacao(); 
         });
     }

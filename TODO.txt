@@ -1,9 +1,9 @@
 Inmplementar:
-- input number
-- input date
-- input time
-- input color
+- image
+- Componente algol-flex-item - será um elemento a ser colocado dentro do algol-grid-layout e que distribuirá os elementos no fluxo do flex, horizontal ou vertical
+- permitir que o algol-grid-item e o algol-flex-item possam receber uma imagem de fundo
 - input range
 - input file
 - input radio (implementar como um select, onde os slots são as opções do radio)
 - input checkbox (idem)
+
