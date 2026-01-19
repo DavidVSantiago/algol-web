@@ -1,23 +1,32 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-    <link rel="stylesheet" href="algol-styles.css">
-    <script src="scripts/variaveis.js" defer></script>
-    <script src="scripts/components/_base-component.js" defer></script>
-    <script src="scripts/components/buttons.js" defer></script>
-    <script src="scripts/components/inputs.js" defer></script>
-    <script src="scripts/components/textarea.js" defer></script>
-    <script src="scripts/components/select.js" defer></script>
-    <script src="scripts/layouts/_base-layout.js" defer></script>
-    <script src="scripts/layouts/grid-layout.js" defer></script>
-    <script src="scripts/layouts/grid-item.js" defer></script>
-    <script src="scripts/layouts/flex-item.js" defer></script>
-    <script src="scripts/components.js" defer></script>
+    <link id="theme-link" rel="stylesheet" href="algol-light.css">
+    <script src="algol-web-min.js"></script>
+    <!-- <link rel="preload" 
+        href="imgs/landscape.webp"
+        as="image"
+        fetchpriority="high"> -->
+
+    <!-- <script src="scripts/variaveis.js" ></script>
     
+    <script src="scripts/components/_base-component.js" ></script>
+    <script src="scripts/components/inputs.js" ></script>
+    <script src="scripts/components/buttons.js" ></script>
+    <script src="scripts/components/textarea.js" ></script>
+    <script src="scripts/components/select.js" ></script>
+    <script src="scripts/components/image.js" ></script>
+    <script src="scripts/components/spacer.js" ></script>
+
+    <script src="scripts/layouts/_base-layout.js" ></script>
+    <script src="scripts/layouts/grid-layout.js" ></script>
+    <script src="scripts/layouts/grid-item.js" ></script>
+    <script src="scripts/layouts/flex-item.js" ></script> -->
+
     <script defer>
         // temporário. apenas para teste
         window.addEventListener('load', function (event) {
@@ -27,8 +36,8 @@
             const MAXIMO = 3.0;
 
             function atualizarCSS() {
-            // Aplica o valor arredondado à variável global CSS
-                document.documentElement.style.setProperty('--scale-factor', fatorAtual.toFixed(1));
+                // Aplica o valor arredondado à variável global CSS
+                document.documentElement.style.setProperty("--scale-factor", fatorAtual.toFixed(1));
             }
 
             window.addEventListener('keydown', (e) => {
@@ -50,8 +59,7 @@
     </script>
 </head>
 
-<body>
-    <div id="app-container">
+<body id="corpo">
         <div class="caixa-teste">
             Pressione as teclas + ou - para ajustar o zoom
         </div>
@@ -64,198 +72,97 @@
 
         <main>
             <p>Use esta página para testar e estilizar os componentes do seu framework CSS.</p>
-            <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Doloremque deserunt recusandae iusto facilis
-                iste
-                nemo libero magnam quo? Temporibus ut earum cum voluptatem natus corporis dolores numquam perspiciatis,
-                ea
-                cumque! Lorem ipsum dolor sit amet consectetur adipisicing elit. Quasi nemo eum illo iusto quaerat,
-                eligendi
-                vero id aperiam debitis sapiente, ea quis nostrum nihil et ut vitae amet inventore temporibus.</p>
-            <section class="algol-bolha-01">
-                <h2>Tipografia</h2>
-                <h1>Título Principal H1</h1>
-                <h2>Título Secundário H2</h2>
-                <h3>Título H3</h3>
-                <h4>Título H4</h4>
-                <h5>Título H5</h5>
-                <h6>Título H6</h6>
-                <p>Este é um parágrafo de texto para você testar a fonte, o espaçamento entre linhas e as cores. É aqui que a mágica acontece.</p>
-                <p><strong>Texto em negrito</strong> e <em>texto em itálico</em>.</p>
-            </section>
+            <p>
+                Lorem ipsum dolor sit amet, <strong>consectetur adipiscing elit</strong>. 
+                <span style="color: #0984e3;">Maecenas sed diam eget</span> risus varius blandit sit amet non magna. 
+                <em>Etiam porta sem malesuada</em> magna mollis euismod.
+            </p>
 
-            <algol-grid-layout colunas="1fr 1fr" gap="1vw" posicao="total" class="algol-bolha-01">
-                <algol-grid-item>
-                    <h3>Título H3</h3>
-                </algol-grid-item>
-                <algol-grid-item>
-                    <h6>Título H6</h6>
-                    <h4>Título H4</h4>
-                    <h5>Título H5</h5>
-                </algol-grid-item>
-            </algol-grid-layout>
-
-            <div class="algol-bolha-01">
-                <h2>Botões</h2>
-                <div class="lay lay-2cols">
-                    <algol-btn-primary posicao="fim" valor="Botão Primário"> </algol-btn-primary>
-                    <algol-btn-secondary posicao="centro" valor="Botão Secundário"></algol-btn-secondary>
-                    <algol-btn-outline id="teste" posicao="total" valor="Botão Outline"></algol-btn-outline>
-                    <algol-btn-success valor="Botão Success"></algol-btn-success>
-                    <algol-btn-danger valor="Botão Danger"></algol-btn-danger>
-                    <algol-btn-warning valor="Botão Warning"></algol-btn-warning>
-                    <algol-btn-info valor="Botão Info"></algol-btn-info>
-                    <algol-btn-link valor="Botão de Link"></algol-btn-link>
-                    <algol-btn-primary  posicao="total" disabled valor="Botão Primário"></algol-btn-primary>
-                    <algol-btn-primary tamanho="pequeno" valor="Pequeno"></algol-btn-primary>
-                    <algol-btn-primary tamanho="grande" valor="Grande"></algol-btn-primary>
-                </div>
-            </div>
-
-            <div class="algol-bolha-01">
-                <h2>Elementos de Formulário</h2>
-                <form>
-                    <div class="lay">
-                        <algol-input-text posicao="inicio" placeholder="sd" rotulo="Input text Estilizado" disabled></algol-input-text>
-                        <algol-input-email posicao="centro" rotulo="Input email Estilizado"></algol-input-email>
-                        <algol-input-password posicao="total" required rotulo="Input password Estilizado"></algol-input-password>
-                        <algol-input-number posicao="total" rotulo="Input number Estilizado" valor="35" min="20" max="60"></algol-input-number>
-                        <algol-input-number rotulo="Disabled" min="10" max="30" disabled></algol-input-number>
-                        <algol-textarea rotulo="Textarea padrão" placeholder="Digite aqui..." position="left" rows="10" name="Algol" wrap="hard"></algol-textarea>
-                        <algol-textarea rotulo="Textarea padrão" placeholder="Digite aqui..." position="all" rows="10" name="Algol" wrap="hard" disabled></algol-textarea>
-
-                        <algol-select rotulo="Select" required position="center">
-                            <option value="null"> Selecione uma das opções</option>
-                            <option value="opcao1">Opção 1</option>
-                            <option value="opcao2">Opção 2</option>
-                            <option value="opcao3">Opção 3</option>
+            <p style="background-color: #f9f9f9; padding: 10px; border-radius: 5px;">
+                <span style="color: #27ae60; font-weight: bold;">[Destaque Especial]:</span> 
+                Nullam id dolor id nibh ultricies vehicula ut id elit. 
+                <span style="text-decoration: underline; color: #d63031;">Curabitur blandit tempus porttitor</span>. 
+                Aenean lacinia bibendum nulla sed consectetur.
+            </p>
+            <form action="" id="form">
+                <algol-grid-layout id="layout" cols="1fr 1fr 1fr" colsbreak="1fr" gap="1vw" class="algol-bubble-01">
+                    <algol-grid-item posh="stretch"> 
+                        <algol-image expand src="imgs/landscape.webp" alt="landscape"></algol-image>
+                    </algol-grid-item>
+                    
+                    <algol-grid-item>
+                        <algol-select id="select" label='select' required>
+                            <option disabled>--Grupo 1--</option>
+                            <option value="algol-light.css">Tema Claro</option>  
+                            <option value="algol-dark.css">Tema Escuro</option>
                         </algol-select>
-                        <algol-select rotulo="Select disabled" position="all" required disabled>
-                            <option value="">Selecione uma opção</option>
-                            <option value="opcao1">Opção 1</option>
-                            <option value="opcao2">Opção 2</option>
-                            <option value="opcao3">Opção 3</option>
+                        <algol-select disabled label='select' required>
+                            <option disabled>--Grupo 1--</option>
+                            <option value="A">Opção A</option>  
+                            <option value="B">Opção B</option>
+                            <option disabled>--Grupo 2--</option>
+                            <option value="C">Opção C</option>
+                            <option value="D">Opção D</option>
+                            <option disabled>--Grupo 3--</option>   
+                            <option value="E">Opção E</option>
+                            <option value="F">Opção F</option>
                         </algol-select>
-                    </div>
-                </form>
-            </div>
-                         <!-- 
+                    </algol-grid-item>
+                    <algol-grid-item>
+                        <algol-button type="submit">Botão simples</algol-button>
+                        <algol-button disabled>Botão simples</algol-button>
+                    </algol-grid-item>
+                    <algol-grid-item posh="stretch">
 
-                        <div class="algol-component-group">
-                            <label>Caixas de Seleção (Checkboxes)</label>
-                            <div>
-                                <input type="checkbox" id="checkbox1" class="checkbox-padrao" checked>
-                                <label for="checkbox1">Opção 1</label>
-                            </div>
-                            <div>
-                                <input type="checkbox" id="checkbox2" class="checkbox-padrao">
-                                <label for="checkbox2">Opção 2</label>
-                            </div>
-                        </div>
+                        <algol-grid-layout id="layout" cols="1fr" gap="1vw" class="algol-bubble-02">
+                            <algol-grid-item>
+                                <algol-textarea id="textarea" label="textarea" maxlength="40" lines="4" placeholder="Digite o seu texto aqui..." required fixed >TEXTO TESTE</algol-textarea>
+                                <algol-textarea disabled id="textarea" label="textarea" maxlength="40" lines="4" placeholder="Digite o seu texto aqui..." required fixed >TEXTO TESTE</algol-textarea>
+                            </algol-grid-item>
+                        </algol-grid-layout>
 
-                        <div class="algol-component-group">
-                            <label>Botões de Rádio (Radios)</label>
-                            <div>
-                                <input type="radio" id="radio1" name="radio-group" class="radio-padrao" checked>
-                                <label for="radio1">Opção A</label>
-                            </div>
-                            <div>
-                                <input type="radio" id="radio2" name="radio-group" class="radio-padrao">
-                                <label for="radio2">Opção B</label>
-                            </div>
-                        </div>
-
-                        <div class="algol-component-group">
-                            <label for="input-range">Slider de Range</label>
-                            <input type="range" id="input-range" class="range-padrao" min="0" max="100" value="50">
-                        </div>
-
-                        <div class="algol-component-group">
-                            <label for="input-color">Seletor de Cor</label>
-                            <input type="color" id="input-color" class="color-padrao" value="#3498db">
-                        </div>
-
-                        <div class="algol-component-group">
-                            <label for="input-date">Seletor de Data</label>
-                            <input type="date" id="input-date" class="date-padrao">
-                        </div>
-
-                        <div class="algol-component-group">
-                            <label for="input-file">Seletor de Arquivo</label>
-                            <input type="file" id="input-file" class="file-padrao">
-                        </div> -->
-
-                <div class="section-separator"></div>
+                    </algol-grid-item>
+                    <algol-grid-item>   
+                        <algol-input id="input" required label="input" placeholder="Digite aqui..." ></algol-input>
+                        <algol-input disabled id="input" required label="input" placeholder="Digite aqui..." ></algol-input>
+                    </algol-grid-item>
+                    <algol-grid-item class="algol-bubble-02">   
+                        <algol-input-number id="input-number" required label="input-number" placeholder="Digite aqui..." ></algol-input-number>
+                        <algol-input-number disabled id="input-number" required label="input-number" placeholder="Digite aqui..." ></algol-input-number>
+                    </algol-grid-item>
+                    <algol-grid-item>   
+                        <algol-input-date id="input-date" required label="input-date" placeholder="Digite aqui..." ></algol-input-date>
+                        <algol-input-date disabled id="input-date" required label="input-date" placeholder="Digite aqui..." ></algol-input-date>
+                    </algol-grid-item>
+                    <algol-grid-item>   
+                        <algol-input-time id="input-time" required label="input-time" placeholder="Digite aqui..." ></algol-input-time>
+                        <algol-input-time disabled id="input-time" required label="input-time" placeholder="Digite aqui..." ></algol-input-time>
+                    </algol-grid-item>
+                    <algol-grid-item>   
+                        <algol-input-range id="input-range" required label="input-range" ></algol-input-range>
+                        <algol-input-range disabled id="input-range" required label="input-range" ></algol-input-range>
+                    </algol-grid-item>
+                    <algol-flex-item distrib="evenly">   
+                        <algol-input-color id="input-color" required label="input-color" ></algol-input-color>
+                        <algol-input-color disabled id="input-color" required label="input-color" ></algol-input-color>
+                    </algol-flex-item>
                 
-                <div class="algol-bolha-01">
-                    <h2>Listas e Tabelas</h2>
-                    <div class="lay lay-2cols">
-                        <div>
-                            <h3>Lista Não Ordenada</h3>
-                            <ul>
-                                <li>Item 1</li>
-                                <li>Item 2</li>
-                                <li>Item 3</li>
-                            </ul>
+                
+            </algol-grid-layout>
+            </form>
+            <script defer>
+                // temporário. apenas para teste
+                window.addEventListener('load', function (event) { 
+                    const select = document.getElementById('select');
+                    const themeLink = document.getElementById('theme-link');
+                    select.addEventListener('algol-select-value', function (e) {
+                        const tema = e.detail.newValue;
+                        themeLink.setAttribute('href', tema);
+                    });
+                });
+            </script>
 
-                            <h3>Lista Ordenada</h3>
-                            <ol>
-                                <li>Primeiro Item</li>
-                                <li>Segundo Item</li>
-                                <li>Terceiro Item</li>
-                            </ol>
-                        </div>
-                        <div>
-                        <h3>Tabela</h3>
-                            <table class="tabela-padrao">
-                                <thead>
-                                    <tr>
-                                        <th>Nome</th>
-                                        <th>Idade</th>
-                                        <th>Cidade</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>João</td>
-                                        <td>30</td>
-                                        <td>São Paulo</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Maria</td>
-                                        <td>25</td>
-                                        <td>Rio de Janeiro</td>
-                                    </tr>
-                                    <tr class="tabela-destaque">
-                                        <td>Carlos</td>
-                                        <td>45</td>
-                                        <td>Belo Horizonte</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-            <div class="section-separator">
-                <h2>Alertas e Mensagens</h2>
-                <div class="algol-component-group">
-                    <div class="alerta alerta-sucesso">Sucesso! A operação foi concluída com sucesso.</div>
-                    <div class="alerta alerta-info">Informação: Esta é uma mensagem informativa.</div>
-                    <div class="alerta alerta-aviso">Aviso! Atenção para este alerta.</div>
-                    <div class="alerta alerta-erro">Erro: Ocorreu um problema, tente novamente.</div>
-                </div>
-            </div>
-
-            <div class="section-separator">
-                <h2>Carregadores (Spinners)</h2>
-                <div class="algol-component-group" style="display: flex; gap: 20px; align-items: center;">
-                    <div class="spinner"></div>
-                    <p>O spinner de carregamento irá aparecer aqui. Você pode estilizar a cor e o tamanho dele via CSS.
-                    </p>
-                </div>
-            </div>
         </main>
-    </div>
 </body>
 
 </html>

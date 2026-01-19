@@ -143,17 +143,20 @@ algol_textarea_sheet.replaceSync(`
         margin-bottom: calc(1.0vw * var(--scale-factor));
         width: 100%;
     }
-    .container label {
-        color: var(--text-color-forms-label);
+    label {
+        color: var(--text-color-label);
         font-size: calc(1.0vw * var(--scale-factor));
     }
-    .container textarea {
+    :host([disabled]) label {
+        color: var(--text-color-label-disabled);
+    }
+    textarea {
         appearance: none;
         -webkit-appearance: none;
         outline: none;
         box-sizing: border-box;
         width: 100%;
-        background: var(--bg-color-forms);
+        background: var(--bg-color-inputs);
         color: var(--text-color);
         border: calc(0.1vw * var(--scale-factor)) solid var(--border-color-forms);
         border-radius: calc(var(--border-radius-components) * var(--scale-factor));
@@ -169,10 +172,11 @@ algol_textarea_sheet.replaceSync(`
         min-height: calc(3.5vw * var(--scale-factor)); /* Altura mínima decente */
     }
     /* Para o estado disabled */
-    :host([disabled]) .container textarea{
-        background-color: var(--bg-color-forms-disabled) !important;
-        color: var(--text-color-forms-disabled) !important;
-        cursor: not-allowed;
+    :host([disabled]) textarea{
+        background-color: var(--bg-color-inputs-disabled) !important;
+        color: var(--text-color-disabled) !important;
+        cursor: not-allowed !important;
+        user-select: none !important;
     }
     :host(:focus-within) textarea {
         border-color: var(--border-color-focus); /* Exemplo */

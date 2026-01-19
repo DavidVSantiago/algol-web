@@ -490,11 +490,11 @@ class InputColor extends Input {
     render() {
         this.root.adoptedStyleSheets = [algol_input_sheet]; // aplica o estilo do componente (compartilhado)
         this.root.innerHTML = `
-            <div class="container">
+            <div class="container" tabindex="-1">
                 <label></label>
                 <input type="color" style="display:none">
                 <div class="color-border" tabindex="0">
-                   <div class="color-box"></div>
+                   <div class="color-box" tabindex="-1"></div>
                 </div>
             </div>
             <slot></slot>
@@ -547,7 +547,16 @@ class InputColor extends Input {
         super.update_value(val);
         this._atualizarVisual(val);
     }
-    update_disabled(val) {}
+    update_disabled(val) {
+        super.update_disabled(val);
+        if (!this.elems.colorBorder) return;
+        if (this.hasAttribute('disabled')) {
+            this.elems.colorBorder.removeAttribute('tabindex');
+        } else {
+            this.elems.colorBorder.setAttribute('tabindex', '0');
+        }
+        this._atualizarVisual(val);
+    }
 
     // ****************************************************************************
     // Utils
@@ -570,6 +579,89 @@ class InputColor extends Input {
     }
 }
 
+class InputRange extends Input {
+    static get PROP_MAP() {
+        return {
+            ...super.PROP_MAP, // Herda label, required, disabled, etc.
+            'min': 'update_min',
+            'max': 'update_max',
+            'step': 'update_step'
+        };
+    }
+    static get observedAttributes() {return Object.keys(this.PROP_MAP);}
+    constructor() {super();}
+
+    // ****************************************************************************
+    // Ciclo de Vida
+    // ****************************************************************************
+    
+    /** @override */
+    postConfig(){
+        super.postConfig(); // Configura container, label, input, slot...
+        this.elems.input.type = "range";
+    }
+
+    /** @override */
+    attachEvents(){
+        super.attachEvents(); // Ganha validação e update_value de graça
+    }
+
+    // ****************************************************************************
+    // Métodos dos atributos
+    // ****************************************************************************
+    
+    update_min(val) {
+        if (!this.elems.input) return;
+        if (val) this.elems.input.min = val;
+        else this.elems.input.removeAttribute('min');
+        this._atualizarValidacao();
+    }
+
+    update_max(val) {
+        if (!this.elems.input) return;
+        if (val) this.elems.input.max = val;
+        else this.elems.input.removeAttribute('max');
+        this._atualizarValidacao();
+    }
+
+    update_step(val) {
+        if (!this.elems.input) return;
+        if (val) this.elems.input.step = val;
+        else this.elems.input.removeAttribute('step');
+        this._atualizarValidacao();
+    }
+
+    // ****************************************************************************
+    // Validação Específica (Idêntica à de Data)
+    // ****************************************************************************
+
+    /** @override */
+    _atualizarValidacao() {
+        if (!this.elems.input) return;
+
+        const validadeInterna = this.elems.input.validity;
+
+        // Nota: Range dificilmente falha na interação do usuário, 
+        // mas protege contra valores inválidos via JS.
+        if (!validadeInterna.valid) {
+            const flags = {
+                valueMissing: validadeInterna.valueMissing,    
+                rangeUnderflow: validadeInterna.rangeUnderflow, 
+                rangeOverflow: validadeInterna.rangeOverflow,   
+                stepMismatch: validadeInterna.stepMismatch      
+            };
+
+            this._internals.setValidity(
+                flags,
+                this.elems.input.validationMessage, 
+                this.elems.input
+            );
+        } else {
+            this._internals.setValidity({});
+        }
+    }
+}
+
 // ----------------------------------------------------------------------------------------------------------------------------------
 // 1. CSS Fora da Classe, Mais performático e limpo (adoptedStyleSheets)
 const algol_input_sheet = new CSSStyleSheet();
@@ -587,17 +679,24 @@ algol_input_sheet.replaceSync(`
         
     }
     label {
-        color: var(--text-color-forms-label);
+        color: var(--text-color-label);
         font-size: calc(1.0vw * var(--scale-factor));
     }
-    .container input {
+    :host([disabled]) label{
+        color: var(--text-color-label-disabled);
+    }
+    input::-webkit-calendar-picker-indicator { /* Chrome & others*/
+        color-scheme: var(--theme-color-scheme);
+    }
+    input {
+        color-scheme: var(--theme-color-scheme);
         appearance: none;
         -webkit-appearance: none;
         outline: none;
         box-sizing: border-box;
         width: 100%;
         padding: calc(0.8vw * var(--scale-factor)) calc(1.1vw * var(--scale-factor));
-        background: var(--bg-color-forms);
+        background: var(--bg-color-inputs);
         color: var(--text-color);
         border: calc(0.1vw * var(--scale-factor)) solid var(--border-color-forms);
         border-radius: calc(var(--border-radius-components) * var(--scale-factor));
@@ -607,20 +706,28 @@ algol_input_sheet.replaceSync(`
         font-size: calc(1.1vw * var(--scale-factor));
         line-height: calc(var(--line-height) * var(--scale-factor));
     }
-    /* Para o estado disabled */
     :host([disabled]) input{
-        background-color: var(--bg-color-forms-disabled) !important;
-        color: var(--text-color-forms-disabled) !important;
+        background-color: var(--bg-color-inputs-disabled) !important;
+        color: var(--text-color-disabled) !important;
         cursor: not-allowed;
     }
-    
     :host(:focus-within) input {
         border-color: var(--border-color-focus); /* Exemplo */
         box-shadow: 0 0 0 calc(0.1vw * var(--scale-factor)) var(--border-color-focus-glow) /* "Glow" externo */
     }
+    input::placeholder {
+        color: var(--text-color-placeholder) !important;
+    }
+    :host([disabled]) input::placeholder {
+        color: var(--text-color-placeholder-disabled) !important;
+    }
 
     /* --- ESTILOS ESPECÍFICOS PARA INPUT NUMBER --- */
 
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button {-webkit-appearance: none;margin: 0;}
+    input[type="number"] {-moz-appearance: textfield;}
+    
     .input-container{
         display: flex;
         flex-direction: row;
@@ -655,6 +762,7 @@ algol_input_sheet.replaceSync(`
         background-color: var(--bg-color-btn-spinner-hover);
     }
     .btnup:active, .btndown:active{
+        transform: translateY(calc(0.09vw * var(--scale-factor))); /* Efeito de clique */
         background-color: var(--bg-color-btn-spinner-hover);
     }
 
@@ -672,24 +780,28 @@ algol_input_sheet.replaceSync(`
     
 
     /* --- ESTILOS ESPECÍFICOS PARA INPUT COLOR --- */
-    
-    :host(:focus-within) .color-border{
-        border-color: var(--border-color-focus); /* Exemplo */
-        box-shadow: 0 0 0 calc(0.1vw * var(--scale-factor)) var(--border-color-focus-glow) /* "Glow" externo */
-    }
-
     .color-border{
         display: flex;
         align-items: center;
         justify-content: center;
         width: calc(5vw * var(--scale-factor));
         height: calc(3vw * var(--scale-factor));
-        background: var(--bg-color-forms);
-        border: calc(0.15vw * var(--scale-factor)) solid var(--border-color-forms);
+        background: var(--bg-color-inputs);
+        border: calc(0.1vw * var(--scale-factor)) solid var(--border-color-forms);
         border-radius: calc(var(--border-radius-components) * var(--scale-factor));
     }
+    :host(:focus-within) .color-border,
+    .color-border:focus {
+        border-color: var(--border-color-focus);
+        box-shadow: 0 0 0 calc(0.1vw * var(--scale-factor)) var(--border-color-focus-glow);
+    }
+    :host([disabled]) .color-border,
+    :host([disabled]) .color-border:focus {
+        border-color: #0000 !important;
+        box-shadow: none;
+    }
     :host([disabled]) .color-border{
-        background: var(--bg-color-forms-disabled) !important;
+        background: var(--bg-color-inputs-disabled) !important;
         cursor: not-allowed;
     }
     
@@ -697,8 +809,12 @@ algol_input_sheet.replaceSync(`
         cursor: pointer;
         width: calc(4vw * var(--scale-factor));
         height: calc(2vw * var(--scale-factor));
-        background-color: #f00;
-        }
+    }
+    :host([disabled]) .color-box{
+        background: var(--bg-color-inputs-disabled) !important;
+        cursor: not-allowed;
+        filter: brightness(0.8); /* leve escurecida */
+    }
     :host(:not([disabled])) .color-box:hover, :host(:not([disabled])) .color-border:hover{
         filter: brightness(0.9); /* leve escurecida */
     }
@@ -706,17 +822,89 @@ algol_input_sheet.replaceSync(`
         transform: translateY(calc(0.09vw * var(--scale-factor))); /* Efeito de clique */
         filter: brightness(0.8);
     }
-    :host([disabled]) .color-box{
+
+    /* --- ESTILOS ESPECÍFICOS PARA INPUT RANGE --- */
+
+    input[type="range"] {        
+        background: transparent; /* Importante: remove o fundo de input texto */
+        padding: 0;              /* Slider não deve ter padding interno */
+        width: 100%;
+        border:none;
+        min-height: calc(2.4vw * var(--scale-factor)); /* Mantém a altura para alinhamento */
+        cursor: pointer;
+    }
+    input[type="range"]:focus {
+        outline: none;
+        box-shadow: none;
+    }
+    
+    /* trilho do range ----------------------------------------------------------- */
+    input[type="range"]::-moz-range-track { /* Firefox */
+        width: 100%;
+        height: calc(0.4vw * var(--scale-factor));
+        background: var(--bg-color-inputs);
+        border-radius: calc(0.2vw * var(--scale-factor));
+        cursor: pointer;
+    }
+    :host([disabled]) input[type="range"]::-moz-range-track { /* Chrome & others */
+        background: var(--bg-color-inputs-disabled) !important;
+    }
+
+    input[type="range"]::-webkit-slider-runnable-track {
+        width: 100%;
+        height: calc(0.4vw * var(--scale-factor));
+        background: var(--bg-color-inputs);
+        border-radius: calc(0.2vw * var(--scale-factor));
+        cursor: pointer;
+    }
+    :host([disabled]) input[type="range"]::-webkit-slider-runnable-track {
+        cursor: not-allowed;
+        background: var(--bg-color-inputs-disabled) !important;
+    }
+    /* bolinha do range ----------------------------------------------------------- */
+    input[type="range"]::-webkit-slider-thumb {/* bolinha Chrome, Safari, Edge */
+        -webkit-appearance: none; /* Necessário para estilizar */
+        height: calc(1.2vw * var(--scale-factor));
+        width: calc(1.2vw * var(--scale-factor));
+        border-radius: 50%;
+        background: var(--text-color); /* Cor da bolinha */
+        border: none;
+        margin-top: calc(-0.4vw * var(--scale-factor)); 
+    }
+   
+    input[type="range"]::-moz-range-thumb { /* bolinha Firefox */
+        height: calc(1.2vw * var(--scale-factor));
+        width: calc(1.2vw * var(--scale-factor));
+        border-radius: 50%;
+        background: var(--text-color);
+        border: none;
+    }
+    input[type="range"]::-webkit-slider-thumb:hover { /* Hover da bolinha Chrome, Safari, Edge */
+        transform: scale(1.2); /* Cresce um pouco */
+        background: var(--border-color-focus);
+    }
+    input[type="range"]::-moz-range-thumb:hover { /* Hover da bolinha firefox */
+        transform: scale(1.2);
+        background: var(--border-color-focus);
+    }
+    input[type="range"]:focus::-moz-range-thumb {
+        box-shadow: 0 0 0 calc(0.3vw * var(--scale-factor)) var(--border-color-focus-glow);
+    }
+    input[type="range"]:focus::-webkit-slider-thumb {
+        box-shadow: 0 0 0 calc(0.3vw * var(--scale-factor)) var(--border-color-focus-glow);
+    }
+    :host([disabled]) input[type="range"]{
+        background: #0000 !important; /* remove o fundo */
+        cursor: not-allowed;
+    }
+    :host([disabled]) input[type="range"]::-moz-range-thumb {
+        background: var(--text-color-disabled) !important;
+    }
+    :host([disabled]) input[type="range"]::-webkit-slider-thumb {
         background: var(--text-color-disabled) !important;
         cursor: not-allowed;
     }
-
-    /* --- ESTILOS ESPECÍFICOS PARA INPUT TIME --- */
-
-    input[type="time"]::-webkit-calendar-picker-indicator {
-        color-scheme: dark;
-    }
-
+    
 `);
 
 // ----------------------------------------------------------------------------------------------------------------------------------
@@ -725,3 +913,4 @@ customElements.define('algol-input-number', InputNumber); // Registra o componen
 customElements.define('algol-input-date', InputDate);
 customElements.define('algol-input-time', InputTime);
 customElements.define('algol-input-color', InputColor); 
+customElements.define('algol-input-range', InputRange); 

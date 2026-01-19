@@ -1,9 +1,10 @@
-Fazer um review nas regras CSS do tema, na parte de normalização de margens
-IMplementar a o hspace e hspaceBreak nas variáveis, aplica isso como padding no site geral, no body
+Fazer os testes de movimentação do layout posh posv.
+Testar a captura dos valores do form depois do clique no submit
 
-Inmplementar:
-- input range
+Inmplementar
 - input file
 - input radio (implementar como um select, onde os slots são as opções do radio)
 - input checkbox (idem)
+
+Começar a implementar o site algol.dev 
 

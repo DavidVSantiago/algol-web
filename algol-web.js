@@ -9,10 +9,14 @@ const GLOBAL = {
     'scale-factor': 1.0, // multiplicador de escala global. recomenda-se que seja um valor entre 0.5 e 1.5 (padrão 1.0)
     'scale-factor-break': 3.0, // multiplicador de escala global para telas menores que 'MOBILE_BREAKPOINT'
     'font-size': '1.1vw', // ajusta o tamanho da fonte global (padrão 1.1vw)
+    'font-size-break': '1.1vw', // para telas menores que 'MOBILE_BREAKPOINT' (padrão 1.1vw)
     'line-height': '1.6vw', // ajusta a altura da linha de texto global (padrão 1.6vw)
-    'border-radius-components': '0.5vw', //
-    'border-radius-layout': '1.0vw', //
-    'font-size-btn': '1.2vw', //
+    'line-height-break': '1.6vw', // para telas menores que 'MOBILE_BREAKPOINT' (padrão 1.6vw)
+    'border-radius-components': '0.2vw', // (padrão 0.5vw)
+    'border-radius-layout': '0.4vw', // ( padrão 1.0vw)
+    'font-size-btn': '1.2vw', // ( padrão 1.2vw)
+    'margin-page': '2vw', // margens laterais da página no modo (padrão 2vw)
+    'margin-page-break': '1vw', // margens laterais da página no modo para telas menores que 'MOBILE_BREAKPOINT' (padrão 1vw)
   }
 
 const MOBILE_BREAKPOINT = '600px'; // breakpoint para celular (padrão 700px) 
@@ -31,8 +35,6 @@ const fontBase64 = "data:application/font-woff;base64,d09GRgABAAAAAE3AABIAAAAAg4
 // **********************************************************************************************************************
 //  PERIGO!! DAQUI PRA BAIXO NÃO ALTERAR NADA!! *************************************************************************
 // **********************************************************************************************************************
-
-// function setFatorEscala(valor) {document.documentElement.style.setProperty('--scale-factor', valor);}
 
 /** Função de injeção das variáveis GLOBAIS */
 function injectGlobalVariablesStyles() {
@@ -64,16 +66,501 @@ function injectGlobalVariablesStyles() {
 }
 injectGlobalVariablesStyles();
 
+/** Função de injeção dos estilos de normalização*/
+function injectGlobalNormalizationStyles() {
+  if (document.getElementById('algol-global-normalization-style')) return; // Já injetado
+
+  const style = document.createElement('style');
+  style.id = 'algol-global-normalization-style';
+
+  style.textContent = `
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      border: none;
+    }
+    body {
+        font-family: 'Algol Font';
+        font-weight: 100;
+        font-style: normal;
+        font-size: calc(var(--font-size) * var(--scale-factor));
+        line-height: calc(var(--line-height) * var(--scale-factor));
+        margin: calc(var(--margin-page) * var(--scale-factor));
+        color: var(--text-color);
+        background-color: var(--bg-color);
+    }
+    main {
+        margin: 0 auto;
+    }
+
+    h1 {
+        font-size: calc(2.0vw * var(--scale-factor));
+    }
+    h2 {
+        font-size: calc(1.8vw * var(--scale-factor));
+    }
+    h3 {
+        font-size: calc(1.6vw * var(--scale-factor));
+    }
+    h4 {
+        font-size: calc(1.4vw  * var(--scale-factor));
+    }
+    h5 {
+        font-size: calc(1.2vw  * var(--scale-factor));
+    }
+    h6 {
+        font-size: calc(1.0vw * var(--scale-factor));
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+        margin-top: calc(1vw * var(--scale-factor));
+        margin-bottom: calc(2vw * var(--scale-factor));
+        font-weight: 600;
+    }
+
+    @media (max-width: ${MOBILE_BREAKPOINT}) {
+        body {
+            font-size: calc(var(--font-size-break) * var(--scale-factor));
+            margin: calc(var(--margin-page-break) * var(--scale-factor));
+            line-height-break: calc(var(--line-height-break) * var(--scale-factor));
+        }
+    }
+  `;
+  document.head.appendChild(style);
+}
+injectGlobalNormalizationStyles();
+
+/** Função de injeção dos classes globais*/
+function injectGlobalClasses() {
+  if (document.getElementById('algol-global-classes-style')) return; // Já injetado
+
+  const style = document.createElement('style');
+  style.id = 'algol-global-classes-style';
+
+  style.textContent = `
+    /* Groups **************************************************************** */
+    .algol-bubble-01 {
+        margin-top: calc(2.0vw * var(--scale-factor));
+        padding: calc(1.0vw * var(--scale-factor));
+        background-color: var(--bg-color-section-bubble-01);
+        border: calc(0.1vw * var(--scale-factor)) solid var(--border-color-section-bubble-01);
+        border-radius: calc(var(--border-radius-layout) * var(--scale-factor));
+    }
+    .algol-bubble-02 {
+        margin-top: calc(2.0vw * var(--scale-factor));
+        padding: calc(1.0vw * var(--scale-factor));
+        background-color: var(--bg-color-section-bubble-02);
+        border: calc(0.1vw * var(--scale-factor)) solid var(--border-color-section-bubble-02);
+        border-radius: calc(var(--border-radius-layout) * var(--scale-factor));
+    }
+  `;
+  document.head.appendChild(style);
+}
+injectGlobalClasses();
+
 // **********************************************************************************************************************
+
+class BaseLayout extends HTMLElement {
+    static get observedAttributes() { return []; } 
+    
+    constructor() {
+        super();
+        this.elems = {}; // cache de elementos internos do componente
+        this.inicializado = false;
+        this._observerEstrutura = null; // observer das mudanças internas 
+    }
+
+    // ****************************************************************************
+    // Métodos de construção do componente
+    // ****************************************************************************
+
+    /** @abstract */
+    postConfig() { throw new Error("Método 'postConfig' deve ser implementado."); }
+
+    // ****************************************************************************
+    // Ciclo de Vida de HTMLElement
+    // ****************************************************************************
+
+    /** @override */
+    connectedCallback() {
+        this._ativarMonitoramentoDeConteudo();
+        if (this.inicializado) return; // se já foi construído, não faz nada!
+
+        this._desativarMonitoramentoDeConteudo();
+        this.postConfig(); // invoca o metodo abstrato de pós-configuração
+
+        // Aplica valores iniciais dos atributos
+        for(const attr of this.constructor.observedAttributes){
+            const val = this.getAttribute(attr);
+            if (val !== null) this.attributeChangedCallback(attr, null, val);
+        };
+
+        this._ativarMonitoramentoDeConteudo();
+        this.inicializado = true;
+    }
+    
+    /** @override */
+    disconnectedCallback() {
+        this._desativarMonitoramentoDeConteudo();
+    }
+
+    /** @override */
+    attributeChangedCallback(name, oldValue, newValue) {
+        if (oldValue === newValue) return;
+
+        // 1. Prioridade: Mapa de Propriedades (Lógica Funcional)
+        const propMap = this.constructor.PROP_MAP;
+        if (propMap && propMap[name]) {
+            const method = propMap[name];
+            if (typeof this[method] === 'function') {
+                this[method](newValue);
+                return;
+            }
+        }
+
+        // 2. Tenta pegar a configuração do mapa de atributos da classe filha
+        const map = this.constructor.ATTR_MAP;
+        if (!map || !map[name]) return; // se não existir mapa ou atributo, abandona 
+
+        const config = map[name]; // obtem o atributo
+        
+        // Normaliza a configuração (para suportar string simples ou objeto)        
+        const isObj = typeof config === 'object';
+        const cssVar = isObj ? config.var : config;
+        const prefix = (isObj && config.prefix) ? config.prefix : '';
+        const suffix = (isObj && config.suffix) ? config.suffix : '';
+
+        // Aplica a variável CSS diretamente no elemento (inline style)
+        this.style.setProperty(cssVar, prefix + newValue + suffix);
+    }
+    
+    // ****************************************************************************
+    // Monitoramento de Estrutura (MutationObserver)
+    // ****************************************************************************
+
+    _ativarMonitoramentoDeConteudo() {
+        if (this._observerEstrutura) return; // Já ativo
+        
+        const callback = (mutationsList) => {
+            // Dispara o evento personalizado planejado
+            this.dispatchEvent(new CustomEvent('algol-layout-update', {
+                bubbles: true,
+                composed: true,
+                detail: {
+                    origin: this,
+                    mutations: mutationsList,
+                },
+            }));
+        };
+        
+        this._observerEstrutura = new MutationObserver(callback);
+        this._observerEstrutura.observe(this, { childList: true, subtree: false, characterData: false});
+    }
+    _desativarMonitoramentoDeConteudo() {
+        if (this._observerEstrutura) {
+            this._observerEstrutura.disconnect();
+            this._observerEstrutura = null;
+        }
+    }
+
+    // ****************************************************************************
+    // Helper Estático para Injeção de CSS do layout no Head da página
+    // ****************************************************************************
+    static _injectStyleOnHead(id, cssContent) {
+        if (document.getElementById(id)) return; // Já existe, ignora
+
+        const style = document.createElement('style');
+        style.id = id;
+        style.textContent = cssContent;
+        document.head.appendChild(style);
+    }
+}
+
+class FlexItem extends BaseLayout {
+    // Mapa de atributos válidos (chaves) e suas respectivas variáveis CSS (valores), usadas dinamicamente
+    static get ATTR_MAP() {
+        return {
+            'colspan':      { var: '--flex-item-colspan',       prefix: 'span ' },
+            'colspanbreak': { var: '--flex-item-colspan-break', prefix: 'span ' },
+            'rowspan':      { var: '--flex-item-rowspan',       prefix: 'span ' },
+            'rowspanbreak': { var: '--flex-item-rowspan-break', prefix: 'span ' },
+            'imgattach': '--flex-item-imgattach', // scroll, fixed
+            'imgrepeat': '--flex-item-imgrepeat', // no-repeat, repeat, repeat-x, repeat-y, ...
+            'imgpos': '--flex-item-imgpos', // top, bottom, center, left, right, ...
+            'imgsize': '--flex-item-imgsize', // contain, cover, ...
+        };
+    }
+    static get PROP_MAP() {
+        return {
+            'distrib': 'update_distrib', // 'between', 'around', 'evenly', 'start', 'center', 'end'
+            'padding': 'update_padding',
+            'paddingbreak': 'update_paddingbreak',
+            'img': 'update_img',
+        };
+    }
+    static get observedAttributes() {return [...Object.keys(this.PROP_MAP), ...Object.keys(this.ATTR_MAP)];}
+    constructor() {super();}
+
+    // ****************************************************************************
+    // Métodos de configuração do layout
+    // ****************************************************************************
+
+    /** @override */
+    postConfig(){
+        this.style.display = 'flex';
+        this.style.flexWrap = 'wrap';
+        this.style.gap = '0';
+    }
+
+    // ****************************************************************************
+    // Métodos dos atributos
+    // ****************************************************************************
+    
+    update_distrib(val) {
+        val = val?.trim().toLowerCase();
+        if(!['between', 'around', 'evenly', 'start', 'center', 'end'].includes(val))return; // guard
+        this.style.justifyContent = ['between', 'around', 'evenly'].includes(val)? `space-${val}`: val;
+    }
+    update_img(val) {
+        this.style.setProperty('--flex-item-img', `url("${val}")`);
+    }
+    update_padding(val) {
+        this.style.setProperty('--flex-item-padding', this._adjustPadding(val));
+    }
+    update_paddingbreak(val) {
+        this.style.setProperty('--flex-item-paddingbreak', this._adjustPadding(val));
+    }
+    
+
+    // ****************************************************************************
+    // Utils
+    // ****************************************************************************
+
+    _adjustPadding(val) {
+        if (!val) return '0vw'; // guard!
+        // 1. Converte para string, remove espaços extras nas pontas e divide pelos espaços internos
+        // O regex /\s+/ garante que múltiplos espaços contem como apenas um separador
+        const partes = val.toString().trim().split(/\s+/);
+        // 2. Mapeia cada parte (ex: "10", "20px") para o formato "Xvw"
+        const valoresConvertidos = partes.map(parte => {
+            const num = parseFloat(parte); 
+            // Se for número válido retorna com vw, senão retorna 0vw
+            return !isNaN(num) ? `${num}vw` : '0vw';
+        });
+        // 3. Junta tudo de volta em uma string separada por espaços
+        return valoresConvertidos.join(' ');
+    }
+
+    // ****************************************************************************
+    // Injeção de estilo CSS
+    // ****************************************************************************
+    
+    static injectStyles() {
+        const css = `
+            algol-flex-item[colspan]{grid-column-end: var(--flex-item-colspan);}
+            algol-flex-item[rowspan]{grid-row-end: var(--flex-item-rowspan);}
+            algol-flex-item[img]{background-image: var(--flex-item-img); width: 100%; height: 100%;}
+            algol-flex-item[imgattach]{background-attachment: var(--flex-item-imgattach);}
+            algol-flex-item[imgrepeat]{background-repeat: var(--flex-item-imgrepeat);}
+            algol-flex-item[imgpos]{background-position: var(--flex-item-imgpos);}
+            algol-flex-item[imgsize]{background-size: var(--flex-item-imgsize);}
+            algol-flex-item[padding]{padding: var(--flex-item-padding);}
+            algol-flex-item[distrib]{width: 100%}
+
+            @media (max-width: ${MOBILE_BREAKPOINT}) {
+                algol-flex-item[colspanbreak] {grid-column-end: var(--flex-item-colspan-break) !important;}
+                algol-flex-item[rowspanbreak] {grid-row-end: var(--flex-item-rowspan-break) !important;}
+                algol-flex-item[paddingbreak]{padding: var(--flex-item-paddingbreak);}
+
+            }
+        `;
+
+        BaseLayout._injectStyleOnHead('algol-flex-item-style', css); // injeta no head
+    }
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------
+
+customElements.define('algol-flex-item', FlexItem); // Registra o componente customizado
+FlexItem.injectStyles(); // injeta CSS desse componente
+
+class GridItem extends BaseLayout {
+    // Mapa de atributos válidos (chaves) e suas respectivas variáveis CSS (valores), usadas dinamicamente
+    static get ATTR_MAP() {
+        return {
+            'colspan':      { var: '--grid-item-colspan',       prefix: 'span ' },
+            'colspanbreak': { var: '--grid-item-colspan-break', prefix: 'span ' },
+            'rowspan':      { var: '--grid-item-rowspan',       prefix: 'span ' },
+            'rowspanbreak': { var: '--grid-item-rowspan-break', prefix: 'span ' },
+            'posh':      '--grid-item-posh',
+            'poshbreak': '--grid-item-poshbreak',
+            'posv':      '--grid-item-posv',
+            'posvbreak': '--grid-item-posvbreak',
+            'imgattach': '--grid-item-imgattach', // scroll, fixed
+            'imgrepeat': '--grid-item-imgrepeat', // no-repeat, repeat, repeat-x, repeat-y, ...
+            'imgpos': '--grid-item-imgpos', // top, bottom, center, left, right, ...
+            'imgsize': '--grid-item-imgsize', // contain, cover, ...
+        };
+    }
+    static get PROP_MAP() {
+        return {
+            'padding': 'update_padding',
+            'paddingbreak': 'update_paddingbreak',
+            'img': 'update_img',
+        };
+    }
+    static get observedAttributes() {return [...Object.keys(this.PROP_MAP), ...Object.keys(this.ATTR_MAP)];}
+    constructor() {super();}
+
+    // ****************************************************************************
+    // Métodos de configuração do layout
+    // ****************************************************************************
+
+    /** @override */
+    postConfig(){
+        this.style.display = 'grid'; 
+        this.style.gap = '0';
+    }
+
+    // ****************************************************************************
+    // Métodos dos atributos
+    // ****************************************************************************
+    
+    update_img(val) {
+        this.style.setProperty('--grid-item-img', `url("${val}")`);
+    }
+    update_padding(val) {
+        this.style.setProperty('--grid-item-padding', this._adjustPadding(val));
+    }
+    update_paddingbreak(val) {
+        this.style.setProperty('--grid-item-paddingbreak', this._adjustPadding(val));
+    }
+
+    // ****************************************************************************
+    // Utils
+    // ****************************************************************************
+
+    _adjustPadding(val) {
+        if (!val) return '0vw'; // guard!
+        // 1. Converte para string, remove espaços extras nas pontas e divide pelos espaços internos
+        // O regex /\s+/ garante que múltiplos espaços contem como apenas um separador
+        const partes = val.toString().trim().split(/\s+/);
+        // 2. Mapeia cada parte (ex: "10", "20px") para o formato "Xvw"
+        const valoresConvertidos = partes.map(parte => {
+            const num = parseFloat(parte); 
+            // Se for número válido retorna com vw, senão retorna 0vw
+            return !isNaN(num) ? `${num}vw` : '0vw';
+        });
+        // 3. Junta tudo de volta em uma string separada por espaços
+        return valoresConvertidos.join(' ');
+    }
+
+    // ****************************************************************************
+    // Injeção de estilo CSS
+    // ****************************************************************************
+    
+    static injectStyles() {
+        const css = `
+            algol-grid-item[colspan]{grid-column-end: var(--grid-item-colspan);}
+            algol-grid-item[rowspan]{grid-row-end: var(--grid-item-rowspan);}
+            algol-grid-item[posh]{justify-self: var(--grid-item-posh);}
+            algol-grid-item[posv]{align-self: var(--grid-item-posv);}
+            algol-grid-item[img]{background-image: var(--grid-item-img); width: 100%; height: 100%;}
+            algol-grid-item[imgattach]{background-attachment: var(--grid-item-imgattach);}
+            algol-grid-item[imgrepeat]{background-repeat: var(--grid-item-imgrepeat);}
+            algol-grid-item[imgpos]{background-position: var(--grid-item-imgpos);}
+            algol-grid-item[imgsize]{background-size: var(--grid-item-imgsize);}
+            algol-grid-item[padding]{padding: var(--grid-item-padding);}
+
+            @media (max-width: ${MOBILE_BREAKPOINT}) {
+                algol-grid-item[colspanbreak] {grid-column-end: var(--grid-item-colspan-break) !important;}
+                algol-grid-item[rowspanbreak] {grid-row-end: var(--grid-item-rowspan-break) !important;}
+                algol-grid-item[poshbreak] {justify-self: var(--grid-item-poshbreak) !important;}
+                algol-grid-item[posvbreak] {align-self: var(--grid-item-posvbreak) !important;}
+                algol-grid-item[paddingbreak]{padding: var(--grid-item-paddingbreak);}
+            }
+        `;
+
+        BaseLayout._injectStyleOnHead('algol-grid-item-style', css); // injeta no head
+    }
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------
+
+customElements.define('algol-grid-item', GridItem); // Registra o componente customizado
+GridItem.injectStyles(); // injeta CSS desse componente
+
+class GridLayout extends BaseLayout {
+    // Mapa de atributos válidos (chaves) e suas respectivas variáveis CSS (valores), usadas dinamicamente
+    static get ATTR_MAP() {
+        return {
+            'cols':      '--grid-layout-cols',
+            'colsbreak': '--grid-layout-cols-break',
+            'gap':       '--grid-layout-gap',
+            'gapbreak':  '--grid-layout-gap-break',
+            'posh':      '--grid-layout-posh',
+            'poshbreak': '--grid-layout-poshbreak',
+            'posv':      '--grid-layout-posv',
+            'posvbreak': '--grid-layout-posvbreak'
+        };
+    }
+    static get observedAttributes() {return Object.keys(this.ATTR_MAP);} // retorna a chaves do mapa de atributos
+    constructor() {super();}
+
+    // ****************************************************************************
+    // Métodos de configuração do layout
+    // ****************************************************************************
+
+    /** @override */
+    postConfig(){
+        this.style.display = 'grid';
+        // por padrão, os elementos da grade são alinhados ao centro
+        if (!this.style.getPropertyValue('--grid-layout-posh')) this.style.setProperty('--grid-layout-posh', 'center');
+        if (!this.style.getPropertyValue('--grid-layout-posv')) this.style.setProperty('--grid-layout-posv', 'center');
+    }
+
+    // ****************************************************************************
+    // Injeção de estilo CSS
+    // ****************************************************************************
+    
+    static injectStyles() {
+        const css = `
+            algol-grid-layout{
+                grid-template-columns: var(--grid-layout-cols, none);
+                gap: var(--grid-layout-gap, none);
+                justify-items: var(--grid-layout-posh, none);
+                align-items: var(--grid-layout-posv, none);
+            }
+                
+            @media (max-width: ${MOBILE_BREAKPOINT}) {
+                algol-grid-layout[colsbreak] {grid-template-columns: var(--grid-layout-cols-break) !important;}
+                algol-grid-layout[gapbreak] {gap: var(--grid-layout-gap-break) !important;}
+                algol-grid-layout[poshbreak] {justify-items: var(--grid-layout-poshbreak) !important;}
+                algol-grid-layout[posvbreak] {align-items: var(--grid-layout-posvbreak) !important;}
+            }
+        `;
+        BaseLayout._injectStyleOnHead('algol-grid-layout-style', css);
+    }
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------
+
+customElements.define('algol-grid-layout', GridLayout); // Registra o componente customizado
+GridLayout.injectStyles(); // injeta CSS desse componente
 
 class BaseComponent extends HTMLElement {
     static formAssociated = true; // Habilita participação em formulários nativos (<form>)
-
+    static useShadow = true; // Usa shadow DOM?
     static _idCont = 0;
     static get observedAttributes() { return []; } 
     
     constructor() {
-        
         super();
         this.elems = {}; // cache de elementos internos do componente
         this.inicializado = false;
@@ -81,11 +568,15 @@ class BaseComponent extends HTMLElement {
         this._internals = this.attachInternals(); // API de Formulários, para notifica ao <form>
         this._gerarAcessoresAutomaticos(); // Gera getters/setters baseados nos mapas implementados nas classes filhas
         
-        // usa shadow DOM, que isola o componente do restante da página 
-        this.root = this.attachShadow({
-            mode: 'open',
-            delegatesFocus: true, // permite que o foco seja delegado para dentro do shadow DOM
-         }); 
+        // Cria Shadow DOM ou usa Light DOM 
+        if (this.constructor.useShadow) {
+            this.root = this.attachShadow({ // Cria Shadow DOM normalmente
+                mode: 'open',
+                delegatesFocus: true,
+            });
+        } else {
+            this.root = this; // No Light DOM, a "raiz" é o próprio elemento (<my-component>)
+        }
     }
 
     // ****************************************************************************
@@ -101,7 +592,7 @@ class BaseComponent extends HTMLElement {
 
     configSlot(){
         const slot = this.root.querySelector('slot');
-        if(!slot) throw new Error("O seu método render() deve incluir um <slot> para o conteúdo interno do componente.");
+        if(this.constructor.useShadow===true && !slot) throw new Error("O seu método render() deve incluir um <slot> para o conteúdo interno do componente.");
 
         this.postConfig(); // invoca o metodo abstrato de pós-configuração
     }
@@ -238,7 +729,6 @@ class BaseComponent extends HTMLElement {
 
     }
 }
-
 class Button extends BaseComponent {
     // Mapa de propriedades
     static get PROP_MAP() {
@@ -253,11 +743,11 @@ class Button extends BaseComponent {
     }
     static get ATTR_MAP() {
         return {
-            'bgcolor': '--bg-color-btn', // cor do fundo botão
-            'color': '--text-color-btn', // cor do texto do botão
+            'bgcolor': '--bg-color-button', // cor do fundo botão
+            'color': '--text-color', // cor do texto do botão
         };
     }
-    static get observedAttributes() {const props = Object.keys(this.PROP_MAP);const attrs = Object.keys(this.ATTR_MAP);return [...props, ...attrs];}
+    static get observedAttributes() {return [...Object.keys(this.PROP_MAP), ...Object.keys(this.ATTR_MAP)];}
     constructor() {super();}
     
     // ****************************************************************************
@@ -361,12 +851,11 @@ algol_button_sheet.replaceSync(`
         padding: calc(0.6vw * var(--scale-factor)) calc(1.2vw * var(--scale-factor));
         min-height: calc(2.4vw * var(--scale-factor));
         border-radius: calc(var(--border-radius-components) * var(--scale-factor));
-        background-color: var(--bg-color-btn);
-        color: var(--text-color-btn);
+        background-color: var(--bg-color-button);
+        color: var(--text-color);
         font-family: 'Algol Font';
         font-weight: 200;
         font-size: calc(var(--font-size-btn)* var(--scale-factor));
-        transition: filter 0.2s, transform 0.1s; 
     }
 
     /* --- Hover e Active --------------------------------------------------------------- */
@@ -393,8 +882,8 @@ algol_button_sheet.replaceSync(`
 
     /* --- Estado Disabled ------------------------------------------------------------- */
     button:disabled {
-        background-color: var(--bg-color-forms-disabled, #ccc);
-        color: var(--text-color-forms-disabled, #666);
+        background-color: var(--bg-color-inputs-disabled);
+        color: var(--text-color-disabled);
         cursor: not-allowed;
         opacity: 0.7;
     }
@@ -433,6 +922,142 @@ algol_button_sheet.replaceSync(`
 
 // ----------------------------------------------------------------------------------------------------------------------------------
 customElements.define('algol-button', Button); // Registra o componente customizado
+
+class Image extends BaseComponent {
+    // Mapa de atributos válidos (chaves) e seus respectivos métodos (valores)
+    static get PROP_MAP() {
+        return {
+            'src': 'update_src',
+            'alt': 'update_alt',
+            'width': 'update_width',
+            'height': 'update_height',
+            'expand': 'update_expand',
+            'lazy': 'update_lazy',
+        };
+    }
+    static get observedAttributes() {return Object.keys(this.PROP_MAP);} // retorna a chaves do mapa de atributos
+    constructor() {super();}
+
+    // ****************************************************************************
+    // Métodos de construção do componente
+    // ****************************************************************************
+
+    /** @override */
+    render() {
+        this.root.adoptedStyleSheets = [algol_image_sheet]; // aplica o estilo do componente (compartilhado)
+        this.root.innerHTML = `
+            <img loading="eager">
+            <div class="error">⚠️ Image not loaded!</div>  
+            <slot></slot>
+        `;
+    }
+    /** @override */
+    postConfig(){
+        // salva as referências globais dos componentes
+        this.elems.img = this.root.querySelector('img');
+        this.elems.error = this.root.querySelector('.error');
+        this.elems.slot = this.root.querySelector('slot');
+
+        // criação de id único para o img
+        const idUnico = `img-${BaseComponent._idCont++}`;
+        this.elems.img.id = idUnico;
+    }
+    /** @override */
+    attachEvents(){
+        this.elems.img.addEventListener('load', () => { 
+            this.elems.error.style.display = 'none';
+            this.elems.img.style.display = 'block';
+            // Dispara evento customizado para o pai saber que carregou
+            this.dispatchEvent(new CustomEvent('algol-image-load', { bubbles: true, composed: true }));
+            this._atualizarValidacao(true);
+        });
+        // 2. Evento de Erro (404, rede, etc)
+        this.elems.img.addEventListener('error', () => {
+            this.elems.error.style.display = 'block';
+            this.elems.img.style.display = 'none';
+            // Dispara evento customizado de erro
+            this.dispatchEvent(new CustomEvent('algol-image-error', { bubbles: true, composed: true }));
+            this._atualizarValidacao(false);
+        });
+    }
+
+    // ****************************************************************************
+    // Métodos dos atributos
+    // ****************************************************************************
+
+    update_src(val) {
+        if (!this.elems.img) return; // guard
+        // Assume que vai dar certo (mostra img, esconde erro) enquanto carrega
+        this.elems.error.style.display = 'none';
+        this.elems.img.style.display = 'block';
+        this.elems.img.src = val;
+    }
+    update_alt(val) {
+        if (!this.elems.img) return; // guard
+        this.elems.img.alt = val;
+    }
+    update_width(val) {
+        if (!this.elems.img) return; // guard
+        this.elems.img.width = val;
+    }
+    update_height(val) {
+        if (!this.elems.img) return; // guard
+        this.elems.img.height = val;
+    }
+    update_expand(val) {
+        if (!this.elems.img) return;
+        if(this.hasAttribute('expand')) this.elems.img.style.width = '100%';
+        else this.elems.img.style.removeProperty('width');
+    }
+    update_lazy(val) {
+        if (!this.elems.img) return;
+        this.elems.img.loading = this.hasAttribute('lazy')?'lazy':'eager';
+    }
+
+    // ****************************************************************************
+    // Utils
+    // ****************************************************************************
+
+    // Atualiza a validação de form do elemento customizado
+    _atualizarValidacao(carregouSucesso = true) {
+        // Se a imagem não participa de forms, isso é opcional, 
+        // mas útil se quiser impedir submit de form com imagem quebrada.
+        if (!this._internals) return;
+
+        if (!carregouSucesso) {
+            this._internals.setValidity(
+                { badInput: true }, // Flag para "dado inválido"
+                "A imagem não pôde ser carregada.",
+                this.elems.img
+            );
+        } else {
+            this._internals.setValidity({});
+        }
+    }
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------
+// 1. CSS Fora da Classe, Mais performático e limpo (adoptedStyleSheets)
+const algol_image_sheet = new CSSStyleSheet();
+algol_image_sheet.replaceSync(`
+    :host {
+        display: block;
+    }
+    slot {display: none;}
+    img{
+        max-width: 100%;
+        height: auto;
+        display: block;     /* remove espaço fantasma */
+        object-fit: cover;   /* preenche tudo, pode cortar */
+    }
+    .error{
+        display: none;
+        text-align: center;
+    }
+`);
+
+// ----------------------------------------------------------------------------------------------------------------------------------
+customElements.define('algol-image', Image); // Registra o componente customizado
 
 class Input extends BaseComponent {
     // Mapa de atributos válidos (chaves) e seus respectivos métodos (valores)
@@ -573,15 +1198,7 @@ class InputNumber extends Input {
     // Mapa de atributos válidos (chaves) e seus respectivos métodos (valores)
     static get PROP_MAP() {
         return {
-            'label': 'update_label',
-            'value': 'update_value',
-            'placeholder': 'update_placeholder',
-            'disabled': 'update_disabled',
-            'required': 'update_required',
-            'type': 'update_type',
-            'minlength': 'update_minlength',
-            'maxlength': 'update_maxlength',
-
+            ...super.PROP_MAP, // Herda tudo de Input
             // exclusivos de input number
             'min': 'update_min',
             'max': 'update_max',
@@ -731,6 +1348,381 @@ class InputNumber extends Input {
 
 }
 
+class InputDate extends Input {
+    // Mapa de atributos válidos (chaves) e seus respectivos métodos (valores)
+    static get PROP_MAP() {
+        return {
+            ...super.PROP_MAP, // Herda tudo de Input
+            'min': 'update_min',
+            'max': 'update_max',
+        };
+    }
+    static get observedAttributes() {return Object.keys(this.PROP_MAP);} // retorna a chaves do mapa de atributos
+    constructor() {super();}
+
+    // ****************************************************************************
+    // Métodos de construção do componente
+    // ****************************************************************************
+    
+    /** @override */
+    postConfig(){
+        super.postConfig();
+        this.elems.input.type = 'date';
+    }
+
+    /** @override */
+    attachEvents(){
+        super.attachEvents();
+    }
+
+    // ****************************************************************************
+    // Métodos dos atributos
+    // ****************************************************************************
+    
+    update_min(val) {
+        if (!this.elems.input) return;
+        if (!val) { // se não houver valor, remove o atributo
+            this.elems.input.removeAttribute('min');
+            this._atualizarValidacao();
+            return;
+        }
+        let valorFinal = val;
+        // verifica formato brasileiro DD/MM/AAAA e atualiza o valor final
+        if (/^\d{2}\/\d{2}\/\d{4}$/.test(val)) {
+            const [dia, mes, ano] = val.split('/');
+            valorFinal = `${ano}-${mes}-${dia}`; // Converte para ISO (AAAA-MM-DD)
+        }
+        this.elems.input.min = valorFinal;
+        this._atualizarValidacao();
+    }
+
+    update_max(val) {
+        if (!this.elems.input) return;
+        if (!val) { // se não houver valor, remove o atributo
+            this.elems.input.removeAttribute('max');
+            this._atualizarValidacao();
+            return;
+        }
+        let valorFinal = val;
+        // verifica formato brasileiro DD/MM/AAAA e atualiza o valor final
+        if (/^\d{2}\/\d{2}\/\d{4}$/.test(val)) {
+            const [dia, mes, ano] = val.split('/');
+            valorFinal = `${ano}-${mes}-${dia}`; // Converte para ISO (AAAA-MM-DD)
+        }
+        this.elems.input.max = valorFinal;
+        this._atualizarValidacao();
+    }
+
+    // ****************************************************************************
+    // Validação Específica para Datas
+    // ****************************************************************************
+
+    /** @override */
+    _atualizarValidacao() {
+        if (!this.elems.input) return;
+
+        const validadeInterna = this.elems.input.validity;
+
+        if (!validadeInterna.valid) {
+            // Mapeamento de flags específicas para DATA/NÚMERO
+            const flags = {
+                valueMissing: validadeInterna.valueMissing,     // Required
+                rangeUnderflow: validadeInterna.rangeUnderflow, // Data anterior ao 'min'
+                rangeOverflow: validadeInterna.rangeOverflow,   // Data posterior ao 'max'
+                badInput: validadeInterna.badInput,             // Data inválida (ex: 31/02)
+                stepMismatch: validadeInterna.stepMismatch      // Fora do 'step' (se usar)
+            };
+
+            this._internals.setValidity(
+                flags,
+                this.elems.input.validationMessage, // Mensagem nativa ("Selecione uma data válida...")
+                this.elems.input
+            );
+        } else {
+            this._internals.setValidity({});
+        }
+    }
+}
+
+class InputTime extends Input {
+    // Mapa de atributos
+    static get PROP_MAP() {
+        return {
+            ...super.PROP_MAP, // Herda label, required, disabled, etc.
+            'min': 'update_min',
+            'max': 'update_max',
+            'step': 'update_step' // Controla a precisão (segundos/milissegundos)
+        };
+    }
+    static get observedAttributes() {return Object.keys(this.PROP_MAP);}
+    constructor() {super();}
+
+    // ****************************************************************************
+    // Ciclo de Vida
+    // ****************************************************************************
+    
+    /** @override */
+    postConfig(){
+        super.postConfig(); // Configura container, label, input, slot...
+        this.elems.input.type = 'time';
+    }
+
+    /** @override */
+    attachEvents(){
+        super.attachEvents(); // Ganha validação e update_value de graça
+    }
+
+    // ****************************************************************************
+    // Métodos dos atributos
+    // ****************************************************************************
+    
+    update_min(val) {
+        if (!this.elems.input) return;
+        // Time usa formato HH:MM ou HH:MM:SS. Não requer conversão complexa de data.
+        if (val) this.elems.input.min = val;
+        else this.elems.input.removeAttribute('min');
+        this._atualizarValidacao();
+    }
+
+    update_max(val) {
+        if (!this.elems.input) return;
+        if (val) this.elems.input.max = val;
+        else this.elems.input.removeAttribute('max');
+        this._atualizarValidacao();
+    }
+
+    // O atributo STEP é crucial para Time.
+    // step="60" (padrão) -> Mostra apenas HH:MM
+    // step="1" -> Mostra HH:MM:SS
+    update_step(val) {
+        if (!this.elems.input) return;
+        if (val) this.elems.input.step = val;
+        else this.elems.input.removeAttribute('step');
+        this._atualizarValidacao();
+    }
+
+    // ****************************************************************************
+    // Validação Específica (Idêntica à de Data)
+    // ****************************************************************************
+
+    /** @override */
+    _atualizarValidacao() {
+        if (!this.elems.input) return;
+
+        const validadeInterna = this.elems.input.validity;
+
+        if (!validadeInterna.valid) {
+            const flags = {
+                valueMissing: validadeInterna.valueMissing,     // Required
+                rangeUnderflow: validadeInterna.rangeUnderflow, // Hora anterior ao 'min'
+                rangeOverflow: validadeInterna.rangeOverflow,   // Hora posterior ao 'max'
+                badInput: validadeInterna.badInput,             // Hora inválida
+                stepMismatch: validadeInterna.stepMismatch      // Fora do 'step' (ex: digitou segundos sem step=1)
+            };
+
+            this._internals.setValidity(
+                flags,
+                this.elems.input.validationMessage, 
+                this.elems.input
+            );
+        } else {
+            this._internals.setValidity({});
+        }
+    }
+}
+
+class InputColor extends Input {
+    // Mapa de atributos (Color é simples: só label, value e disabled importam)
+    static get PROP_MAP() {
+        return {
+            'label': 'update_label',
+            'value': 'update_value',
+            'disabled': 'update_disabled'
+        };
+    }
+    static get observedAttributes() {return Object.keys(this.PROP_MAP);}
+    constructor() {super();}
+
+    // ****************************************************************************
+    // Ciclo de Vida
+    // ****************************************************************************
+    
+    /** @override */    
+    render() {
+        this.root.adoptedStyleSheets = [algol_input_sheet]; // aplica o estilo do componente (compartilhado)
+        this.root.innerHTML = `
+            <div class="container" tabindex="-1">
+                <label></label>
+                <input type="color" style="display:none">
+                <div class="color-border" tabindex="0">
+                   <div class="color-box" tabindex="-1"></div>
+                </div>
+            </div>
+            <slot></slot>
+        `;
+    }
+
+    /** @override */
+    postConfig(){
+        super.postConfig();
+        
+        this.elems.colorBorder = this.root.querySelector('.color-border');
+        this.elems.colorBox = this.root.querySelector('.color-box');
+
+        // CORREÇÃO: Remove a associação automática do label com o input escondido
+        this.elems.label.removeAttribute('for');
+
+        if (!this.value){
+            this.value = '#f00'; // cor padrão inicial
+            this.elems.input.value = '#f00';
+        }
+        this._atualizarVisual(this.value);
+    }
+
+    /** @override */
+    attachEvents(){
+        super.attachEvents();
+        this.elems.colorBox.addEventListener('click', (e) => {
+            if (this.hasAttribute('disabled')) return;
+            this.elems.input.click(); // abre o seletor de cor nativo
+        });
+        // ao digitar no input color, atualiza a cor do box REAL-TIME
+        this.elems.input.addEventListener('input', (e) => {
+            const novaCor = e.target.value;
+            this._atualizarVisual(novaCor);
+        });
+        // ao mudar o valor do input color, atualiza a cor do box
+        this.elems.input.addEventListener('change', (e) => {
+             this._atualizarVisual(e.target.value);
+        });
+
+    }
+
+    // ****************************************************************************
+    // Métodos dos atributos
+    // ****************************************************************************
+    
+    /** @override */
+    update_value(val) {
+        if (!this.elems.input) return;
+        super.update_value(val);
+        this._atualizarVisual(val);
+    }
+    update_disabled(val) {
+        super.update_disabled(val);
+        if (!this.elems.colorBorder) return;
+        if (this.hasAttribute('disabled')) {
+            this.elems.colorBorder.removeAttribute('tabindex');
+        } else {
+            this.elems.colorBorder.setAttribute('tabindex', '0');
+        }
+        this._atualizarVisual(val);
+    }
+
+    // ****************************************************************************
+    // Utils
+    // ****************************************************************************
+
+    _atualizarVisual(cor) {
+        if(this.elems.colorBox) {
+            this.elems.colorBox.style.backgroundColor = cor;
+        }
+    }
+
+    // ****************************************************************************
+    // Validação
+    // ****************************************************************************
+
+    /** @override */
+    _atualizarValidacao() {
+        // Input color é sempre válido (validity.valid é sempre true),
+        if (this._internals) this._internals.setValidity({});
+    }
+}
+
+class InputRange extends Input {
+    static get PROP_MAP() {
+        return {
+            ...super.PROP_MAP, // Herda label, required, disabled, etc.
+            'min': 'update_min',
+            'max': 'update_max',
+            'step': 'update_step'
+        };
+    }
+    static get observedAttributes() {return Object.keys(this.PROP_MAP);}
+    constructor() {super();}
+
+    // ****************************************************************************
+    // Ciclo de Vida
+    // ****************************************************************************
+    
+    /** @override */
+    postConfig(){
+        super.postConfig(); // Configura container, label, input, slot...
+        this.elems.input.type = "range";
+    }
+
+    /** @override */
+    attachEvents(){
+        super.attachEvents(); // Ganha validação e update_value de graça
+    }
+
+    // ****************************************************************************
+    // Métodos dos atributos
+    // ****************************************************************************
+    
+    update_min(val) {
+        if (!this.elems.input) return;
+        if (val) this.elems.input.min = val;
+        else this.elems.input.removeAttribute('min');
+        this._atualizarValidacao();
+    }
+
+    update_max(val) {
+        if (!this.elems.input) return;
+        if (val) this.elems.input.max = val;
+        else this.elems.input.removeAttribute('max');
+        this._atualizarValidacao();
+    }
+
+    update_step(val) {
+        if (!this.elems.input) return;
+        if (val) this.elems.input.step = val;
+        else this.elems.input.removeAttribute('step');
+        this._atualizarValidacao();
+    }
+
+    // ****************************************************************************
+    // Validação Específica (Idêntica à de Data)
+    // ****************************************************************************
+
+    /** @override */
+    _atualizarValidacao() {
+        if (!this.elems.input) return;
+
+        const validadeInterna = this.elems.input.validity;
+
+        // Nota: Range dificilmente falha na interação do usuário, 
+        // mas protege contra valores inválidos via JS.
+        if (!validadeInterna.valid) {
+            const flags = {
+                valueMissing: validadeInterna.valueMissing,    
+                rangeUnderflow: validadeInterna.rangeUnderflow, 
+                rangeOverflow: validadeInterna.rangeOverflow,   
+                stepMismatch: validadeInterna.stepMismatch      
+            };
+
+            this._internals.setValidity(
+                flags,
+                this.elems.input.validationMessage, 
+                this.elems.input
+            );
+        } else {
+            this._internals.setValidity({});
+        }
+    }
+}
+
 // ----------------------------------------------------------------------------------------------------------------------------------
 // 1. CSS Fora da Classe, Mais performático e limpo (adoptedStyleSheets)
 const algol_input_sheet = new CSSStyleSheet();
@@ -748,9 +1740,55 @@ algol_input_sheet.replaceSync(`
         
     }
     label {
-        color: var(--text-color-forms-label);
+        color: var(--text-color-label);
         font-size: calc(1.0vw * var(--scale-factor));
     }
+    :host([disabled]) label{
+        color: var(--text-color-label-disabled);
+    }
+    input::-webkit-calendar-picker-indicator { /* Chrome & others*/
+        color-scheme: var(--theme-color-scheme);
+    }
+    input {
+        color-scheme: var(--theme-color-scheme);
+        appearance: none;
+        -webkit-appearance: none;
+        outline: none;
+        box-sizing: border-box;
+        width: 100%;
+        padding: calc(0.8vw * var(--scale-factor)) calc(1.1vw * var(--scale-factor));
+        background: var(--bg-color-inputs);
+        color: var(--text-color);
+        border: calc(0.1vw * var(--scale-factor)) solid var(--border-color-forms);
+        border-radius: calc(var(--border-radius-components) * var(--scale-factor));
+        
+        font-family: 'Algol Font';
+        font-weight: 100;
+        font-size: calc(1.1vw * var(--scale-factor));
+        line-height: calc(var(--line-height) * var(--scale-factor));
+    }
+    :host([disabled]) input{
+        background-color: var(--bg-color-inputs-disabled) !important;
+        color: var(--text-color-disabled) !important;
+        cursor: not-allowed;
+    }
+    :host(:focus-within) input {
+        border-color: var(--border-color-focus); /* Exemplo */
+        box-shadow: 0 0 0 calc(0.1vw * var(--scale-factor)) var(--border-color-focus-glow) /* "Glow" externo */
+    }
+    input::placeholder {
+        color: var(--text-color-placeholder) !important;
+    }
+    :host([disabled]) input::placeholder {
+        color: var(--text-color-placeholder-disabled) !important;
+    }
+
+    /* --- ESTILOS ESPECÍFICOS PARA INPUT NUMBER --- */
+
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button {-webkit-appearance: none;margin: 0;}
+    input[type="number"] {-moz-appearance: textfield;}
+    
     .input-container{
         display: flex;
         flex-direction: row;
@@ -785,31 +1823,10 @@ algol_input_sheet.replaceSync(`
         background-color: var(--bg-color-btn-spinner-hover);
     }
     .btnup:active, .btndown:active{
+        transform: translateY(calc(0.09vw * var(--scale-factor))); /* Efeito de clique */
         background-color: var(--bg-color-btn-spinner-hover);
     }
-    .container input {
-        appearance: none;
-        -webkit-appearance: none;
-        outline: none;
-        box-sizing: border-box;
-        width: 100%;
-        padding: calc(0.8vw * var(--scale-factor)) calc(1.1vw * var(--scale-factor));
-        background: var(--bg-color-forms);
-        color: var(--text-color);
-        border: calc(0.1vw * var(--scale-factor)) solid var(--border-color-forms);
-        border-radius: calc(var(--border-radius-components) * var(--scale-factor));
-        
-        font-family: 'Algol Font';
-        font-weight: 100;
-        font-size: calc(1.1vw * var(--scale-factor));
-        line-height: calc(var(--line-height) * var(--scale-factor));
-    }
-    /* Para o estado disabled */
-    :host([disabled]) input{
-        background-color: var(--bg-color-forms-disabled) !important;
-        color: var(--text-color-forms-disabled) !important;
-        cursor: not-allowed;
-    }
+
     :host([disabled]) .btnup,:host([disabled]) .btndown{
         background-color: var(--bg-color-btn-spinner-disabled) !important;
         color: var(--text-color-btn-spinner-disabled) !important;
@@ -821,15 +1838,143 @@ algol_input_sheet.replaceSync(`
     :host([disabled]) .btndown{
         border-top-color:var(--border-color-btn-spinner-disabled) !important;
     }
-    :host(:focus-within) input {
-        border-color: var(--border-color-focus); /* Exemplo */
-        box-shadow: 0 0 0 calc(0.1vw * var(--scale-factor)) var(--border-color-focus-glow) /* "Glow" externo */
+    
+
+    /* --- ESTILOS ESPECÍFICOS PARA INPUT COLOR --- */
+    .color-border{
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: calc(5vw * var(--scale-factor));
+        height: calc(3vw * var(--scale-factor));
+        background: var(--bg-color-inputs);
+        border: calc(0.1vw * var(--scale-factor)) solid var(--border-color-forms);
+        border-radius: calc(var(--border-radius-components) * var(--scale-factor));
     }
+    :host(:focus-within) .color-border,
+    .color-border:focus {
+        border-color: var(--border-color-focus);
+        box-shadow: 0 0 0 calc(0.1vw * var(--scale-factor)) var(--border-color-focus-glow);
+    }
+    :host([disabled]) .color-border,
+    :host([disabled]) .color-border:focus {
+        border-color: #0000 !important;
+        box-shadow: none;
+    }
+    :host([disabled]) .color-border{
+        background: var(--bg-color-inputs-disabled) !important;
+        cursor: not-allowed;
+    }
+    
+    .color-box{
+        cursor: pointer;
+        width: calc(4vw * var(--scale-factor));
+        height: calc(2vw * var(--scale-factor));
+    }
+    :host([disabled]) .color-box{
+        background: var(--bg-color-inputs-disabled) !important;
+        cursor: not-allowed;
+        filter: brightness(0.8); /* leve escurecida */
+    }
+    :host(:not([disabled])) .color-box:hover, :host(:not([disabled])) .color-border:hover{
+        filter: brightness(0.9); /* leve escurecida */
+    }
+    :host(:not([disabled])) .color-box:active{
+        transform: translateY(calc(0.09vw * var(--scale-factor))); /* Efeito de clique */
+        filter: brightness(0.8);
+    }
+
+    /* --- ESTILOS ESPECÍFICOS PARA INPUT RANGE --- */
+
+    input[type="range"] {        
+        background: transparent; /* Importante: remove o fundo de input texto */
+        padding: 0;              /* Slider não deve ter padding interno */
+        width: 100%;
+        border:none;
+        min-height: calc(2.4vw * var(--scale-factor)); /* Mantém a altura para alinhamento */
+        cursor: pointer;
+    }
+    input[type="range"]:focus {
+        outline: none;
+        box-shadow: none;
+    }
+    
+    /* trilho do range ----------------------------------------------------------- */
+    input[type="range"]::-moz-range-track { /* Firefox */
+        width: 100%;
+        height: calc(0.4vw * var(--scale-factor));
+        background: var(--bg-color-inputs);
+        border-radius: calc(0.2vw * var(--scale-factor));
+        cursor: pointer;
+    }
+    :host([disabled]) input[type="range"]::-moz-range-track { /* Chrome & others */
+        background: var(--bg-color-inputs-disabled) !important;
+    }
+
+    input[type="range"]::-webkit-slider-runnable-track {
+        width: 100%;
+        height: calc(0.4vw * var(--scale-factor));
+        background: var(--bg-color-inputs);
+        border-radius: calc(0.2vw * var(--scale-factor));
+        cursor: pointer;
+    }
+    :host([disabled]) input[type="range"]::-webkit-slider-runnable-track {
+        cursor: not-allowed;
+        background: var(--bg-color-inputs-disabled) !important;
+    }
+    /* bolinha do range ----------------------------------------------------------- */
+    input[type="range"]::-webkit-slider-thumb {/* bolinha Chrome, Safari, Edge */
+        -webkit-appearance: none; /* Necessário para estilizar */
+        height: calc(1.2vw * var(--scale-factor));
+        width: calc(1.2vw * var(--scale-factor));
+        border-radius: 50%;
+        background: var(--text-color); /* Cor da bolinha */
+        border: none;
+        margin-top: calc(-0.4vw * var(--scale-factor)); 
+    }
+   
+    input[type="range"]::-moz-range-thumb { /* bolinha Firefox */
+        height: calc(1.2vw * var(--scale-factor));
+        width: calc(1.2vw * var(--scale-factor));
+        border-radius: 50%;
+        background: var(--text-color);
+        border: none;
+    }
+    input[type="range"]::-webkit-slider-thumb:hover { /* Hover da bolinha Chrome, Safari, Edge */
+        transform: scale(1.2); /* Cresce um pouco */
+        background: var(--border-color-focus);
+    }
+    input[type="range"]::-moz-range-thumb:hover { /* Hover da bolinha firefox */
+        transform: scale(1.2);
+        background: var(--border-color-focus);
+    }
+    input[type="range"]:focus::-moz-range-thumb {
+        box-shadow: 0 0 0 calc(0.3vw * var(--scale-factor)) var(--border-color-focus-glow);
+    }
+    input[type="range"]:focus::-webkit-slider-thumb {
+        box-shadow: 0 0 0 calc(0.3vw * var(--scale-factor)) var(--border-color-focus-glow);
+    }
+    :host([disabled]) input[type="range"]{
+        background: #0000 !important; /* remove o fundo */
+        cursor: not-allowed;
+    }
+    :host([disabled]) input[type="range"]::-moz-range-thumb {
+        background: var(--text-color-disabled) !important;
+    }
+    :host([disabled]) input[type="range"]::-webkit-slider-thumb {
+        background: var(--text-color-disabled) !important;
+        cursor: not-allowed;
+    }
+    
 `);
 
 // ----------------------------------------------------------------------------------------------------------------------------------
 customElements.define('algol-input', Input); // Registra o componente customizado
 customElements.define('algol-input-number', InputNumber); // Registra o componente customizado
+customElements.define('algol-input-date', InputDate);
+customElements.define('algol-input-time', InputTime);
+customElements.define('algol-input-color', InputColor); 
+customElements.define('algol-input-range', InputRange);
 
 class Select extends BaseComponent {
     // Mapa de atributos válidos (chaves) e seus respectivos métodos (valores)
@@ -950,13 +2095,14 @@ class Select extends BaseComponent {
         if (!this.elems.select) return;
         // Pega a validade nativa do select escondido
         const validadeInterna = this.elems.select.validity; // obtem a validade do select interno
+        const mensagem = this.elems.select.validationMessage || "Select option!.";
         if (!validadeInterna.valid) { // Se for inválido
             this._internals.setValidity( // seta a validade do elemento customizado
                 { 
                     valueMissing: validadeInterna.valueMissing,
                     valid: false 
                 }, 
-                this.elems.select.validationMessage, 
+                mensagem, 
                 this.elems.select, // onde a 'bolha' de erro deve aparecer
             );
         } else this._internals.setValidity({}); // Se for válido, limpa o erro
@@ -978,16 +2124,19 @@ algol_select_sheet.replaceSync(`
         margin-bottom: calc(1.0vw * var(--scale-factor));
         width: 100%;
     }
-    .container label {
-        color: var(--text-color-forms-label);
+    label {
+        color: var(--text-color-label);
         font-size: calc(1.0vw * var(--scale-factor));
     }
-    .container select {
+    :host([disabled]) label{
+        color: var(--text-color-label-disabled);
+    }
+    select {
         appearance: none;
         -webkit-appearance: none;
         outline: none;
         box-sizing: border-box;
-        background: var(--bg-color-forms);
+        background: var(--bg-color-inputs);
         color: var(--text-color);
         border: calc(0.1vw * var(--scale-factor)) solid var(--border-color-forms);
         border-radius: calc(var(--border-radius-components) * var(--scale-factor));
@@ -1001,9 +2150,9 @@ algol_select_sheet.replaceSync(`
         line-height: calc(var(--line-height) * var(--scale-factor));
     }
     /* Para o estado disabled */
-    :host([disabled]) .container select{
-        background-color: var(--bg-color-forms-disabled) !important;
-        color: var(--text-color-forms-disabled) !important;
+    :host([disabled]) select{
+        background-color: var(--bg-color-inputs-disabled) !important;
+        color: var(--text-color-disabled) !important;
         cursor: not-allowed;
     }
     :host(:focus-within) select {
@@ -1014,6 +2163,73 @@ algol_select_sheet.replaceSync(`
 
 // ----------------------------------------------------------------------------------------------------------------------------------
 customElements.define('algol-select', Select); // Registra o componente customizado
+
+class Spacer extends BaseComponent {
+    // Mapa de atributos válidos (chaves) e seus respectivos métodos (valores)
+    static get PROP_MAP() {
+        return {
+            'value': 'update_value',
+            'valuebreak': 'update_valuebreak',
+        };
+    }
+    static get observedAttributes() {return Object.keys(this.PROP_MAP);} // retorna a chaves do mapa de atributos
+    constructor() {super();}
+
+    // ****************************************************************************
+    // Métodos de construção do componente
+    // ****************************************************************************
+
+    /** @override */
+    render() {
+        this.root.adoptedStyleSheets = [algol_spacer_sheet]; // aplica o estilo do componente (compartilhado)
+        this.root.innerHTML = `<slot></slot>`;
+    }
+    /** @override */
+    postConfig(){}
+    /** @override */
+    attachEvents(){}
+
+    // ****************************************************************************
+    // Métodos dos atributos
+    // ****************************************************************************
+
+    update_value(val) {
+        this.style.setProperty('--spacer-value', this._toVw(val));
+    }
+    update_valuebreak(val) {
+        this.style.setProperty('--spacer-valuebreak', this._toVw(val));
+    }
+
+    // ****************************************************************************
+    // Utils
+    // ****************************************************************************
+
+    _toVw(val) {
+        const num = parseFloat(val); // converte para numero puro (ex: "10px" vira 10)
+        if (!isNaN(num)) {return `${num}vw`;} // 2. Verifica se o resultado é um número válido
+        return '0vw'; // Valor de fallback caso venha lixo
+    }
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------
+// 1. CSS Fora da Classe, Mais performático e limpo (adoptedStyleSheets)
+const algol_spacer_sheet = new CSSStyleSheet();
+algol_spacer_sheet.replaceSync(`
+    :host {
+        display: block;
+        width: 100%;
+    }
+    :host([value]){ height: var(--spacer-value);}
+        
+    slot {display: none;}
+    @media (max-width: ${MOBILE_BREAKPOINT}) {
+        :host([valuebreak]) {height: var(--spacer-valuebreak);}
+    }
+`);
+
+// ----------------------------------------------------------------------------------------------------------------------------------
+customElements.define('algol-spacer', Spacer); // Registra o componente customizado
+
 class TextArea extends BaseComponent {
     // Mapa de atributos válidos (chaves) e seus respectivos métodos (valores)
     static get PROP_MAP() {
@@ -1085,7 +2301,7 @@ class TextArea extends BaseComponent {
             this._internals.setFormValue(novoValor); // Informa ao formulário nativo (API Internals)
             this._atualizarValidacao();
         });
-        this.elems.textarea.addEventListener('change',() => {
+        this.elems.textarea.addEventListener('change',(e) => {
             this._atualizarValidacao(); 
         });
     }
@@ -1159,17 +2375,20 @@ algol_textarea_sheet.replaceSync(`
         margin-bottom: calc(1.0vw * var(--scale-factor));
         width: 100%;
     }
-    .container label {
-        color: var(--text-color-forms-label);
+    label {
+        color: var(--text-color-label);
         font-size: calc(1.0vw * var(--scale-factor));
     }
-    .container textarea {
+    :host([disabled]) label {
+        color: var(--text-color-label-disabled);
+    }
+    textarea {
         appearance: none;
         -webkit-appearance: none;
         outline: none;
         box-sizing: border-box;
         width: 100%;
-        background: var(--bg-color-forms);
+        background: var(--bg-color-inputs);
         color: var(--text-color);
         border: calc(0.1vw * var(--scale-factor)) solid var(--border-color-forms);
         border-radius: calc(var(--border-radius-components) * var(--scale-factor));
@@ -1185,10 +2404,11 @@ algol_textarea_sheet.replaceSync(`
         min-height: calc(3.5vw * var(--scale-factor)); /* Altura mínima decente */
     }
     /* Para o estado disabled */
-    :host([disabled]) .container textarea{
-        background-color: var(--bg-color-forms-disabled) !important;
-        color: var(--text-color-forms-disabled) !important;
-        cursor: not-allowed;
+    :host([disabled]) textarea{
+        background-color: var(--bg-color-inputs-disabled) !important;
+        color: var(--text-color-disabled) !important;
+        cursor: not-allowed !important;
+        user-select: none !important;
     }
     :host(:focus-within) textarea {
         border-color: var(--border-color-focus); /* Exemplo */
@@ -1198,221 +2418,3 @@ algol_textarea_sheet.replaceSync(`
 
 // ----------------------------------------------------------------------------------------------------------------------------------
 customElements.define('algol-textarea', TextArea); // Registra o componente customizado
-
-class BaseLayout extends HTMLElement {
-    static get observedAttributes() { return []; } 
-    
-    constructor() {
-        super();
-        this.elems = {}; // cache de elementos internos do componente
-        this.inicializado = false;
-        this._observerEstrutura = null; // observer das mudanças internas 
-    }
-
-    // ****************************************************************************
-    // Métodos de construção do componente
-    // ****************************************************************************
-
-    /** @abstract */
-    postConfig() { throw new Error("Método 'postConfig' deve ser implementado."); }
-
-    // ****************************************************************************
-    // Ciclo de Vida de HTMLElement
-    // ****************************************************************************
-
-    /** @override */
-    connectedCallback() {
-        this._ativarMonitoramentoDeConteudo();
-        if (this.inicializado) return; // se já foi construído, não faz nada!
-
-        this._desativarMonitoramentoDeConteudo();
-        this.postConfig(); // invoca o metodo abstrato de pós-configuração
-
-        // Aplica valores iniciais dos atributos
-        for(const attr of this.constructor.observedAttributes){
-            const val = this.getAttribute(attr);
-            if (val !== null) this.attributeChangedCallback(attr, null, val);
-        };
-
-        this._ativarMonitoramentoDeConteudo();
-        this.inicializado = true;
-    }
-    
-    /** @override */
-    disconnectedCallback() {
-        this._desativarMonitoramentoDeConteudo();
-    }
-
-    /** @override */
-    attributeChangedCallback(name, oldValue, newValue) {
-        if (oldValue === newValue) return;
-
-        // 1. Tenta pegar a configuração do mapa de atributos da classe filha
-        const map = this.constructor.ATTR_MAP;
-        if (!map || !map[name]) return; // se não existir mapa ou atributo, abandona 
-
-        const config = map[name]; // obtem o atributo
-        
-        // Normaliza a configuração (para suportar string simples ou objeto)        
-        const isObj = typeof config === 'object';
-        const cssVar = isObj ? config.var : config;
-        const prefix = (isObj && config.prefix) ? config.prefix : '';
-        const suffix = (isObj && config.suffix) ? config.suffix : '';
-
-        // Aplica a variável CSS diretamente no elemento (inline style)
-        this.style.setProperty(cssVar, prefix + newValue + suffix);
-    }
-    
-    // ****************************************************************************
-    // Monitoramento de Estrutura (MutationObserver)
-    // ****************************************************************************
-
-    _ativarMonitoramentoDeConteudo() {
-        if (this._observerEstrutura) return; // Já ativo
-        
-        const callback = (mutationsList) => {
-            // Dispara o evento personalizado planejado
-            this.dispatchEvent(new CustomEvent('algol-layout-update', {
-                bubbles: true,
-                composed: true,
-                detail: {
-                    origin: this,
-                    mutations: mutationsList,
-                },
-            }));
-        };
-        
-        this._observerEstrutura = new MutationObserver(callback);
-        this._observerEstrutura.observe(this, { childList: true, subtree: false, characterData: false});
-    }
-    _desativarMonitoramentoDeConteudo() {
-        if (this._observerEstrutura) {
-            this._observerEstrutura.disconnect();
-            this._observerEstrutura = null;
-        }
-    }
-
-    // ****************************************************************************
-    // Helper Estático para Injeção de CSS do layout no Head da página
-    // ****************************************************************************
-    static _injectStyleOnHead(id, cssContent) {
-        if (document.getElementById(id)) return; // Já existe, ignora
-
-        const style = document.createElement('style');
-        style.id = id;
-        style.textContent = cssContent;
-        document.head.appendChild(style);
-    }
-}
-class GridItem extends BaseLayout {
-    // Mapa de atributos válidos (chaves) e suas respectivas variáveis CSS (valores), usadas dinamicamente
-    static get ATTR_MAP() {
-        return {
-            'colspan':      { var: '--grid-item-colspan',       prefix: 'span ' },
-            'colspanbreak': { var: '--grid-item-colspan-break', prefix: 'span ' },
-            'rowspan':      { var: '--grid-item-rowspan',       prefix: 'span ' },
-            'rowspanbreak': { var: '--grid-item-rowspan-break', prefix: 'span ' },
-            'posh':      '--grid-item-posh',
-            'poshbreak': '--grid-item-poshbreak',
-            'posv':      '--grid-item-posv',
-            'posvbreak': '--grid-item-posvbreak'
-        };
-    }
-    static get observedAttributes() {return Object.keys(GridItem.ATTR_MAP);} // retorna a chaves do mapa de atributos
-    constructor() {super();}
-
-    // ****************************************************************************
-    // Métodos de configuração do layout
-    // ****************************************************************************
-
-    /** @override */
-    postConfig(){
-        this.style.display = 'grid';
-        this.style.gap = '0';
-    }
-
-    // ****************************************************************************
-    // Injeção de estilo CSS
-    // ****************************************************************************
-    
-    static injectStyles() {
-        const css = `
-            algol-grid-item[colspan]{grid-column-end: var(--grid-item-colspan);}
-            algol-grid-item[rowspan]{grid-row-end: var(--grid-item-rowspan);}
-            algol-grid-item[posh]{justify-self: var(--grid-item-posh);}
-            algol-grid-item[posv]{align-self: var(--grid-item-posv);}
-
-            @media (max-width: ${MOBILE_BREAKPOINT}) {
-                algol-grid-item[colspanbreak] {grid-column-end: var(--grid-item-colspan-break) !important;}
-                algol-grid-item[rowspanbreak] {grid-row-end: var(--grid-item-rowspan-break) !important;}
-                algol-grid-item[poshbreak] {justify-self: var(--grid-item-poshbreak) !important;}
-                algol-grid-item[posvbreak] {align-self: var(--grid-item-posvbreak) !important;}
-            }
-        `;
-
-        BaseLayout._injectStyleOnHead('algol-grid-item-style', css); // injeta no head
-    }
-}
-
-// ----------------------------------------------------------------------------------------------------------------------------------
-
-customElements.define('algol-grid-item', GridItem); // Registra o componente customizado
-GridItem.injectStyles(); // injeta CSS desse componente
-
-class GridLayout extends BaseLayout {
-    // Mapa de atributos válidos (chaves) e suas respectivas variáveis CSS (valores), usadas dinamicamente
-    static get ATTR_MAP() {
-        return {
-            'cols':      '--grid-layout-cols',
-            'colsbreak': '--grid-layout-cols-break',
-            'gap':       '--grid-layout-gap',
-            'gapbreak':  '--grid-layout-gap-break',
-            'posh':      '--grid-layout-posh',
-            'poshbreak': '--grid-layout-poshbreak',
-            'posv':      '--grid-layout-posv',
-            'posvbreak': '--grid-layout-posvbreak'
-        };
-    }
-    static get observedAttributes() {return Object.keys(GridLayout.ATTR_MAP);} // retorna a chaves do mapa de atributos
-    constructor() {super();}
-
-    // ****************************************************************************
-    // Métodos de configuração do layout
-    // ****************************************************************************
-
-    /** @override */
-    postConfig(){
-        this.style.display = 'grid';
-        // por padrão, os elementos da grade são alinhados ao centro
-        if (!this.style.getPropertyValue('--grid-layout-posh')) this.style.setProperty('--grid-layout-posh', 'center');
-        if (!this.style.getPropertyValue('--grid-layout-posv')) this.style.setProperty('--grid-layout-posv', 'center');
-    }
-
-    // ****************************************************************************
-    // Injeção de estilo CSS
-    // ****************************************************************************
-    
-    static injectStyles() {
-        const css = `
-            algol-grid-layout{
-                grid-template-columns: var(--grid-layout-cols, none);
-                gap: var(--grid-layout-gap, none);
-                justify-items: var(--grid-layout-posh, none);
-                align-items: var(--grid-layout-posv, none);
-            }
-                
-            @media (max-width: ${MOBILE_BREAKPOINT}) {
-                algol-grid-layout[colsbreak] {grid-template-columns: var(--grid-layout-cols-break) !important;}
-                algol-grid-layout[gapbreak] {gap: var(--grid-layout-gap-break) !important;}
-                algol-grid-layout[poshbreak] {justify-items: var(--grid-layout-poshbreak) !important;}
-                algol-grid-layout[posvbreak] {align-items: var(--grid-layout-posvbreak) !important;}
-            }
-        `;
-        BaseLayout._injectStyleOnHead('algol-grid-layout-style', css);
-    }
-}
-
-// ----------------------------------------------------------------------------------------------------------------------------------
-
-customElements.define('algol-grid-layout', GridLayout); // Registra o componente customizado
-GridLayout.injectStyles(); // injeta CSS desse componente

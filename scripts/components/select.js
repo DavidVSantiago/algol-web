@@ -117,13 +117,14 @@ class Select extends BaseComponent {
         if (!this.elems.select) return;
         // Pega a validade nativa do select escondido
         const validadeInterna = this.elems.select.validity; // obtem a validade do select interno
+        const mensagem = this.elems.select.validationMessage || "Select option!.";
         if (!validadeInterna.valid) { // Se for inválido
             this._internals.setValidity( // seta a validade do elemento customizado
                 { 
                     valueMissing: validadeInterna.valueMissing,
                     valid: false 
                 }, 
-                this.elems.select.validationMessage, 
+                mensagem, 
                 this.elems.select, // onde a 'bolha' de erro deve aparecer
             );
         } else this._internals.setValidity({}); // Se for válido, limpa o erro
@@ -145,16 +146,19 @@ algol_select_sheet.replaceSync(`
         margin-bottom: calc(1.0vw * var(--scale-factor));
         width: 100%;
     }
-    .container label {
-        color: var(--text-color-forms-label);
+    label {
+        color: var(--text-color-label);
         font-size: calc(1.0vw * var(--scale-factor));
     }
-    .container select {
+    :host([disabled]) label{
+        color: var(--text-color-label-disabled);
+    }
+    select {
         appearance: none;
         -webkit-appearance: none;
         outline: none;
         box-sizing: border-box;
-        background: var(--bg-color-forms);
+        background: var(--bg-color-inputs);
         color: var(--text-color);
         border: calc(0.1vw * var(--scale-factor)) solid var(--border-color-forms);
         border-radius: calc(var(--border-radius-components) * var(--scale-factor));
@@ -168,9 +172,9 @@ algol_select_sheet.replaceSync(`
         line-height: calc(var(--line-height) * var(--scale-factor));
     }
     /* Para o estado disabled */
-    :host([disabled]) .container select{
-        background-color: var(--bg-color-forms-disabled) !important;
-        color: var(--text-color-forms-disabled) !important;
+    :host([disabled]) select{
+        background-color: var(--bg-color-inputs-disabled) !important;
+        color: var(--text-color-disabled) !important;
         cursor: not-allowed;
     }
     :host(:focus-within) select {

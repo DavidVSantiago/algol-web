@@ -1,4 +1,0 @@
-document.querySelector('#elem').label='NOVO';
-document.querySelector('#elem').value='NOVO';
-document.querySelector('#elem').disabled='NOVO';
-document.querySelector('#elem').required='NOVO';

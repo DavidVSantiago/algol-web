@@ -12,8 +12,8 @@ class Button extends BaseComponent {
     }
     static get ATTR_MAP() {
         return {
-            'bgcolor': '--bg-color-btn', // cor do fundo botão
-            'color': '--text-color-btn', // cor do texto do botão
+            'bgcolor': '--bg-color-button', // cor do fundo botão
+            'color': '--text-color', // cor do texto do botão
         };
     }
     static get observedAttributes() {return [...Object.keys(this.PROP_MAP), ...Object.keys(this.ATTR_MAP)];}
@@ -120,12 +120,11 @@ algol_button_sheet.replaceSync(`
         padding: calc(0.6vw * var(--scale-factor)) calc(1.2vw * var(--scale-factor));
         min-height: calc(2.4vw * var(--scale-factor));
         border-radius: calc(var(--border-radius-components) * var(--scale-factor));
-        background-color: var(--bg-color-btn);
-        color: var(--text-color-btn);
+        background-color: var(--bg-color-button);
+        color: var(--text-color);
         font-family: 'Algol Font';
         font-weight: 200;
         font-size: calc(var(--font-size-btn)* var(--scale-factor));
-        transition: filter 0.2s, transform 0.1s; 
     }
 
     /* --- Hover e Active --------------------------------------------------------------- */
@@ -152,8 +151,8 @@ algol_button_sheet.replaceSync(`
 
     /* --- Estado Disabled ------------------------------------------------------------- */
     button:disabled {
-        background-color: var(--bg-color-forms-disabled);
-        color: var(--text-color-forms-disabled);
+        background-color: var(--bg-color-inputs-disabled);
+        color: var(--text-color-disabled);
         cursor: not-allowed;
         opacity: 0.7;
     }

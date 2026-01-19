@@ -81,12 +81,13 @@ class FlexItem extends BaseLayout {
         const css = `
             algol-flex-item[colspan]{grid-column-end: var(--flex-item-colspan);}
             algol-flex-item[rowspan]{grid-row-end: var(--flex-item-rowspan);}
-            algol-flex-item[img]{background-image: var(--flex-item-img); whidth: 100%; height: 100%;}
+            algol-flex-item[img]{background-image: var(--flex-item-img); width: 100%; height: 100%;}
             algol-flex-item[imgattach]{background-attachment: var(--flex-item-imgattach);}
             algol-flex-item[imgrepeat]{background-repeat: var(--flex-item-imgrepeat);}
             algol-flex-item[imgpos]{background-position: var(--flex-item-imgpos);}
             algol-flex-item[imgsize]{background-size: var(--flex-item-imgsize);}
             algol-flex-item[padding]{padding: var(--flex-item-padding);}
+            algol-flex-item[distrib]{width: 100%}
 
             @media (max-width: ${MOBILE_BREAKPOINT}) {
                 algol-flex-item[colspanbreak] {grid-column-end: var(--flex-item-colspan-break) !important;}

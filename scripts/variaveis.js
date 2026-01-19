@@ -9,10 +9,14 @@ const GLOBAL = {
     'scale-factor': 1.0, // multiplicador de escala global. recomenda-se que seja um valor entre 0.5 e 1.5 (padrão 1.0)
     'scale-factor-break': 3.0, // multiplicador de escala global para telas menores que 'MOBILE_BREAKPOINT'
     'font-size': '1.1vw', // ajusta o tamanho da fonte global (padrão 1.1vw)
+    'font-size-break': '1.1vw', // para telas menores que 'MOBILE_BREAKPOINT' (padrão 1.1vw)
     'line-height': '1.6vw', // ajusta a altura da linha de texto global (padrão 1.6vw)
-    'border-radius-components': '0.5vw', //
-    'border-radius-layout': '1.0vw', //
-    'font-size-btn': '1.2vw', //
+    'line-height-break': '1.6vw', // para telas menores que 'MOBILE_BREAKPOINT' (padrão 1.6vw)
+    'border-radius-components': '0.2vw', // (padrão 0.5vw)
+    'border-radius-layout': '0.4vw', // ( padrão 1.0vw)
+    'font-size-btn': '1.2vw', // ( padrão 1.2vw)
+    'margin-page': '2vw', // margens laterais da página no modo (padrão 2vw)
+    'margin-page-break': '1vw', // margens laterais da página no modo para telas menores que 'MOBILE_BREAKPOINT' (padrão 1vw)
   }
 
 const MOBILE_BREAKPOINT = '600px'; // breakpoint para celular (padrão 700px) 
@@ -63,5 +67,103 @@ function injectGlobalVariablesStyles() {
     document.head.appendChild(style);
 }
 injectGlobalVariablesStyles();
+
+/** Função de injeção dos estilos de normalização*/
+function injectGlobalNormalizationStyles() {
+  if (document.getElementById('algol-global-normalization-style')) return; // Já injetado
+
+  const style = document.createElement('style');
+  style.id = 'algol-global-normalization-style';
+
+  style.textContent = `
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      border: none;
+    }
+    body {
+        font-family: 'Algol Font';
+        font-weight: 100;
+        font-style: normal;
+        font-size: calc(var(--font-size) * var(--scale-factor));
+        line-height: calc(var(--line-height) * var(--scale-factor));
+        margin: calc(var(--margin-page) * var(--scale-factor));
+        color: var(--text-color);
+        background-color: var(--bg-color);
+    }
+    main {
+        margin: 0 auto;
+    }
+
+    h1 {
+        font-size: calc(2.0vw * var(--scale-factor));
+    }
+    h2 {
+        font-size: calc(1.8vw * var(--scale-factor));
+    }
+    h3 {
+        font-size: calc(1.6vw * var(--scale-factor));
+    }
+    h4 {
+        font-size: calc(1.4vw  * var(--scale-factor));
+    }
+    h5 {
+        font-size: calc(1.2vw  * var(--scale-factor));
+    }
+    h6 {
+        font-size: calc(1.0vw * var(--scale-factor));
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+        margin-top: calc(1vw * var(--scale-factor));
+        margin-bottom: calc(2vw * var(--scale-factor));
+        font-weight: 600;
+    }
+
+    @media (max-width: ${MOBILE_BREAKPOINT}) {
+        body {
+            font-size: calc(var(--font-size-break) * var(--scale-factor));
+            margin: calc(var(--margin-page-break) * var(--scale-factor));
+            line-height-break: calc(var(--line-height-break) * var(--scale-factor));
+        }
+    }
+  `;
+  document.head.appendChild(style);
+}
+injectGlobalNormalizationStyles();
+
+/** Função de injeção dos classes globais*/
+function injectGlobalClasses() {
+  if (document.getElementById('algol-global-classes-style')) return; // Já injetado
+
+  const style = document.createElement('style');
+  style.id = 'algol-global-classes-style';
+
+  style.textContent = `
+    /* Groups **************************************************************** */
+    .algol-bubble-01 {
+        margin-top: calc(2.0vw * var(--scale-factor));
+        padding: calc(1.0vw * var(--scale-factor));
+        background-color: var(--bg-color-section-bubble-01);
+        border: calc(0.1vw * var(--scale-factor)) solid var(--border-color-section-bubble-01);
+        border-radius: calc(var(--border-radius-layout) * var(--scale-factor));
+    }
+    .algol-bubble-02 {
+        margin-top: calc(2.0vw * var(--scale-factor));
+        padding: calc(1.0vw * var(--scale-factor));
+        background-color: var(--bg-color-section-bubble-02);
+        border: calc(0.1vw * var(--scale-factor)) solid var(--border-color-section-bubble-02);
+        border-radius: calc(var(--border-radius-layout) * var(--scale-factor));
+    }
+  `;
+  document.head.appendChild(style);
+}
+injectGlobalClasses();
 
 // **********************************************************************************************************************
