@@ -5,26 +5,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-    
-    <link rel="stylesheet" href="algol-styles-min.css">
-    <script src="min.js" defer></script>
+    <link rel="stylesheet" href="algol-styles.css">
+    <!-- <script src="min.js"></script> -->
     <link rel="preload" 
         href="imgs/landscape.webp"
         as="image"
         fetchpriority="high">
 
-    <!-- <script src="scripts/variaveis.js" defer></script>
+    <script src="scripts/variaveis.js" ></script>
     
-    <script src="scripts/components/_base-component.js" defer></script>
-    <script src="scripts/components/inputs.js" defer></script>
-    <script src="scripts/components/buttons.js" defer></script>
-    <script src="scripts/components/textarea.js" defer></script>
-    <script src="scripts/components/select.js" defer></script>
-    <script src="scripts/components/image.js" defer></script>
+    <script src="scripts/components/_base-component.js" ></script>
+    <script src="scripts/components/inputs.js" ></script>
+    <script src="scripts/components/buttons.js" ></script>
+    <script src="scripts/components/textarea.js" ></script>
+    <script src="scripts/components/select.js" ></script>
+    <script src="scripts/components/image.js" ></script>
+    <script src="scripts/components/spacer.js" ></script>
 
-    <script src="scripts/layouts/_base-layout.js" defer></script>
-    <script src="scripts/layouts/grid-layout.js" defer></script>
-    <script src="scripts/layouts/grid-item.js" defer></script> -->
+    <script src="scripts/layouts/_base-layout.js" ></script>
+    <script src="scripts/layouts/grid-layout.js" ></script>
+    <script src="scripts/layouts/grid-item.js" ></script>
+    <script src="scripts/layouts/flex-item.js" ></script>
 
     <script defer>
         // temporário. apenas para teste
@@ -59,7 +60,6 @@
 </head>
 
 <body id="corpo">
-    <div id="app-container">
         <div class="caixa-teste">
             Pressione as teclas + ou - para ajustar o zoom
         </div>
@@ -81,8 +81,33 @@
                 vero id aperiam debitis sapiente, ea quis nostrum nihil et ut vitae amet inventore temporibus.
             </p>
             <form action="" id="form">
-            <algol-grid-layout id="layout" posh="stretch" poshbreak="center" posv="center" cols="1fr 1fr 1fr" colsbreak="1fr 1fr" gap="1vw" gapbreak="5vw" class="algol-bolha-01">
-                <algol-grid-item id="item" colspan="1" colspanbreak="2" >   
+                <algol-grid-layout id="layout" poshbreak="center" posv="center" cols="1fr 1fr 1fr" colsbreak="1fr 1fr" gap="1vw" gapbreak="5vw" class="algol-bolha-01">
+                    <algol-flex-item
+                    img="imgs/landscape.webp"
+                    colspan="3"
+                    colspanbreak="2"
+                    distrib="center"
+                    imgrepeat="no-repeat"
+                    imgsize="cover"
+                    imgpos="center"
+                    padding="20 3" paddingbreak="15 2">
+                    <algol-input-color id="inputcolor" label="Cor" value="#ff0000" required></algol-input-color>  
+                    <algol-input-color id="inputcolor" label="Cor" value="#ff0000" required></algol-input-color>  
+                    <algol-input-color id="inputcolor" label="Cor" value="#ff0000" required></algol-input-color>  
+                    <algol-input-color id="inputcolor" label="Cor" value="#ff0000" required></algol-input-color>  
+                    <algol-input-color id="inputcolor" label="Cor" value="#ff0000" required></algol-input-color>  
+                    <algol-input-color id="inputcolor" label="Cor" value="#ff0000" required></algol-input-color>  
+                    <algol-input-color id="inputcolor" label="Cor" value="#ff0000" required></algol-input-color>  
+                </algol-flex-item>
+                <algol-grid-item id="item"
+                posh="stretch"
+                img="imgs/landscape.webp"
+                imgrepeat="no-repeat"
+                imgsize="cover"
+                imgpos="center"
+                padding="20 3" paddingbreak="15 2">
+                    <!-- <algol-spacer value="10" valuebreak="20"></algol-spacer> -->
+                    <h1>TITULO DO SITE</h1> 
                     <algol-select id="elem" label='NOVO' required>
                         <option disabled>--Grupo 1--</option>
                         <option value="A">Opção A</option>  
@@ -94,27 +119,25 @@
                         <option value="E">Opção E</option>
                         <option value="F">Opção F</option>
                     </algol-select>
+                    <!-- <algol-spacer value="10" valuebreak="20"></algol-spacer> -->
                 </algol-grid-item>
-                <algol-grid-item colspan="2" colspanbreak="1" >
-                    <algol-image id="img" src="imgs/landscape.webp" alt="landscape" width="400" height="200" expand></algol-image>   
-                    <algol-textarea id="textarea" label="Área de Texto" maxlength="40" lines="4" placeholder="Digite o seu texto aqui..." required ></algol-textarea>
+                <algol-grid-item>
+                    <!-- <algol-image id="img" src="imgs/landscape.webp" alt="landscape" width="400" height="200" expand></algol-image>    -->
+                    <algol-textarea id="textarea" label="Área de Texto" maxlength="40" lines="4" placeholder="Digite o seu texto aqui..." required >TEXTO</algol-textarea>
                 </algol-grid-item>
                 <algol-grid-item poshbreak="stretch">   
                     <!-- <algol-button size="big" id="btn1" bgcolor="#fbb" color="#400" >BOTÃO</algol-button> -->
                     <algol-input id="input" type="text" required label="Input" placeholder="Digite aqui..." >CONTEUDO DO SLOT</algol-input>
                 </algol-grid-item>
                 <algol-grid-item posh="end"> 
-                    <algol-input-color id="inputcolor" label="Cor" value="#ff0000" required></algol-input-color>  
-                    <!-- <algol-input-time id="inputtime" label="Data do dia" required min="14:15" max="16:40" step="1"></algol-input-time>   -->
+                    <algol-input-time id="inputtime" label="Data do dia" required min="14:15" max="16:40" step="1"></algol-input-time>  
                     <!-- <algol-input-number id="inputnumber" min="-6" max="6" type="text" required label="Input" placeholder="Digite aqui..." >CONTEUDO DO SLOT</algol-input-number> -->
                 </algol-grid-item>
                 <algol-grid-item poshbreak="stretch">
                     <!-- <algol-button type="reset" size="small" id="btn3">RESET</algol-button> -->
                     <algol-button type="submit" id="btn2">SUBMIT</algol-button>
                 </algol-grid-item>
-                <algol-grid-item>   
-                    CONTEUDO
-                </algol-grid-item>
+                
                 
             </algol-grid-layout>
             </form>
@@ -136,7 +159,6 @@
             </script>
 
         </main>
-    </div>
 </body>
 
 </html>

@@ -12,7 +12,7 @@ class GridLayout extends BaseLayout {
             'posvbreak': '--grid-layout-posvbreak'
         };
     }
-    static get observedAttributes() {return Object.keys(GridLayout.ATTR_MAP);} // retorna a chaves do mapa de atributos
+    static get observedAttributes() {return Object.keys(this.ATTR_MAP);} // retorna a chaves do mapa de atributos
     constructor() {super();}
 
     // ****************************************************************************

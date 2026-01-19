@@ -1,11 +1,10 @@
 class BaseComponent extends HTMLElement {
     static formAssociated = true; // Habilita participação em formulários nativos (<form>)
-
+    static useShadow = true; // Usa shadow DOM?
     static _idCont = 0;
     static get observedAttributes() { return []; } 
     
     constructor() {
-        
         super();
         this.elems = {}; // cache de elementos internos do componente
         this.inicializado = false;
@@ -13,11 +12,15 @@ class BaseComponent extends HTMLElement {
         this._internals = this.attachInternals(); // API de Formulários, para notifica ao <form>
         this._gerarAcessoresAutomaticos(); // Gera getters/setters baseados nos mapas implementados nas classes filhas
         
-        // usa shadow DOM, que isola o componente do restante da página 
-        this.root = this.attachShadow({
-            mode: 'open',
-            delegatesFocus: true, // permite que o foco seja delegado para dentro do shadow DOM
-         }); 
+        // Cria Shadow DOM ou usa Light DOM 
+        if (this.constructor.useShadow) {
+            this.root = this.attachShadow({ // Cria Shadow DOM normalmente
+                mode: 'open',
+                delegatesFocus: true,
+            });
+        } else {
+            this.root = this; // No Light DOM, a "raiz" é o próprio elemento (<my-component>)
+        }
     }
 
     // ****************************************************************************
@@ -33,7 +36,7 @@ class BaseComponent extends HTMLElement {
 
     configSlot(){
         const slot = this.root.querySelector('slot');
-        if(!slot) throw new Error("O seu método render() deve incluir um <slot> para o conteúdo interno do componente.");
+        if(this.constructor.useShadow===true && !slot) throw new Error("O seu método render() deve incluir um <slot> para o conteúdo interno do componente.");
 
         this.postConfig(); // invoca o metodo abstrato de pós-configuração
     }

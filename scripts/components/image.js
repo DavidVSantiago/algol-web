@@ -118,9 +118,7 @@ algol_image_sheet.replaceSync(`
     :host {
         display: block;
     }
-    slot {
-        display: none; 
-    }
+    slot {display: none;}
     img{
         max-width: 100%;
         height: auto;

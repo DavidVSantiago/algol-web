@@ -46,7 +46,17 @@ class BaseLayout extends HTMLElement {
     attributeChangedCallback(name, oldValue, newValue) {
         if (oldValue === newValue) return;
 
-        // 1. Tenta pegar a configuração do mapa de atributos da classe filha
+        // 1. Prioridade: Mapa de Propriedades (Lógica Funcional)
+        const propMap = this.constructor.PROP_MAP;
+        if (propMap && propMap[name]) {
+            const method = propMap[name];
+            if (typeof this[method] === 'function') {
+                this[method](newValue);
+                return;
+            }
+        }
+
+        // 2. Tenta pegar a configuração do mapa de atributos da classe filha
         const map = this.constructor.ATTR_MAP;
         if (!map || !map[name]) return; // se não existir mapa ou atributo, abandona 
 

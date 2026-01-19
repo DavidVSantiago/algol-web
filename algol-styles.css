@@ -82,7 +82,7 @@ body {
     font-style: normal;
     font-size: calc(var(--font-size) * var(--scale-factor));
     line-height: calc(var(--line-height) * var(--scale-factor));
-    margin: calc(1vw * var(--scale-factor));
+    padding: calc(1vw * var(--scale-factor));
     color: var(--text-color);
     background-color: var(--bg-color);
 }

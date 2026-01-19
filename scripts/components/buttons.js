@@ -16,7 +16,7 @@ class Button extends BaseComponent {
             'color': '--text-color-btn', // cor do texto do botão
         };
     }
-    static get observedAttributes() {const props = Object.keys(this.PROP_MAP);const attrs = Object.keys(this.ATTR_MAP);return [...props, ...attrs];}
+    static get observedAttributes() {return [...Object.keys(this.PROP_MAP), ...Object.keys(this.ATTR_MAP)];}
     constructor() {super();}
     
     // ****************************************************************************

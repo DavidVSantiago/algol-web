@@ -590,6 +590,37 @@ algol_input_sheet.replaceSync(`
         color: var(--text-color-forms-label);
         font-size: calc(1.0vw * var(--scale-factor));
     }
+    .container input {
+        appearance: none;
+        -webkit-appearance: none;
+        outline: none;
+        box-sizing: border-box;
+        width: 100%;
+        padding: calc(0.8vw * var(--scale-factor)) calc(1.1vw * var(--scale-factor));
+        background: var(--bg-color-forms);
+        color: var(--text-color);
+        border: calc(0.1vw * var(--scale-factor)) solid var(--border-color-forms);
+        border-radius: calc(var(--border-radius-components) * var(--scale-factor));
+        
+        font-family: 'Algol Font';
+        font-weight: 100;
+        font-size: calc(1.1vw * var(--scale-factor));
+        line-height: calc(var(--line-height) * var(--scale-factor));
+    }
+    /* Para o estado disabled */
+    :host([disabled]) input{
+        background-color: var(--bg-color-forms-disabled) !important;
+        color: var(--text-color-forms-disabled) !important;
+        cursor: not-allowed;
+    }
+    
+    :host(:focus-within) input {
+        border-color: var(--border-color-focus); /* Exemplo */
+        box-shadow: 0 0 0 calc(0.1vw * var(--scale-factor)) var(--border-color-focus-glow) /* "Glow" externo */
+    }
+
+    /* --- ESTILOS ESPECÍFICOS PARA INPUT NUMBER --- */
+
     .input-container{
         display: flex;
         flex-direction: row;
@@ -626,29 +657,7 @@ algol_input_sheet.replaceSync(`
     .btnup:active, .btndown:active{
         background-color: var(--bg-color-btn-spinner-hover);
     }
-    .container input {
-        appearance: none;
-        -webkit-appearance: none;
-        outline: none;
-        box-sizing: border-box;
-        width: 100%;
-        padding: calc(0.8vw * var(--scale-factor)) calc(1.1vw * var(--scale-factor));
-        background: var(--bg-color-forms);
-        color: var(--text-color);
-        border: calc(0.1vw * var(--scale-factor)) solid var(--border-color-forms);
-        border-radius: calc(var(--border-radius-components) * var(--scale-factor));
-        
-        font-family: 'Algol Font';
-        font-weight: 100;
-        font-size: calc(1.1vw * var(--scale-factor));
-        line-height: calc(var(--line-height) * var(--scale-factor));
-    }
-    /* Para o estado disabled */
-    :host([disabled]) input{
-        background-color: var(--bg-color-forms-disabled) !important;
-        color: var(--text-color-forms-disabled) !important;
-        cursor: not-allowed;
-    }
+
     :host([disabled]) .btnup,:host([disabled]) .btndown{
         background-color: var(--bg-color-btn-spinner-disabled) !important;
         color: var(--text-color-btn-spinner-disabled) !important;
@@ -660,10 +669,7 @@ algol_input_sheet.replaceSync(`
     :host([disabled]) .btndown{
         border-top-color:var(--border-color-btn-spinner-disabled) !important;
     }
-    :host(:focus-within) input {
-        border-color: var(--border-color-focus); /* Exemplo */
-        box-shadow: 0 0 0 calc(0.1vw * var(--scale-factor)) var(--border-color-focus-glow) /* "Glow" externo */
-    }
+    
 
     /* --- ESTILOS ESPECÍFICOS PARA INPUT COLOR --- */
     
@@ -703,6 +709,12 @@ algol_input_sheet.replaceSync(`
     :host([disabled]) .color-box{
         background: var(--text-color-disabled) !important;
         cursor: not-allowed;
+    }
+
+    /* --- ESTILOS ESPECÍFICOS PARA INPUT TIME --- */
+
+    input[type="time"]::-webkit-calendar-picker-indicator {
+        color-scheme: dark;
     }
 
 `);
