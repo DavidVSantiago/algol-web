@@ -6,8 +6,8 @@
   * OBS: com exceção de 'scale-factor', altere o valor, mas MANTENHA A UNIDADE 'vw'!! ex: '1.2vw', '0.9vw', ...
 */
 const GLOBAL = {
-    'scale-factor': 1.0, // multiplicador de escala global. recomenda-se que seja um valor entre 0.5 e 1.5 (padrão 1.0)
-    'scale-factor-break': 3.0, // multiplicador de escala global para telas menores que 'MOBILE_BREAKPOINT'
+    'scale-factor': 1.0, // multiplicador de escala global. recomenda-se que seja um valor entre 0.5 e 1.5 (padrão 1.0) (não deve ser usado de forma dinamica!)
+    'scale-factor-break': 3.0, // multiplicador de escala global para telas menores que 'MOBILE_BREAKPOINT' (não deve ser usado de forma dinamica!)
     'font-size': '1.1vw', // ajusta o tamanho da fonte global (padrão 1.1vw)
     'font-size-break': '1.1vw', // para telas menores que 'MOBILE_BREAKPOINT' (padrão 1.1vw)
     'line-height': '1.6vw', // ajusta a altura da linha de texto global (padrão 1.6vw)
@@ -148,14 +148,12 @@ function injectGlobalClasses() {
   style.textContent = `
     /* Groups **************************************************************** */
     .algol-bubble-01 {
-        margin-top: calc(2.0vw * var(--scale-factor));
         padding: calc(1.0vw * var(--scale-factor));
         background-color: var(--bg-color-section-bubble-01);
         border: calc(0.1vw * var(--scale-factor)) solid var(--border-color-section-bubble-01);
         border-radius: calc(var(--border-radius-layout) * var(--scale-factor));
     }
     .algol-bubble-02 {
-        margin-top: calc(2.0vw * var(--scale-factor));
         padding: calc(1.0vw * var(--scale-factor));
         background-color: var(--bg-color-section-bubble-02);
         border: calc(0.1vw * var(--scale-factor)) solid var(--border-color-section-bubble-02);

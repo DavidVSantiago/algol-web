@@ -1,0 +1,22 @@
+# .gitignore gerado para projeto web (algol-web)
+
+# Sistema / SO
+.DS_Store
+Thumbs.db
+desktop.ini
+ehthumbs.db
+*.swp
+
+# Node / JavaScript
+node_modules/
+npm-debug.log*
+dist/
+build/
+out/
+public/build/
+
+# Logs / cobertura / relatórios
+logs/
+
+# IDEs / editores
+.vscode/

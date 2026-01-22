@@ -532,7 +532,13 @@ class InputColor extends Input {
         });
         // ao mudar o valor do input color, atualiza a cor do box
         this.elems.input.addEventListener('change', (e) => {
-             this._atualizarVisual(e.target.value);
+            this._atualizarVisual(e.target.value);
+        });
+        this.addEventListener('keydown', (e) => {
+            if (e.code === "Space" || e.code === "Enter") {
+                e.preventDefault(); // evita scroll no Space
+                this.elems.input.click(); // abre o seletor de cor nativo
+            }
         });
 
     }
@@ -604,6 +610,14 @@ class InputRange extends Input {
     /** @override */
     attachEvents(){
         super.attachEvents(); // Ganha validação e update_value de graça
+        
+        this.elems.input.addEventListener('input', (e) => {
+            this.dispatchEvent(new CustomEvent('algol-input-range-move', { 
+                bubbles: true, 
+                composed: true,
+                detail: { value: this.value }
+            }));
+        });
     }
 
     // ****************************************************************************

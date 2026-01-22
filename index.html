@@ -5,14 +5,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-    <link id="theme-link" rel="stylesheet" href="algol-light.css">
-    <script src="algol-web-min.js"></script>
+    <link id="theme-link" rel="stylesheet" href="algol-dark.css">
+    <!-- <script src="algol-web-min.js"></script> -->
     <!-- <link rel="preload" 
         href="imgs/landscape.webp"
         as="image"
         fetchpriority="high"> -->
 
-    <!-- <script src="scripts/variaveis.js" ></script>
+    <script src="scripts/variaveis.js" ></script>
     
     <script src="scripts/components/_base-component.js" ></script>
     <script src="scripts/components/inputs.js" ></script>
@@ -25,33 +25,28 @@
     <script src="scripts/layouts/_base-layout.js" ></script>
     <script src="scripts/layouts/grid-layout.js" ></script>
     <script src="scripts/layouts/grid-item.js" ></script>
-    <script src="scripts/layouts/flex-item.js" ></script> -->
+    <script src="scripts/layouts/flex-item.js" ></script>
 
     <script defer>
         // temporário. apenas para teste
         window.addEventListener('load', function (event) {
-            let fatorAtual = 1.0;
             const PASSO = 0.1;
             const MINIMO = 0.5;
             const MAXIMO = 3.0;
-
-            function atualizarCSS() {
-                // Aplica o valor arredondado à variável global CSS
-                document.documentElement.style.setProperty("--scale-factor", fatorAtual.toFixed(1));
-            }
-
+            
             window.addEventListener('keydown', (e) => {
+                let fatorAtual = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--scale-factor").trim());
                 // Detecta as teclas + (ou =) e - (ou _)
                 if (e.key === '+' || e.key === '=') {
                     if (fatorAtual < MAXIMO) {
-                    fatorAtual += PASSO;
-                    atualizarCSS();
+                        fatorAtual += PASSO;
+                        document.documentElement.style.setProperty("--scale-factor", fatorAtual.toFixed(1));
                     }
                 } 
                 else if (e.key === '-' || e.key === '_') {
                     if (fatorAtual > MINIMO) {
-                    fatorAtual -= PASSO;
-                    atualizarCSS();
+                        fatorAtual -= PASSO;
+                        document.documentElement.style.setProperty("--scale-factor", fatorAtual.toFixed(1));
                     }
                 }
             });
@@ -85,12 +80,12 @@
                 Aenean lacinia bibendum nulla sed consectetur.
             </p>
             <form action="" id="form">
-                <algol-grid-layout id="layout" cols="1fr 1fr 1fr" colsbreak="1fr" gap="1vw" class="algol-bubble-01">
-                    <algol-grid-item posh="stretch"> 
-                        <algol-image expand src="imgs/landscape.webp" alt="landscape"></algol-image>
+                <algol-grid-layout posh="stretch" id="layout" cols="1fr 1fr 1fr" colsbreak="1fr" gap="1vw" class="algol-bubble-01">
+                    <algol-grid-item>
+                        <algol-image expand src="imgs/landscape.webp" alt="landscape" width="400" height="200"></algol-image>
                     </algol-grid-item>
                     
-                    <algol-grid-item>
+                    <algol-grid-item posh="center">
                         <algol-select id="select" label='select' required>
                             <option disabled>--Grupo 1--</option>
                             <option value="algol-light.css">Tema Claro</option>  
@@ -107,42 +102,42 @@
                             <option value="E">Opção E</option>
                             <option value="F">Opção F</option>
                         </algol-select>
-                    </algol-grid-item>
-                    <algol-grid-item>
+                     </algol-grid-item>
+                    <algol-grid-item posh="center" posv="end">
                         <algol-button type="submit">Botão simples</algol-button>
                         <algol-button disabled>Botão simples</algol-button>
                     </algol-grid-item>
                     <algol-grid-item posh="stretch">
 
                         <algol-grid-layout id="layout" cols="1fr" gap="1vw" class="algol-bubble-02">
-                            <algol-grid-item>
+                            <algol-grid-item posh="stretch" padding="0 2" paddingbreak="0">
                                 <algol-textarea id="textarea" label="textarea" maxlength="40" lines="4" placeholder="Digite o seu texto aqui..." required fixed >TEXTO TESTE</algol-textarea>
                                 <algol-textarea disabled id="textarea" label="textarea" maxlength="40" lines="4" placeholder="Digite o seu texto aqui..." required fixed >TEXTO TESTE</algol-textarea>
                             </algol-grid-item>
                         </algol-grid-layout>
 
                     </algol-grid-item>
-                    <algol-grid-item>   
+                    <algol-grid-item posh="end">   
                         <algol-input id="input" required label="input" placeholder="Digite aqui..." ></algol-input>
                         <algol-input disabled id="input" required label="input" placeholder="Digite aqui..." ></algol-input>
                     </algol-grid-item>
-                    <algol-grid-item class="algol-bubble-02">   
+                    <algol-grid-item class="algol-bubble-02" posh="start" posv="start">   
                         <algol-input-number id="input-number" required label="input-number" placeholder="Digite aqui..." ></algol-input-number>
                         <algol-input-number disabled id="input-number" required label="input-number" placeholder="Digite aqui..." ></algol-input-number>
                     </algol-grid-item>
-                    <algol-grid-item>   
+                    <algol-grid-item posh="start">   
                         <algol-input-date id="input-date" required label="input-date" placeholder="Digite aqui..." ></algol-input-date>
                         <algol-input-date disabled id="input-date" required label="input-date" placeholder="Digite aqui..." ></algol-input-date>
                     </algol-grid-item>
-                    <algol-grid-item>   
+                    <algol-grid-item posh="stretch">   
                         <algol-input-time id="input-time" required label="input-time" placeholder="Digite aqui..." ></algol-input-time>
                         <algol-input-time disabled id="input-time" required label="input-time" placeholder="Digite aqui..." ></algol-input-time>
                     </algol-grid-item>
-                    <algol-grid-item>   
-                        <algol-input-range id="input-range" required label="input-range" ></algol-input-range>
+                    <algol-grid-item posh="end">
+                        <algol-input-range id="input-range" required label="input-range" min=0.5 max="3" step="0.1"></algol-input-range>
                         <algol-input-range disabled id="input-range" required label="input-range" ></algol-input-range>
                     </algol-grid-item>
-                    <algol-flex-item distrib="evenly">   
+                    <algol-flex-item distrib="between"> 
                         <algol-input-color id="input-color" required label="input-color" ></algol-input-color>
                         <algol-input-color disabled id="input-color" required label="input-color" ></algol-input-color>
                     </algol-flex-item>
@@ -159,6 +154,7 @@
                         const tema = e.detail.newValue;
                         themeLink.setAttribute('href', tema);
                     });
+                    
                 });
             </script>
 

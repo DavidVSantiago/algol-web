@@ -22,7 +22,9 @@ class Select extends BaseComponent {
         this.root.innerHTML = `
             <div class="container">
                 <label></label>
-                <select></select>
+                <div class="select-wrapper">
+                    <select></select>
+                </div>
             </div>
             <slot></slot>
         `;
@@ -153,6 +155,30 @@ algol_select_sheet.replaceSync(`
     :host([disabled]) label{
         color: var(--text-color-label-disabled);
     }
+    /* --- Wrapper para posicionamento relativo --- */
+    .select-wrapper {
+        position: relative; /* Âncora para a seta absoluta */
+        width: 100%;
+        display: flex;
+        align-items: center;
+    }
+    /* --- A Seta (▼) --- */
+    .select-wrapper::after {
+        content: '▼';
+        position: absolute;
+        right: calc(1.0vw * var(--scale-factor)); /* Distância da direita */
+        
+        /* Centraliza verticalmente */
+        top: 50%;
+        transform: translateY(-50%);
+        
+        /* Estilos de Texto */
+        font-size: calc(0.8vw * var(--scale-factor)); 
+        color: var(--text-color);
+        
+        /* IMPORTANTE: Permite que o clique passe pela seta e atinja o select */
+        pointer-events: none; 
+    }
     select {
         appearance: none;
         -webkit-appearance: none;
@@ -162,7 +188,17 @@ algol_select_sheet.replaceSync(`
         color: var(--text-color);
         border: calc(0.1vw * var(--scale-factor)) solid var(--border-color-forms);
         border-radius: calc(var(--border-radius-components) * var(--scale-factor));
-        padding: calc(0.8vw * var(--scale-factor)) calc(1.1vw * var(--scale-factor));
+       
+        padding: calc(0.8vw * var(--scale-factor)) 0 calc(0.8vw * var(--scale-factor)) calc(1.1vw * var(--scale-factor));
+        
+        /* Padding Extra na Direita para a seta */
+        padding-right: calc(2.5vw * var(--scale-factor));
+
+        /* Se o texto for maior que a caixa, coloca "..." em vez de quebrar ou esconder feio */
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
+        
         width: 100%;
         font-family: 'Algol Font';
         cursor: inherit;
