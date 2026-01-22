@@ -1,3 +1,23 @@
+/**
+ * Componente Web `<algol-flex-item>`.
+ *
+ * Item flexível para composição de layouts baseados em Flexbox.
+ * Atua como contêiner flex (`display: flex`) com quebra automática de linha,
+ * permitindo distribuição de conteúdo, padding responsivo
+ * e aplicação de imagem de fundo.
+ *
+ * Suporta:
+ *  - distribuição horizontal do conteúdo (space-between, around, evenly, start, center, end)
+ *  - padding responsivo (1 a 4 valores)
+ *  - aplicação de imagem de fundo
+ *  - controle de rowspan/colspan para integração com sistemas híbridos (grid + flex)
+ *
+ * Os atributos são mapeados dinamicamente para CSS Custom Properties,
+ * mantendo o padrão arquitetural da engine.
+ *
+ * @extends BaseLayout
+ */
+
 class FlexItem extends BaseLayout {
     // Mapa de atributos válidos (chaves) e suas respectivas variáveis CSS (valores), usadas dinamicamente
     static get ATTR_MAP() {

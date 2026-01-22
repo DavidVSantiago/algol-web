@@ -1,3 +1,21 @@
+/**
+ * Componente Web `<algol-button>`.
+ *
+ * Botão customizado com suporte a:
+ *  - tamanhos configuráveis (small, mid, big)
+ *  - estados disabled e loading (com spinner)
+ *  - integração nativa com formulários via ElementInternals
+ *  - disparo de eventos de clique herdados do BaseComponent
+ *  - personalização visual via CSS Custom Properties
+ *
+ * Este componente encapsula um `<button>` nativo dentro do Shadow DOM,
+ * mantendo compatibilidade com formulários (`submit` e `reset`) mesmo fora
+ * do DOM principal.
+ *
+ * @fires algol-click (já implementado no BaseComponent)
+ *
+ * @extends BaseComponent
+ */
 class Button extends BaseComponent {
     // Mapa de propriedades
     static get PROP_MAP() {

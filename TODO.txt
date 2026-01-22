@@ -1,5 +1,4 @@
 - Testar a captura dos valores do form depois do clique no submit
-- padronizar os nomes de todos os eventos estilizados
 
 Inmplementar
 - input file

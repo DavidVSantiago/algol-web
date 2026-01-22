@@ -1,3 +1,22 @@
+/**
+ * Componente Web `<algol-select>`.
+ *
+ * Select customizado com:
+ *  - suporte a label integrada
+ *  - placeholder interno
+ *  - sincronização automática de <option> via slot (light DOM → shadow DOM)
+ *  - integração nativa com formulários (ElementInternals)
+ *  - suporte a validação (`required`)
+ *  - estado disabled
+ *  - disparo de evento customizado ao mudar o valor
+ *
+ * Este componente encapsula um `<select>` nativo no Shadow DOM,
+ * preservando comportamento de formulários, validação e acessibilidade.
+ *
+ * @fires Select#algol-select-value
+ *
+ * @extends BaseComponent
+ */
 class Select extends BaseComponent {
     // Mapa de atributos válidos (chaves) e seus respectivos métodos (valores)
     static get PROP_MAP() {

@@ -1,3 +1,22 @@
+/**
+ * Componente Web `<algol-spacer>`.
+ *
+ * Espaçador responsivo para controle de espaçamento vertical entre elementos.
+ * Permite definir um valor padrão e um valor alternativo para breakpoints móveis.
+ *
+ * Funciona aplicando altura dinâmica ao host via CSS Custom Properties,
+ * convertendo automaticamente os valores para `vw`.
+ *
+ * Suporta:
+ *  - espaçamento padrão (`value`)
+ *  - espaçamento em telas menores (`valuebreak`)
+ *
+ * Ideal para organização de layout, grids e composição visual sem necessidade
+ * de margens externas nos componentes.
+ *
+ * @extends BaseComponent
+ */
+
 class Spacer extends BaseComponent {
     // Mapa de atributos válidos (chaves) e seus respectivos métodos (valores)
     static get PROP_MAP() {

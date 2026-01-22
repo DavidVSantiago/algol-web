@@ -1,22 +1,20 @@
 /**
- * Componente Web <algol-image>
- * 
- * Encapsula uma tag <img> com:
- *  - fallback visual de erro
- *  - lazy loading opcional
- *  - eventos customizados
- *  - integração com validação de formulários
+ * Componente Web `<algol-image>`.
+ *
+ * Encapsula um elemento `<img>` com:
+ *  - fallback visual para erro de carregamento
+ *  - suporte a lazy loading
+ *  - modo expandido (width: 100%)
+ *  - disparo de eventos customizados
+ *  - integração com validação de formulários (ElementInternals)
+ *
+ * @fires Image#algol-image-load
+ * @fires Image#algol-image-error
  *
  * @extends BaseComponent
- * @fires algol-image-load
- * @fires algol-image-error
  */
 class Image extends BaseComponent {
-    /**
-     * Mapa de atributos observados e seus métodos.
-     * 
-     * @returns {Object<string, string>}
-     */
+    // Mapa de atributos válidos (chaves) e seus respectivos métodos (valores)
     static get PROP_MAP() {
         return {
             'src': 'update_src',

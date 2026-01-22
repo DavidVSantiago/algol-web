@@ -79,14 +79,24 @@
                 <span style="text-decoration: underline; color: #d63031;">Curabitur blandit tempus porttitor</span>. 
                 Aenean lacinia bibendum nulla sed consectetur.
             </p>
+            <algol-grid-layout posh="stretch" cols="1fr 1fr 1fr 1fr" gap="2vw" class="algol-bubble-02">
+                <algol-grid-item><algol-input-number></algol-input-number></algol-grid-item>
+                <algol-grid-item><algol-input-number></algol-input-number></algol-grid-item>
+                <algol-grid-item><algol-input-number></algol-input-number></algol-grid-item>
+                <algol-grid-item><algol-input-number></algol-input-number></algol-grid-item>
+                <algol-grid-item><algol-input-number></algol-input-number></algol-grid-item>
+                <algol-grid-item><algol-input-number></algol-input-number></algol-grid-item>
+                <algol-grid-item><algol-input-number></algol-input-number></algol-grid-item>
+                <algol-grid-item><algol-input-number></algol-input-number></algol-grid-item>
+            </algol-grid-layout>
             <form action="" id="form">
                 <algol-grid-layout posh="stretch" id="layout" cols="1fr 1fr 1fr" colsbreak="1fr" gap="1vw" class="algol-bubble-01">
                     <algol-grid-item>
                         <algol-image expand src="imgs/landscape.webp" alt="landscape" width="400" height="200"></algol-image>
                     </algol-grid-item>
-                    
                     <algol-grid-item posh="center">
-                        <algol-select id="select" label='select' required>
+
+                        <algol-select name="select" id="select" label='select'>
                             <option disabled>--Grupo 1--</option>
                             <option value="algol-light.css">Tema Claro</option>  
                             <option value="algol-dark.css">Tema Escuro</option>
@@ -111,35 +121,35 @@
 
                         <algol-grid-layout id="layout" cols="1fr" gap="1vw" class="algol-bubble-02">
                             <algol-grid-item posh="stretch" padding="0 2" paddingbreak="0">
-                                <algol-textarea id="textarea" label="textarea" maxlength="40" lines="4" placeholder="Digite o seu texto aqui..." required fixed >TEXTO TESTE</algol-textarea>
-                                <algol-textarea disabled id="textarea" label="textarea" maxlength="40" lines="4" placeholder="Digite o seu texto aqui..." required fixed >TEXTO TESTE</algol-textarea>
+                                <algol-textarea name="textarea" id="textarea" label="textarea" maxlength="40" lines="4" placeholder="Digite o seu texto aqui..." fixed ></algol-textarea>
+                                <algol-textarea disabled label="textarea" maxlength="40" lines="4" placeholder="Digite o seu texto aqui..." required fixed >Como assim</algol-textarea>
                             </algol-grid-item>
                         </algol-grid-layout>
 
                     </algol-grid-item>
                     <algol-grid-item posh="end">   
-                        <algol-input id="input" required label="input" placeholder="Digite aqui..." ></algol-input>
-                        <algol-input disabled id="input" required label="input" placeholder="Digite aqui..." ></algol-input>
+                        <algol-input name="input" id="input" label="input" placeholder="Digite aqui..." ></algol-input>
+                        <algol-input disabled required label="input" placeholder="Digite aqui..." ></algol-input>
                     </algol-grid-item>
                     <algol-grid-item class="algol-bubble-02" posh="start" posv="start">   
-                        <algol-input-number id="input-number" required label="input-number" placeholder="Digite aqui..." ></algol-input-number>
-                        <algol-input-number disabled id="input-number" required label="input-number" placeholder="Digite aqui..." ></algol-input-number>
+                        <algol-input-number name="input-number" id="input-number" label="input-number" placeholder="Digite aqui..." ></algol-input-number>
+                        <algol-input-number disabled required label="input-number" placeholder="Digite aqui..." ></algol-input-number>
                     </algol-grid-item>
                     <algol-grid-item posh="start">   
-                        <algol-input-date id="input-date" required label="input-date" placeholder="Digite aqui..." ></algol-input-date>
-                        <algol-input-date disabled id="input-date" required label="input-date" placeholder="Digite aqui..." ></algol-input-date>
+                        <algol-input-date name="input-date" id="input-date" label="input-date" placeholder="Digite aqui..." ></algol-input-date>
+                        <algol-input-date disabled required label="input-date" placeholder="Digite aqui..." ></algol-input-date>
                     </algol-grid-item>
                     <algol-grid-item posh="stretch">   
-                        <algol-input-time id="input-time" required label="input-time" placeholder="Digite aqui..." ></algol-input-time>
-                        <algol-input-time disabled id="input-time" required label="input-time" placeholder="Digite aqui..." ></algol-input-time>
+                        <algol-input-time name="input-time" id="input-time" label="input-time" placeholder="Digite aqui..." ></algol-input-time>
+                        <algol-input-time disabled required label="input-time" placeholder="Digite aqui..." ></algol-input-time>
                     </algol-grid-item>
                     <algol-grid-item posh="end">
-                        <algol-input-range id="input-range" required label="input-range" min=0.5 max="3" step="0.1"></algol-input-range>
-                        <algol-input-range disabled id="input-range" required label="input-range" ></algol-input-range>
+                        <algol-input-range name="input-range" id="input-range" label="input-range" min=0.5 max="3" step="0.1"></algol-input-range>
+                        <algol-input-range disabled required label="input-range" ></algol-input-range>
                     </algol-grid-item>
                     <algol-flex-item distrib="between"> 
-                        <algol-input-color id="input-color" required label="input-color" ></algol-input-color>
-                        <algol-input-color disabled id="input-color" required label="input-color" ></algol-input-color>
+                        <algol-input-color name="input-color" id="input-color" label="input-color" ></algol-input-color>
+                        <algol-input-color disabled required label="input-color" ></algol-input-color>
                     </algol-flex-item>
                 
                 
@@ -155,6 +165,17 @@
                         themeLink.setAttribute('href', tema);
                     });
                     
+
+                    const form = document.getElementById('form');
+                    form.addEventListener('submit', function (e) {
+                        e.preventDefault(); // Evita o envio padrão do formulário
+                        const formData = new FormData(form); //// 1. Cria o objeto FormData a partir do formulário
+                        console.log('Dados do formulário:');
+                        // const dados = Object.fromEntries(formData.entries()); // to json
+                        for (const [name, value] of formData.entries()) {
+                            console.log(`${name}: ${value}`);
+                        }
+                    });
                 });
             </script>
 

@@ -1,3 +1,23 @@
+/**
+ * Componente Web `<algol-textarea>`.
+ *
+ * Área de texto customizada com:
+ *  - label integrada
+ *  - suporte a placeholder, readonly e disabled
+ *  - controle de linhas visíveis (`lines`)
+ *  - limite de caracteres (`maxlength`)
+ *  - modo fixo (desabilita resize)
+ *  - sincronização automática com formulários (ElementInternals)
+ *  - validação nativa (`required`, `tooLong`)
+ *  - suporte a conteúdo inicial via slot
+ *
+ * Este componente encapsula um `<textarea>` nativo no Shadow DOM,
+ * preservando acessibilidade, comportamento de formulários e validações.
+ *
+ * @fires Image#algol-textarea-input
+ * 
+ * @extends BaseComponent
+ */
 class TextArea extends BaseComponent {
     // Mapa de atributos válidos (chaves) e seus respectivos métodos (valores)
     static get PROP_MAP() {
@@ -66,6 +86,13 @@ class TextArea extends BaseComponent {
             if (this.value !== novoValor) {
                 this.value = novoValor; // Mantém a propriedade da classe sincronizada
             }
+            // dispara o evento estilizado do textarea
+            this.dispatchEvent(new CustomEvent('algol-textarea-input', { bubbles: true,composed: true,
+                detail: {
+                    origin: this,
+                    value: e.target.value
+                }
+            }));
             this._internals.setFormValue(novoValor); // Informa ao formulário nativo (API Internals)
             this._atualizarValidacao();
         });

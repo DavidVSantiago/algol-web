@@ -1,3 +1,23 @@
+/**
+ * Componente de layout `<algol-grid-layout>`.
+ *
+ * Wrapper de layout baseado em CSS Grid, com configuração dinâmica via atributos
+ * que são refletidos diretamente em variáveis CSS.
+ *
+ * Permite controlar:
+ *  - número e tamanho das colunas
+ *  - espaçamento entre os itens (gap)
+ *  - alinhamento horizontal e vertical dos elementos
+ *  - variações responsivas para breakpoint móvel
+ *
+ * Todos os atributos são convertidos em CSS Custom Properties,
+ * possibilitando layouts altamente flexíveis sem reprocessamento de DOM.
+ *
+ * A estilização é injetada automaticamente no `<head>` via `injectStyles()`.
+ *
+ * @extends BaseLayout
+ */
+
 class GridLayout extends BaseLayout {
     // Mapa de atributos válidos (chaves) e suas respectivas variáveis CSS (valores), usadas dinamicamente
     static get ATTR_MAP() {

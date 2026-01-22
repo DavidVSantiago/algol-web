@@ -1,3 +1,22 @@
+/**
+ * Componente Web `<algol-input>`.
+ *
+ * Campo de entrada base para formulários da Algol UI.
+ * Integra-se nativamente com formulários HTML via ElementInternals,
+ * suportando validação automática, required, minlength, maxlength e tipos de input.
+ *
+ * Atua como classe base para todos os outros inputs especializados.
+ *
+ * Suporta:
+ *  - label associado automaticamente
+ *  - sincronização atributo ↔ input interno
+ *  - validação nativa (required, minlength, maxlength, type, pattern)
+ *  - integração total com <form>
+ * 
+ * @fires Image#algol-input
+ * 
+ * @extends BaseComponent
+ */
 class Input extends BaseComponent {
     // Mapa de atributos válidos (chaves) e seus respectivos métodos (valores)
     static get PROP_MAP() {
@@ -52,6 +71,13 @@ class Input extends BaseComponent {
             if (this.value !== novoValor) {
                 this.value = novoValor; // Mantém a propriedade da classe sincronizada
             }
+            // dispara o evento estilizado do textarea
+            this.dispatchEvent(new CustomEvent('algol-input', { bubbles: true,composed: true,
+                detail: {
+                    origin: this,
+                    value: e.target.value
+                }
+            }));
             this._internals.setFormValue(novoValor); // Informa ao formulário nativo (API Internals)
             this._atualizarValidacao();
         });
@@ -133,6 +159,27 @@ class Input extends BaseComponent {
 
 // ----------------------------------------------------------------------------------------------------------------------------------
 
+/**
+ * Componente Web `<algol-input-number>`.
+ *
+ * Campo numérico avançado com:
+ *  - validação de digitação em tempo real
+ *  - botões de incremento/decremento
+ *  - suporte a setas do teclado
+ *  - validação de min/max
+ *
+ * Aceita números inteiros e decimais, com tratamento de vírgula e ponto.
+ * Mantém compatibilidade total com formulários HTML.
+ *
+ * Suporta:
+ *  - min / max
+ *  - required
+ *  - incremento por botões ou teclado
+ *
+ * @fires Image#algol-input-number
+ * 
+ * @extends Input
+ */
 class InputNumber extends Input {
     // Mapa de atributos válidos (chaves) e seus respectivos métodos (valores)
     static get PROP_MAP() {
@@ -202,21 +249,27 @@ class InputNumber extends Input {
                 this._resetToEmpty();
                 return;
             }
-
+            
             // Tratar vírgula antes de converter
             let valorNum = Number(valorStr.replace(',', '.'));
-
+            
             if (isNaN(valorNum)) {
                 this._resetToEmpty();
                 return;
             }
-
+            
             valorNum = this._validaLimites(valorNum); // valida min/max
             
             this.value = String(valorNum); 
             this.elems.input.value = this.value;
             this._lastValidValue = this.value;
-
+            this.dispatchEvent(new CustomEvent('algol-input-number', { bubbles: true,composed: true,
+                detail: {
+                    origin: this,
+                    value: this.value
+                }
+            }));
+            // dispara o evento estilizado do textarea
             this._internals.setFormValue(this.value);
             this._atualizarValidacao(); 
         });
@@ -275,6 +328,13 @@ class InputNumber extends Input {
         this.elems.input.value = this.value;
         this._lastValidValue = this.value; // se é válido, salva o último valor válido
         this._internals.setFormValue(this.value);
+        this.dispatchEvent(new CustomEvent('algol-input-number', { bubbles: true,composed: true,
+                detail: {
+                    origin: this,
+                    value: this.value
+                }
+        }));
+        this._atualizarValidacao();
     }
 
     _resetToEmpty() {
@@ -287,6 +347,26 @@ class InputNumber extends Input {
 
 }
 
+// ----------------------------------------------------------------------------------------------------------------------------------
+
+/**
+ * Componente Web `<algol-input-date>`.
+ *
+ * Campo de data baseado em input nativo, com:
+ *  - suporte a min/max
+ *  - aceitação de datas no formato brasileiro (DD/MM/AAAA)
+ *  - conversão automática para ISO (YYYY-MM-DD)
+ *  - validação nativa repassada ao form.
+ *
+ * Suporta:
+ *  - required
+ *  - min / max (ISO ou BR)
+ *  - validação automática de datas inválidas
+ *
+ * @fires Image#algol-input (herda de Input)
+ * 
+ * @extends Input
+ */
 class InputDate extends Input {
     // Mapa de atributos válidos (chaves) e seus respectivos métodos (valores)
     static get PROP_MAP() {
@@ -383,6 +463,24 @@ class InputDate extends Input {
     }
 }
 
+// ----------------------------------------------------------------------------------------------------------------------------------
+
+/**
+ * Componente Web `<algol-input-time>`.
+ *
+ * Campo de horário baseado em input nativo do tipo time.
+ * Suporta controle de intervalo, precisão por step
+ * e validação automática integrada ao formulário.
+ *
+ * Suporta:
+ *  - min / max
+ *  - step (ex: 60 → HH:MM | 1 → HH:MM:SS)
+ *  - required
+ *
+ * @fires Image#algol-input (herda de Input)
+ * 
+ * @extends Input
+ */
 class InputTime extends Input {
     // Mapa de atributos
     static get PROP_MAP() {
@@ -470,6 +568,28 @@ class InputTime extends Input {
     }
 }
 
+// ----------------------------------------------------------------------------------------------------------------------------------
+
+/**
+ * Componente Web `<algol-input-color>`.
+ *
+ * Campo seletor de cor customizado.
+ * Utiliza input[type="color"] nativo oculto, mantendo:
+ *  - acessibilidade
+ *  - seletor de cores do sistema
+ *  - integração com formulários.
+ *
+ * Implementa interface visual própria com foco, hover e teclado.
+ *
+ * Suporta:
+ *  - label
+ *  - disabled
+ *  - value (hex)
+ * 
+ * @fires Image#algol-input (herda de Input)
+ *
+ * @extends Input
+ */
 class InputColor extends Input {
     // Mapa de atributos (Color é simples: só label, value e disabled importam)
     static get PROP_MAP() {
@@ -585,6 +705,30 @@ class InputColor extends Input {
     }
 }
 
+// ----------------------------------------------------------------------------------------------------------------------------------
+
+/**
+ * Componente Web `<algol-input-range>`.
+ *
+ * Slider de intervalo baseado em input[type="range"].
+ * Mantém integração total com formulários e expõe evento próprio
+ * para mudanças em tempo real.
+ *
+ * Dispara:
+ *  - algol-input-range-move → enquanto arrasta
+ *
+ * Suporta:
+ *  - min / max
+ *  - step
+ *  - required
+ *
+ * @fires Image#algol-input (disparo contínuo enquanto move. herdado de Input)
+ * 
+ * @fires Image#algol-input-range (disparo ao soltar o controle)
+ *
+ * @extends Input
+ */
+
 class InputRange extends Input {
     static get PROP_MAP() {
         return {
@@ -611,8 +755,8 @@ class InputRange extends Input {
     attachEvents(){
         super.attachEvents(); // Ganha validação e update_value de graça
         
-        this.elems.input.addEventListener('input', (e) => {
-            this.dispatchEvent(new CustomEvent('algol-input-range-move', { 
+        this.elems.input.addEventListener('change', (e) => {
+            this.dispatchEvent(new CustomEvent('algol-input-range', { 
                 bubbles: true, 
                 composed: true,
                 detail: { value: this.value }

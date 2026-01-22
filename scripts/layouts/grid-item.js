@@ -1,3 +1,24 @@
+/**
+ * Componente Web `<algol-grid-item>`.
+ *
+ * Item de grade para ser usado dentro do `<algol-grid-layout>`.
+ * Permite controle fino de posicionamento, expansão em linhas/colunas,
+ * alinhamento individual, espaçamentos internos (padding) responsivos
+ * e aplicação de imagem de fundo.
+ *
+ * Suporta:
+ *  - colspan / rowspan (e versões responsivas)
+ *  - alinhamento horizontal e vertical do item
+ *  - padding responsivo (1 a 4 valores)
+ *  - imagem de fundo configurável (url, repeat, size, position, attachment)
+ *
+ * Todos os atributos são convertidos dinamicamente em CSS Custom Properties,
+ * permitindo integração direta com o sistema de layout da engine.
+ *
+ * @extends BaseLayout
+ */
+
+
 class GridItem extends BaseLayout {
     // Mapa de atributos válidos (chaves) e suas respectivas variáveis CSS (valores), usadas dinamicamente
     static get ATTR_MAP() {
