@@ -1,4 +1,4 @@
-- Testar a captura dos valores do form depois do clique no submit
+- Remover todos os geradores de id dos shadow dom, não há necessidade disso
 
 Inmplementar
 - input file

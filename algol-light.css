@@ -8,12 +8,18 @@
     --bg-color: #fff; /* Um cinza bem clarinho, quase branco, levemente azulado */
 
     /* Textos */
-    --text-color: #151d29; /* Não usamos preto puro (#000), usamos um cinza chumbo escuro para leitura confortável */
+    --text-color: #151d29;
     --text-color-disabled: #A0AEC0;
     --text-color-label: #4A5568;
     --text-color-label-disabled: #abb3bc;
     --text-color-placeholder: #96a2b9;
     --text-color-placeholder-disabled: #0000;
+
+    /* Menus */
+    --bg-color-menu: var(--bg-color-section-bubble-02); /* fundo do site. deve respeitar o color-scheme */
+    --text-color-menu: var(--text-color);
+    --text-color-menu-focus: #b2b6c4;
+    --text-color-menu-active: #c0c4d1;
 
     /* Bordas e Focos */
     --border-color: #c2c7ce; /* Cinza claro para bordas sutis */

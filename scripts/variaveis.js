@@ -36,8 +36,6 @@ const fontBase64 = "data:application/font-woff;base64,d09GRgABAAAAAE3AABIAAAAAg4
 //  PERIGO!! DAQUI PRA BAIXO NÃO ALTERAR NADA!! *************************************************************************
 // **********************************************************************************************************************
 
-// function setFatorEscala(valor) {document.documentElement.style.setProperty('--scale-factor', valor);}
-
 /** Função de injeção das variáveis GLOBAIS */
 function injectGlobalVariablesStyles() {
     if (document.getElementById('algol-global-variables-style')) return; // Já injetado

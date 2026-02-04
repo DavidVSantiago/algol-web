@@ -49,17 +49,25 @@ class BaseComponent extends HTMLElement {
     connectedCallback() {
         if (this.inicializado) return; // se já foi construído, não faz nada!
         
-        this.render(); // Realiza a construção, uma única vez        
-        this.configSlot(); // configura o slot e faz configuraçẽos posteriores
+        setTimeout(() => { // truque para esperar até que o DOM já esteja completo.
 
-        // Aplica valores iniciais dos atributos
-        this.constructor.observedAttributes.forEach(attr => {
-            const val = this.getAttribute(attr);
-            if (val !== null) this.attributeChangedCallback(attr, null, val);
-        });
-        this.attachEvents();
-        this._registerBaseEvents();
-        this.inicializado = true;
+            this.render(); // Realiza a construção, uma única vez
+            
+            if(this.constructor.useShadow) // se for shadow DOM  
+                this.configSlot(); // configura o slot e faz configuraçẽos posteriores
+            else // se for light DOM
+                this.postConfig();
+        
+
+            // Aplica valores iniciais dos atributos
+            this.constructor.observedAttributes.forEach(attr => {
+                const val = this.getAttribute(attr);
+                if (val !== null) this.attributeChangedCallback(attr, null, val);
+            });
+            this.attachEvents();
+            this._registerBaseEvents();
+            this.inicializado = true;
+        }, 0);
     }
 
     /** @override */

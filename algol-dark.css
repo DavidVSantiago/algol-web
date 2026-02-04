@@ -3,9 +3,11 @@
 /* ******************************************************************************************* */
 
 :root {
+    /* Identidade do Esquema */
     --theme-color-scheme: dark; /* dark ou light. para colorir componentes nativos do navegador*/
     --bg-color: #0b0f13; /* fundo do site. deve respeitar o color-scheme */
 
+    /* Textos */
     --text-color: #fff;
     --text-color-disabled: #888888;
     --text-color-label: #a2a2a2;
@@ -13,8 +15,14 @@
     --text-color-placeholder: #6b6c7a;
     --text-color-placeholder-disabled: #0000;
 
+    /* Menus */
+    --bg-color-menu: #29303b; /* fundo do site. deve respeitar o color-scheme */
+    --text-color-menu: var(--text-color);
+    --text-color-menu-focus: #414855;
+    --text-color-menu-active: #323742;
+
     /* Bordas e Focos */
-    --border-color: #1e2633;
+    --border-color: #28313f;
     --border-color-forms: var(--border-color);
     --border-color-focus:  #2196F3;
     --border-color-focus-glow: #2196f34d;

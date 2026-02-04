@@ -59,7 +59,7 @@ class Spacer extends BaseComponent {
 
     _toVw(val) {
         const num = parseFloat(val); // converte para numero puro (ex: "10px" vira 10)
-        if (!isNaN(num)) {return `${num}vw`;} // 2. Verifica se o resultado é um número válido
+        if (!isNaN(num)) {return `calc(${num}vw * var(--scale-factor)`;} // 2. Verifica se o resultado é um número válido
         return '0vw'; // Valor de fallback caso venha lixo
     }
 }
