@@ -5,6 +5,7 @@ class PowerMenu extends BaseComponent {
         return {
             'logo': 'update_logo',
             'logoalt': 'update_logoalt',
+            'logolink': 'update_logolink',
         };
     }
     static get observedAttributes() {return Object.keys(PowerMenu.PROP_MAP);} // retorna a chaves do mapa de atributos
@@ -44,21 +45,26 @@ class PowerMenu extends BaseComponent {
     postConfig(){
         // salva as referências globais dos componentes
         this.elems.menu = this.root.querySelector('.menu');
+        this.elems.logoLink = this.root.querySelector('.logo-link');
         this.elems.logo = this.root.querySelector('.logo');
         this.elems.menuToggle = this.root.querySelector('.menu-toggle');
         this.elems.menuBtns = this.root.querySelector('.menu-btns');
         this.elems.ul = this.root.querySelector('.menu-btns ul');
         this.elems.menuOverlay = this.root.querySelector('.menu-overlay');
 
+        this._sincronizarMenuOptions(); // adiciona as opções ao menu
+    }
+    /** @override */
+    attachEvents(){
         this.elems.menuToggle.addEventListener('click', () =>{
             this.elems.menuBtns.classList.toggle('show');
             this.elems.menuOverlay.classList.toggle('show');
         });
-
-        this._sincronizarMenuOptions(); // adiciona as opções ao menu
+        this.elems.menuOverlay.addEventListener('click', () =>{
+            this.elems.menuBtns.classList.toggle('show');
+            this.elems.menuOverlay.classList.toggle('show');
+        });
     }
-    /** @override */
-    attachEvents(){}
 
     // ****************************************************************************
     // Métodos dos atributos
@@ -72,6 +78,10 @@ class PowerMenu extends BaseComponent {
     update_logoalt(val) {
         if (!this.elems.logo) return; // guard
         this.elems.logo.alt = val;
+    }
+    update_logolink(val) {
+        if (!this.elems.logo) return; // guard
+        this.elems.logoLink.href = val;
     }
    
     // ****************************************************************************
@@ -160,6 +170,11 @@ class PowerMenu extends BaseComponent {
                     background-color: black;
             }
             
+            algol-power-menu[logolink] .menu .logo{
+                cursor: pointer;
+                text-decoration: none;
+            }
+
             algol-power-menu .menu .logo-link,
             algol-power-menu .menu .menu-btns ul .li-link-wrapper a{
                 color: var(--text-color);

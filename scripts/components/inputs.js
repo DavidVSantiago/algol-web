@@ -56,11 +56,6 @@ class Input extends BaseComponent {
         this.elems.label = this.root.querySelector('label');
         this.elems.input = this.root.querySelector('input');
         this.elems.slot = this.root.querySelector('slot');
-
-        // criação de id único para o select e linkagem com o label
-        const idUnico = `input-${BaseComponent._idCont++}`;
-        this.elems.input.id = idUnico;
-        this.elems.label.setAttribute('for', idUnico);
     }
 
     /** @override */
@@ -820,6 +815,252 @@ class InputRange extends Input {
     }
 }
 
+/**
+ * Componente Web `<algol-input-file>`.
+ *
+ * Campo de seleção de arquivos customizado.
+ * Utiliza um input text (readonly) para exibir o nome do arquivo
+ * e um botão para disparar o input file oculto.
+ *
+ * @extends Input
+ */
+class InputFile extends Input {
+    // Adicionamos os atributos específicos de arquivo
+    static get PROP_MAP() {
+        return {
+            // --- Herdados do conceito de Input (mas alguns sobrescritos)
+            'label': 'update_label',         // Usa o do pai (Input)
+            'required': 'update_required',   // Usa o do pai (Input)
+            'disabled': 'update_disabled',   // Sobrescreveremos para afetar o botão
+            'placeholder': 'update_placeholder', // Sobrescreveremos (substitui o inputtext)
+            'value': 'update_value',
+
+            // --- Específicos de File ---
+            'accept': 'update_accept',
+            'multiple': 'update_multiple',
+            'text': 'update_text'
+
+        };
+    }
+    
+    static get observedAttributes() { return Object.keys(this.PROP_MAP); }
+
+    constructor() { super(); }
+
+    // ****************************************************************************
+    // Métodos de construção do componente
+    // ****************************************************************************
+
+    /** @override */
+    render() {
+        this.root.adoptedStyleSheets = [algol_input_sheet]; // Mantemos o estilo base por enquanto
+        
+        // Estrutura baseada na sua sugestão
+        this.root.innerHTML = `
+            <div class="container-file">
+                <label></label>
+                <div class="input-container">
+                    <input type="text" class='input-file' readonly placeholder="Select file...">
+                    <button class="btn">Search</button>
+                    <input type="file" style="display: none;">
+                </div>
+            </div>
+            <slot></slot>
+        `;
+    }
+
+    /** @override */
+    postConfig() {
+        super.postConfig(); // O pai já captura: container, label, slot
+        
+        // Capturamos as referências específicas dessa estrutura
+        this.elems.textDisplay = this.root.querySelector('.input-file');
+        this.elems.btnSearch = this.root.querySelector('.btn');
+        this.elems.input = this.root.querySelector('input[type="file"]');
+    }
+
+    /** @override */
+    attachEvents(){
+        this.elems.btnSearch.addEventListener('click', (e) => {
+            if(this.hasAttribute('disabled')) return;
+            this.elems.input.click();
+        });
+        this.elems.input.addEventListener('change', (e) => {
+            const arquivos = this.elems.input.files; // obtem a lista de arquivos
+
+            if(arquivos.length > 0){ // se houver 1 ou mais arquivos, vamos validá-los
+                let temArquivoInvalido = false;
+                for (const file of arquivos) {// Verifica cada arquivo selecionado
+                    if (!this._validaArquivo(file)) {
+                        temArquivoInvalido = true;
+                        break;
+                    }
+                }
+                if (temArquivoInvalido) {
+                    this.elems.input.value = ''; // Limpa o input (rejeita a seleção)
+                    this._atualizarTextoDisplay();
+                    // 3. Força um erro de validação customizado
+                    this._internals.setValidity(
+                        { customError: true }, 
+                        `Invalid file! Only: ${this.getAttribute('accept')}`,
+                        this.elems.btnSearch
+                    );
+                    return;
+                }
+            }
+
+            this._atualizarTextoDisplay(); // Atualiza o visual
+            this._atualizarValidacao(); // Dispara validação (necessário para 'required')
+
+            if (this.elems.input.files.length > 0) { // se houver arquivos anexados
+                // Se tiver arquivos, passamos um objeto FormData contendo eles
+                const nomeCampo = this.getAttribute('name') || 'file';
+                const formData = new FormData();
+                // Adiciona todos os arquivos selecionados ao FormData
+                for (const file of this.elems.input.files) {
+                    formData.append(nomeCampo, file);
+                }
+                this._internals.setFormValue(formData); // Informa ao formulário pai
+            } else {// Se não tiver arquivo, limpa
+                this._internals.setFormValue(null);
+            }
+            // Dispara evento customizado caso queira capturar externamente
+            this.dispatchEvent(new CustomEvent('algol-change', {
+                bubbles: true, composed: true,
+                detail: { 
+                    origin: this, 
+                    files: this.elems.input.files 
+                }
+            }));
+        });
+    }
+
+    // ****************************************************************************
+    // Utils Específicos
+    // ****************************************************************************
+
+     /** @override */
+    _atualizarValidacao() {
+        if (!this.elems.input) return;
+
+        // Pega a validade nativa do input file oculto
+        const validadeInterna = this.elems.input.validity;
+
+        if (!validadeInterna.valid) {
+            // Para arquivos, a validação principal é 'valueMissing' (required)
+            // Mas repassamos 'customError' caso você queira validar tamanho/extensão manualmente no futuro
+            const flags = {
+                valueMissing: validadeInterna.valueMissing,
+                customError: validadeInterna.customError 
+            };
+
+            // Define a mensagem e a validade na API Internals
+            this._internals.setValidity(
+                flags,
+                this.elems.input.validationMessage, // Mensagem nativa ("Selecione um arquivo.")
+                this.elems.btnSearch // <--- IMPORTANTE: Aponta o erro para o botão visível, não para o input oculto
+            );
+        } else {
+            this._internals.setValidity({});
+        }
+    }
+
+    _atualizarTextoDisplay() {
+        const files = this.elems.input.files;
+        if (!files || files.length === 0) { // Se o usuário abriu a janela e cancelou (ou removeu arquivos)
+            this.elems.textDisplay.value = '';
+        } else if (files.length === 1) { // Um arquivo: mostra o nome
+            this.elems.textDisplay.value = files[0].name;
+        } else { // Múltiplos arquivos: mostra a contagem
+            //this.elems.textDisplay.value = `${files.length} arquivos selecionados`;
+            
+            // Opção B (Alternativa): Listar nomes com vírgula (se preferir)
+            const nomes = Array.from(files).map(f => f.name).join(' | ');
+            this.elems.textDisplay.value = nomes;
+        }
+    }
+    
+    _validaArquivo(file){
+        const accept = this.getAttribute('accept');
+        if (!accept) return true; // Se não tem filtro, tudo é válido
+        // Divide a string "image/*, .pdf, application/json" em regras
+        const regras = accept.split(',').map(r => r.trim().toLowerCase());
+        const nomeArquivo = file.name.toLowerCase();
+        const tipoArquivo = file.type.toLowerCase();
+
+        // Verifica se o arquivo bate com ALGUMA das regras
+        return regras.some(regra => {
+            if (regra.startsWith('.')) {
+                // Validação por extensão (ex: .pdf)
+                return nomeArquivo.endsWith(regra);
+            } else if (regra.endsWith('/*')) {
+                // Validação por coringa MIME (ex: image/*)
+                const baseMime = regra.replace('/*', ''); // vira "image"
+                return tipoArquivo.startsWith(baseMime);
+            } else {
+                // Validação por MIME exato (ex: application/json)
+                return tipoArquivo === regra;
+            }
+        });
+    }
+
+    /** Obtêm os dados dos arquivos selecionados (FileList) */
+    get files() {
+        return this.elems.input ? this.elems.input.files : null;
+    }
+
+
+    // ****************************************************************************
+    // Métodos dos atributos (Stubs para implementação futura)
+    // ****************************************************************************
+    
+    /** @override */
+    update_placeholder(val) {
+        if (this.elems.textDisplay) {
+            this.elems.textDisplay.placeholder = val || "Select file...";
+        }
+    }
+
+    /** @override */
+    update_disabled(val) {
+        // Chama a lógica do pai (que lida com o this.elems.input oculto)
+        // Mas como Input.update_disabled é simples, podemos reescrever tudo aqui para garantir
+        const isDisabled = this.hasAttribute('disabled');
+        if (this.elems.input) this.elems.input.disabled = isDisabled;
+        if (this.elems.btnSearch) {
+            this.elems  .btnSearch.disabled = isDisabled;
+        }
+        if (this.elems.textDisplay) {
+            this.elems.textDisplay.disabled = isDisabled; 
+        }
+    }
+    /** @override */
+    update_value(val) {
+        if (!val && this.elems.input) {
+            this.elems.input.value = '';
+            this.elems.textDisplay.value = '';
+        }
+    }
+    update_accept(val) {
+        if (this.elems.input) {
+            if (val) this.elems.input.accept = val;
+            else this.elems.input.removeAttribute('accept');
+        }
+    }
+
+    update_multiple(val) {
+        if (this.elems.input) {
+            this.elems.input.multiple = this.hasAttribute('multiple');
+        }
+    }
+    
+    update_text(val) {
+        if (this.elems.btnSearch) {
+            this.elems.btnSearch.textContent = val || "Search";
+        }
+    }
+}
+
 // ----------------------------------------------------------------------------------------------------------------------------------
 // 1. CSS Fora da Classe, Mais performático e limpo (adoptedStyleSheets)
 const algol_input_sheet = new CSSStyleSheet();
@@ -1062,7 +1303,47 @@ algol_input_sheet.replaceSync(`
         background: var(--text-color-disabled) !important;
         cursor: not-allowed;
     }
+
+    /* --- ESTILOS ESPECÍFICOS PARA INPUT FILE --- */
     
+    :host .container-file .btn{
+        appearance: none;
+        outline: none;
+        border: none;
+        user-select: none; // evita seleção de texto
+        cursor: pointer;
+
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: calc(0.6vw * var(--scale-factor)) calc(1.2vw * var(--scale-factor));
+        min-height: calc(2.4vw * var(--scale-factor));
+        border-radius: 0 calc(var(--border-radius-components) * var(--scale-factor)) calc(var(--border-radius-components) * var(--scale-factor)) 0;
+        background-color: var(--bg-color-button);
+        color: var(--text-color);
+        font-family: 'Algol Font';
+        font-weight: 200;
+        font-size: calc(var(--font-size-btn)* var(--scale-factor));
+    }
+    
+    :host .container-file input[type="text"]{
+        border-radius: calc(var(--border-radius-components) * var(--scale-factor)) 0 0 calc(var(--border-radius-components) * var(--scale-factor));
+    }
+
+    :host .container-file .btn:hover:not(:disabled) {
+        filter: brightness(1.1); /* Clareia levemente */
+    }
+    :host .container-file .btn:active:not(:disabled) {
+        transform: translateY(calc(0.09vw * var(--scale-factor))); /* Efeito de clique */
+        filter: brightness(0.9);
+    }
+    :host([disabled]) .container-file .btn {
+        background-color: var(--bg-color-inputs-disabled);
+        color: var(--text-color-disabled);
+        cursor: not-allowed;
+        opacity: 0.7;
+    }
+
 `);
 
 // ----------------------------------------------------------------------------------------------------------------------------------
@@ -1072,3 +1353,4 @@ customElements.define('algol-input-date', InputDate);
 customElements.define('algol-input-time', InputTime);
 customElements.define('algol-input-color', InputColor); 
 customElements.define('algol-input-range', InputRange); 
+customElements.define('algol-input-file', InputFile);

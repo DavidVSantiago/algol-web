@@ -1,7 +1,6 @@
 class BaseComponent extends HTMLElement {
     static formAssociated = true; // Habilita participação em formulários nativos (<form>)
     static useShadow = true; // Usa shadow DOM?
-    static _idCont = 0;
     static get observedAttributes() { return []; } 
     
     constructor() {

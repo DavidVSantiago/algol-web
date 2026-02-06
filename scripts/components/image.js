@@ -47,10 +47,6 @@ class Image extends BaseComponent {
         this.elems.img = this.root.querySelector('img');
         this.elems.error = this.root.querySelector('.error');
         this.elems.slot = this.root.querySelector('slot');
-
-        // criação de id único para o img
-        const idUnico = `img-${BaseComponent._idCont++}`;
-        this.elems.img.id = idUnico;
     }
     /** @override */
     attachEvents(){

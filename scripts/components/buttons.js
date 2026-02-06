@@ -58,10 +58,6 @@ class Button extends BaseComponent {
         this.elems.button = this.root.querySelector('button');
         this.elems.content = this.root.querySelector('.content');
         this.elems.slot = this.root.querySelector('slot');
-
-        // criação de id único
-        const idUnico = `button-${BaseComponent._idCont++}`;
-        this.elems.button.id = idUnico;
     }
 
     /** @override */
@@ -87,6 +83,20 @@ class Button extends BaseComponent {
     }
 
     // ****************************************************************************
+    // Utils
+    // ****************************************************************************
+
+    preventDefault(){
+        this.elems.button.preventDefault();
+    }
+    stopImmediatePropagation(){
+        this.elems.button.stopImmediatePropagation();
+    }
+    stopPropagation(){
+        this.elems.button.stopPropagation();
+    }
+
+    // ****************************************************************************
     // Métodos dos atributos
     // ****************************************************************************
     
@@ -108,7 +118,8 @@ class Button extends BaseComponent {
     update_type(val) {
         // Validação básica de tipo, o tipo real é gerenciado no evento 'click' usando internals
         if (!['button', 'submit', 'reset'].includes(val)) {this.setAttribute('type', 'button');} // fallback
-        
+        if(!this.elems.button) return;
+        this.elems.button.type = val;
     }
     update_name(val) {} 
     update_value(val) {}

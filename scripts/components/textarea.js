@@ -58,12 +58,6 @@ class TextArea extends BaseComponent {
         this.elems.label = this.root.querySelector('label');
         this.elems.textarea = this.root.querySelector('textarea');
         this.elems.slot = this.root.querySelector('slot');
-
-        // criação de id único para o textarea e linkagem com o label
-        const idUnico = `textarea-${BaseComponent._idCont++}`;
-        this.elems.textarea.id = idUnico;
-        this.elems.label.setAttribute('for', idUnico);
-
     }
     /** @override */
     attachEvents(){

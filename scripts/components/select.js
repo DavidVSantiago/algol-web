@@ -55,12 +55,6 @@ class Select extends BaseComponent {
         this.elems.label = this.root.querySelector('label');
         this.elems.select = this.root.querySelector('select');
         this.elems.slot = this.root.querySelector('slot');
-
-        // criação de id único para o select e linkagem com o label
-        const idUnico = `select-${BaseComponent._idCont++}`;
-        this.elems.select.id = idUnico;
-        this.elems.label.setAttribute('for', idUnico);
-
     }
     /** @override */
     attachEvents(){

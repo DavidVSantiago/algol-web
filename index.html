@@ -6,13 +6,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <link id="theme-link" rel="stylesheet" href="algol-dark.css">
-    <script src="min.js"></script>
+    <!-- <script src="min.js"></script> -->
     <!-- <link rel="preload" 
         href="imgs/landscape.webp"
         as="image"
         fetchpriority="high"> -->
 
-    <!-- <script src="scripts/variaveis.js" ></script>
+    <script src="scripts/variaveis.js" ></script>
     
     <script src="scripts/bases/base_component.js" ></script>
     <script src="scripts/bases/base_layout.js" ></script>
@@ -27,7 +27,7 @@
 
     <script src="scripts/layouts/grid-layout.js" ></script>
     <script src="scripts/layouts/grid-item.js" ></script>
-    <script src="scripts/layouts/flex-item.js" ></script> -->
+    <script src="scripts/layouts/flex-item.js" ></script>
 
     <script defer>
         // temporário. apenas para teste
@@ -57,11 +57,11 @@
 </head>
 
 <body id="corpo">
-
    
     <algol-power-menu
         logo="imgs/logo.png"
         logoalt="logo"
+        logolink="https://www.google.com.br"
     >
         <li><a href="">SOBRE</a></li>
         <li><div>INFO DADOS</div></li>
@@ -78,14 +78,21 @@
             <algol-button type="submit">Botão simples</algol-button>
         </li>
     </algol-power-menu>
+
     <div class="caixa-teste">
         Pressione as teclas + ou - para ajustar o zoom
     </div>
 
     <main>
+    <algol-grid-layout posh="stretch" cols="0.1fr 0.8fr 0.1fr" colsbreak="1fr">
+    <algol-grid-item>
+    </algol-grid-item>
+    <algol-grid-item>
         <algol-spacer value="8" valuebreak="4"></algol-spacer>
         <algol-grid-layout posh="stretch" cols="1fr 1fr 1fr 1fr" gap="2vw" class="algol-bubble-02">
-            <algol-grid-item><algol-input-number></algol-input-number></algol-grid-item>
+            <algol-grid-item>
+                
+            </algol-grid-item>
             <algol-grid-item><algol-input-number></algol-input-number></algol-grid-item>
             <algol-grid-item><algol-input-number></algol-input-number></algol-grid-item>
             <algol-grid-item><algol-input-number></algol-input-number></algol-grid-item>
@@ -98,11 +105,21 @@
         <form action="" id="form">
             <algol-grid-layout posh="stretch" id="layout" cols="1fr 1fr 1fr" colsbreak="1fr" gap="1vw" class="algol-bubble-01">
                 <algol-grid-item>
+                    <algol-input-file name="input-file"
+                        id="input-file"
+                        label="Texto"
+                        text="Procurar"
+                        placeholder="Selecione o arquivo..."
+                        multiple
+                        required
+                        accept=".java"
+                        
+                    ></algol-input-file>
                     <algol-image expand src="imgs/landscape.webp" alt="landscape" width="400" height="200"></algol-image>
                 </algol-grid-item>
                 <algol-grid-item posh="center">
 
-                    <algol-select name="select" label='select'>
+                    <algol-select id="select" name="select" label='select'>
                         <option disabled>--Grupo 1--</option>
                         <option value="algol-light.css">Tema Claro</option>  
                         <option value="algol-dark.css">Tema Escuro</option>
@@ -120,7 +137,7 @@
                     </algol-select>
                     </algol-grid-item>
                 <algol-grid-item posh="center" posv="end">
-                    <algol-button type="submit">Botão simples</algol-button>
+                    <algol-button id="btn-enviar">Botão simples</algol-button>
                     <algol-button disabled>Botão simples</algol-button>
                 </algol-grid-item>
                 <algol-grid-item posh="stretch">
@@ -128,7 +145,7 @@
                     <algol-grid-layout id="layout" cols="1fr" gap="1vw" class="algol-bubble-02">
                         <algol-grid-item posh="stretch" padding="0 2" paddingbreak="0">
                             <algol-textarea name="textarea" id="textarea" label="textarea" maxlength="40" lines="4" placeholder="Digite o seu texto aqui..." fixed ></algol-textarea>
-                            <algol-textarea disabled label="textarea" maxlength="40" lines="4" placeholder="Digite o seu texto aqui..." required fixed >Como assim</algol-textarea>
+                            <algol-textarea disabled label="textarea" maxlength="40" lines="4" placeholder="Digite o seu texto aqui..." required fixed ></algol-textarea>
                         </algol-grid-item>
                     </algol-grid-layout>
 
@@ -158,7 +175,6 @@
                     <algol-input-color disabled required label="input-color" ></algol-input-color>
                 </algol-flex-item>
             
-            
         </algol-grid-layout>
         </form>
         <script defer>
@@ -173,18 +189,32 @@
                 
 
                 const form = document.getElementById('form');
-                form.addEventListener('submit', function (e) {
-                    e.preventDefault(); // Evita o envio padrão do formulário
-                    const formData = new FormData(form); //// 1. Cria o objeto FormData a partir do formulário
-                    console.log('Dados do formulário:');
-                    // const dados = Object.fromEntries(formData.entries()); // to json
-                    for (const [name, value] of formData.entries()) {
-                        console.log(`${name}: ${value}`);
+                const inputFile = document.getElementById('input-file');
+                const btnEnviar = document.getElementById('btn-enviar');
+                // form.addEventListener('submit', function (e) {
+                //     e.preventDefault(); // Evita o envio padrão do formulário
+                //     const formData = new FormData(form); //// 1. Cria o objeto FormData a partir do formulário
+                //     console.log('Dados do formulário:');
+                //     // const dados = Object.fromEntries(formData.entries()); // to json
+                //     for (const [name, value] of formData.entries()) {
+                //         console.log(`${name}: ${value}`);
+                //     }
+                    
+                // });
+                btnEnviar.addEventListener('algol-click', function (e) {
+                    //e.preventDefault();
+                    const files = inputFile.files;
+                    for(const file of files){
+                        console.log('Objeto completo:', file);
                     }
                 });
             });
         </script>
-
+    
+    </algol-grid-item>
+    <algol-grid-item>
+    </algol-grid-item>
+    </algol-grid-layout>
     </main>
 </body>
 

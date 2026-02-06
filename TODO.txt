@@ -1,7 +1,6 @@
-- Remover todos os geradores de id dos shadow dom, não há necessidade disso
+reimplementar todo o esquema de variáveis de cores
 
 Inmplementar
-- input file
 - input radio (implementar como um select, onde os slots são as opções do radio)
 - input checkbox (idem)
 
