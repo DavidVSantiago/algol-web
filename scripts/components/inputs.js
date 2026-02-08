@@ -18,6 +18,7 @@
  * @extends BaseComponent
  */
 class Input extends BaseComponent {
+    static get formAssociated() { return true; }
     // Mapa de atributos válidos (chaves) e seus respectivos métodos (valores)
     static get PROP_MAP() {
         return {
@@ -32,7 +33,7 @@ class Input extends BaseComponent {
         };
     }
     static get observedAttributes() {return Object.keys(this.PROP_MAP);} // retorna a chaves do mapa de atributos
-    constructor() {super();}
+    constructor() {super();this._internals = this.attachInternals();}
 
     // ****************************************************************************
     // Métodos de construção do componente

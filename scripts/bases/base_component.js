@@ -1,5 +1,4 @@
 class BaseComponent extends HTMLElement {
-    static formAssociated = true; // Habilita participação em formulários nativos (<form>)
     static useShadow = true; // Usa shadow DOM?
     static get observedAttributes() { return []; } 
     
@@ -8,7 +7,6 @@ class BaseComponent extends HTMLElement {
         this.elems = {}; // cache de elementos internos do componente
         this.inicializado = false;
 
-        this._internals = this.attachInternals(); // API de Formulários, para notifica ao <form>
         this._gerarAcessoresAutomaticos(); // Gera getters/setters baseados nos mapas implementados nas classes filhas
         
         // Cria Shadow DOM ou usa Light DOM 

@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
 
-    <link rel="stylesheet" href="algol-light.css">
+    <link rel="stylesheet" href="../algol-light.css">
     <style>
         :root{
             --scale-factor: 1.0;
@@ -29,7 +29,7 @@
             align-items: center;
         }
 
-        label{
+        .container .box-switch-radio{
             position: relative;
             background-color: var(--bg-color-inputs);
             width: calc(7vw * var(--scale-factor));
@@ -41,7 +41,7 @@
             justify-content: center;
             align-items: center
         }
-        label span{
+        .container .box-switch-radio .ball-switch-radio{
             position: absolute;
             left: calc(0.5vw * var(--scale-factor));
             background-color: var(--text-color-disabled);
@@ -50,16 +50,16 @@
             border-radius: calc(1.5vw * var(--scale-factor));
             transition: left 0.3s ease, background-color 0.3s ease;
         }
-        label input{
+        .container .box input{
             display: none;
         }
 
-        label input:checked ~ span{
+        .container .box-switch-radio input:checked ~ .ball-switch-radio{
             left: calc(3.5vw * var(--scale-factor));
             background-color: var(--bg-color-button);
         }
 
-        label:has(input:disabled){
+        .container .box-switch-radio:has(input:disabled){
             background-color: var(--text-color-disabled);
         }
 
@@ -67,12 +67,28 @@
     </style>
 </head>
 <body>
-    <div class="container">
-        <label for="input-checkbox">
-            <input id="input-checkbox" type="checkbox">
-            <span></span>
-        </label>
-        <span>Checkbox</span>
+    <div style="display: flex; flex-direction: column; gap: calc(2vw * var(--scale-factor))">
+        <div class="container">
+            <label for="input-1" class="box">
+                <input id="input-1" type="radio" name="1">
+                <span class="ball"></span>
+            </label>
+            <label for="input-1" style="cursor: pointer;">Opção 1</label>
+        </div>
+        <div class="container">
+            <label for="input-2" class="box">
+                <input id="input-2" type="radio" name="1">
+                <span class="ball"></span>
+            </label>
+            <label for="input-2" style="cursor: pointer;">Opção 2</label>
+        </div>
+        <div class="container">
+            <label for="input-3" class="box">
+                <input id="input-3" type="radio" name="1">
+                <span class="ball"></span>
+            </label>
+            <label for="input-3" style="cursor: pointer;">Opção 3</label>
+        </div>
     </div>
 </body>
 </html>

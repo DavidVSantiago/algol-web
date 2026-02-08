@@ -17,6 +17,7 @@
  * @extends BaseComponent
  */
 class Button extends BaseComponent {
+    static get formAssociated() { return true; }
     // Mapa de propriedades
     static get PROP_MAP() {
         return {
@@ -35,7 +36,7 @@ class Button extends BaseComponent {
         };
     }
     static get observedAttributes() {return [...Object.keys(this.PROP_MAP), ...Object.keys(this.ATTR_MAP)];}
-    constructor() {super();}
+    constructor() {super(); this._internals = this.attachInternals();}
     
     // ****************************************************************************
     // Métodos de construção

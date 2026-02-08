@@ -6,13 +6,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <link id="theme-link" rel="stylesheet" href="algol-dark.css">
-    <!-- <script src="min.js"></script> -->
+    <script src="min.js"></script>
     <!-- <link rel="preload" 
         href="imgs/landscape.webp"
         as="image"
         fetchpriority="high"> -->
 
-    <script src="scripts/variaveis.js" ></script>
+    <!-- <script src="scripts/variaveis.js" ></script>
     
     <script src="scripts/bases/base_component.js" ></script>
     <script src="scripts/bases/base_layout.js" ></script>
@@ -24,10 +24,11 @@
     <script src="scripts/components/image.js" ></script>
     <script src="scripts/components/spacer.js" ></script>
     <script src="scripts/components/power_menu.js" ></script>
+    <script src="scripts/components/checkables.js" ></script>
 
     <script src="scripts/layouts/grid-layout.js" ></script>
     <script src="scripts/layouts/grid-item.js" ></script>
-    <script src="scripts/layouts/flex-item.js" ></script>
+    <script src="scripts/layouts/flex-item.js" ></script> -->
 
     <script defer>
         // temporário. apenas para teste
@@ -89,21 +90,81 @@
     </algol-grid-item>
     <algol-grid-item>
         <algol-spacer value="8" valuebreak="4"></algol-spacer>
-        <algol-grid-layout posh="stretch" cols="1fr 1fr 1fr 1fr" gap="2vw" class="algol-bubble-02">
-            <algol-grid-item>
-                
-            </algol-grid-item>
-            <algol-grid-item><algol-input-number></algol-input-number></algol-grid-item>
-            <algol-grid-item><algol-input-number></algol-input-number></algol-grid-item>
-            <algol-grid-item><algol-input-number></algol-input-number></algol-grid-item>
-            <algol-grid-item><algol-input-number></algol-input-number></algol-grid-item>
-            <algol-grid-item><algol-input-number></algol-input-number></algol-grid-item>
-            <algol-grid-item><algol-input-number></algol-input-number></algol-grid-item>
-            <algol-grid-item><algol-input-number></algol-input-number></algol-grid-item>
+        <algol-grid-layout posh="stretch" cols="1fr 1fr" gap="2vw" class="algol-bubble-02">
+            
         </algol-grid-layout>
         <algol-spacer value="5" valuebreak="2"></algol-spacer>
         <form action="" id="form">
-            <algol-grid-layout posh="stretch" id="layout" cols="1fr 1fr 1fr" colsbreak="1fr" gap="1vw" class="algol-bubble-01">
+            <algol-grid-layout posh="stretch" id="layout" cols="1fr 1fr 1fr 1fr" colsbreak="1fr" gap="1vw" class="algol-bubble-01">
+                <algol-grid-item posh="center">
+                <algol-checkbox
+                    id="check"
+                    value="novo valor"
+                    name = "check 1"
+                    label="algol-checkbox 1"
+                    required
+                ></algol-checkbox>
+                <algol-spacer value="1" valuebreak="2"></algol-spacer>
+                <algol-checkbox
+                    label="algol-checkbox 2"
+                ></algol-checkbox>
+                <algol-spacer value="1" valuebreak="2"></algol-spacer>
+                <algol-checkbox
+                    label="algol-checkbox 3"
+                ></algol-checkbox>
+                <algol-spacer valuebreak="4"></algol-spacer>
+                </algol-grid-item>
+                <algol-grid-item posh="center">
+                    <algol-radio
+                        id="check"
+                        value="novo valor"
+                        name = "radio"
+                        label="algol-radio 1"
+                        required
+                    ></algol-radio>
+                    <algol-spacer value="1" valuebreak="2"></algol-spacer>
+                    <algol-radio
+                        label="algol-radio 2"
+                        name = "radio"
+                    ></algol-radio>
+                    <algol-spacer value="1" valuebreak="2"></algol-spacer>
+                    <algol-radio
+                        label="algol-radio 3"
+                        name = "radio"
+                    ></algol-radio>
+                    <algol-spacer valuebreak="4"></algol-spacer>
+                </algol-grid-item>
+                <algol-grid-item posh="center">
+                    <algol-switch-checkbox
+                        label="algol-switch-checkbox 1"
+                    ></algol-switch-checkbox>
+                    <algol-spacer value="1" valuebreak="2"></algol-spacer>
+                    <algol-switch-checkbox
+                        label="algol-switch-checkbox 2"
+                    
+                    ></algol-switch-checkbox>
+                    <algol-spacer value="1" valuebreak="2"></algol-spacer>
+                    <algol-switch-checkbox
+                        label="algol-switch-checkbox 3"
+                    ></algol-switch-checkbox>
+                    <algol-spacer valuebreak="4"></algol-spacer>
+                </algol-grid-item>
+                <algol-grid-item posh="center">
+                    <algol-switch-radio
+                        label="algol-switch-radio 1"
+                        name="switch-radio"
+                    ></algol-switch-radio>
+                    <algol-spacer value="1" valuebreak="2"></algol-spacer>
+                    <algol-switch-radio
+                        label="algol-switch-radio 2"
+                        name="switch-radio"
+                    ></algol-switch-radio>
+                    <algol-spacer value="1" valuebreak="2"></algol-spacer>
+                    <algol-switch-radio
+                        label="algol-switch-radio 3"
+                        name="switch-radio"
+                    ></algol-switch-radio>
+                </algol-grid-item>
                 <algol-grid-item>
                     <algol-input-file name="input-file"
                         id="input-file"
@@ -112,7 +173,6 @@
                         placeholder="Selecione o arquivo..."
                         multiple
                         required
-                        accept=".java"
                         
                     ></algol-input-file>
                     <algol-image expand src="imgs/landscape.webp" alt="landscape" width="400" height="200"></algol-image>
@@ -137,7 +197,7 @@
                     </algol-select>
                     </algol-grid-item>
                 <algol-grid-item posh="center" posv="end">
-                    <algol-button id="btn-enviar">Botão simples</algol-button>
+                    <algol-button id="btn-enviar" type="submit">Botão simples</algol-button>
                     <algol-button disabled>Botão simples</algol-button>
                 </algol-grid-item>
                 <algol-grid-item posh="stretch">
@@ -188,25 +248,19 @@
                 });
                 
 
-                const form = document.getElementById('form');
                 const inputFile = document.getElementById('input-file');
                 const btnEnviar = document.getElementById('btn-enviar');
-                // form.addEventListener('submit', function (e) {
-                //     e.preventDefault(); // Evita o envio padrão do formulário
-                //     const formData = new FormData(form); //// 1. Cria o objeto FormData a partir do formulário
-                //     console.log('Dados do formulário:');
-                //     // const dados = Object.fromEntries(formData.entries()); // to json
-                //     for (const [name, value] of formData.entries()) {
-                //         console.log(`${name}: ${value}`);
-                //     }
-                    
-                // });
                 btnEnviar.addEventListener('algol-click', function (e) {
                     //e.preventDefault();
                     const files = inputFile.files;
                     for(const file of files){
                         console.log('Objeto completo:', file);
                     }
+                });
+
+                const check = document.querySelector('#check');
+                check.addEventListener('algol-change', (e)=>{
+                    console.log('algol-change', e.detail);
                 });
             });
         </script>
