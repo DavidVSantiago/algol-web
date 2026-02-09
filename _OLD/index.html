@@ -6,13 +6,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <link id="theme-link" rel="stylesheet" href="algol-dark.css">
-    <!-- <script src="min.js"></script> -->
+    <script src="min.js"></script>
     <!-- <link rel="preload" 
         href="imgs/landscape.webp"
         as="image"
         fetchpriority="high"> -->
 
-    <script src="scripts/variaveis.js" ></script>
+    <!-- <script src="scripts/variaveis.js" ></script>
     
     <script src="scripts/bases/base_component.js" ></script>
     <script src="scripts/bases/base_layout.js" ></script>
@@ -28,7 +28,7 @@
 
     <script src="scripts/layouts/grid-layout.js" ></script>
     <script src="scripts/layouts/grid-item.js" ></script>
-    <script src="scripts/layouts/flex-item.js" ></script>
+    <script src="scripts/layouts/flex-item.js" ></script> -->
 
     <script defer>
         // temporário. apenas para teste
@@ -71,7 +71,7 @@
         <li>
              <algol-select name="select" id="select">
                 <option disabled>--Grupo 1--</option>
-                <option value="algol-light-green.css">Tema Claro</option>  
+                <option value="algol-light.css">Tema Claro</option>  
                 <option value="algol-dark.css">Tema Escuro</option>
             </algol-select>
         </li>
@@ -90,7 +90,9 @@
     </algol-grid-item>
     <algol-grid-item>
         <algol-spacer value="8" valuebreak="4"></algol-spacer>
-        
+        <algol-grid-layout posh="stretch" cols="1fr 1fr" gap="2vw" class="algol-bubble-02">
+            
+        </algol-grid-layout>
         <algol-spacer value="5" valuebreak="2"></algol-spacer>
         <form action="" id="form">
             <algol-grid-layout posh="stretch" id="layout" cols="1fr 1fr 1fr 1fr" colsbreak="1fr" gap="1vw" class="algol-bubble-01">
@@ -108,7 +110,7 @@
                 ></algol-checkbox>
                 <algol-spacer value="1" valuebreak="2"></algol-spacer>
                 <algol-checkbox
-                    label="algol-checkbox 3" disabled
+                    label="algol-checkbox 3"
                 ></algol-checkbox>
                 <algol-spacer valuebreak="4"></algol-spacer>
                 </algol-grid-item>
@@ -128,7 +130,7 @@
                     <algol-spacer value="1" valuebreak="2"></algol-spacer>
                     <algol-radio
                         label="algol-radio 3"
-                        name = "radio" disabled
+                        name = "radio"
                     ></algol-radio>
                     <algol-spacer valuebreak="4"></algol-spacer>
                 </algol-grid-item>
@@ -143,7 +145,7 @@
                     ></algol-switch-checkbox>
                     <algol-spacer value="1" valuebreak="2"></algol-spacer>
                     <algol-switch-checkbox
-                        label="algol-switch-checkbox 3" disabled
+                        label="algol-switch-checkbox 3"
                     ></algol-switch-checkbox>
                     <algol-spacer valuebreak="4"></algol-spacer>
                 </algol-grid-item>
@@ -160,7 +162,7 @@
                     <algol-spacer value="1" valuebreak="2"></algol-spacer>
                     <algol-switch-radio
                         label="algol-switch-radio 3"
-                        name="switch-radio" disabled
+                        name="switch-radio"
                     ></algol-switch-radio>
                 </algol-grid-item>
                 <algol-grid-item>
@@ -171,13 +173,7 @@
                         placeholder="Selecione o arquivo..."
                         multiple
                         required
-                    ></algol-input-file>
-                    <algol-input-file name="input-file"
-                        label="Texto"
-                        text="Procurar"
-                        placeholder="Selecione o arquivo..."
-                        multiple
-                        disabled
+                        
                     ></algol-input-file>
                     <algol-image expand src="imgs/landscape.webp" alt="landscape" width="400" height="200"></algol-image>
                 </algol-grid-item>

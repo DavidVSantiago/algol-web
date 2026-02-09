@@ -3,50 +3,33 @@
 /* ******************************************************************************************* */
 
 :root {
-    /* Identidade do Esquema */
     --theme-color-scheme: dark; /* dark ou light. para colorir componentes nativos do navegador*/
-    --bg-color: #0b0f13; /* fundo do site. deve respeitar o color-scheme */
 
-    /* Textos */
-    --text-color: #fff;
-    --text-color-disabled: #888888;
-    --text-color-label: #a2a2a2;
-    --text-color-label-disabled: #3a3a3a;
-    --text-color-placeholder: #6b6c7a;
-    --text-color-placeholder-disabled: #0000;
+    --accent-A:#378acd;
+    --accent-B:#2174b8;
 
-    /* Menus */
-    --bg-color-menu: #29303b; /* fundo do site. deve respeitar o color-scheme */
-    --text-color-menu: var(--text-color);
-    --text-color-menu-focus: #414855;
-    --text-color-menu-active: #323742;
+    --bg-A:#0b0f13;
+    --bg-B:#121821;
+    --bg-C:#1a212c;
+    --bg-D:#242d3b;
+    
+    --bg-comp-A:#0c1219;
+    --bg-comp-dis-A:#373e46;
 
-    /* Bordas e Focos */
-    --border-color: #28313f;
-    --border-color-forms: var(--border-color);
-    --border-color-focus:  #2196F3;
-    --border-color-focus-glow: #2196f34d;
+    --border-A:#343e4f;
+    --border-B:var(--border-A);
+    --border-C:var(--border-A);
 
-    /* Inputs e Fundos */
-    --bg-color-inputs: #0c1219;
-    --bg-color-inputs-disabled: #373e46;
-    --bg-color-button: #378acd; 
+    --text-A:#fff;
+    --text-B:#a2a2a2;
+    --text-C:var(--text-A);
+    --text-dis-A:#888888;
 
-    /* components input-number */
-    --bg-color-btn-spinner: #f0f0f0;
-    --bg-color-btn-spinner-disabled: #b8b8b8;
-    --bg-color-btn-spinner-hover: #b0b0b0;
-    --text-color-btn-spinner: #0b0f13;
-    --text-color-btn-spinner-disabled: #525252;
-    --border-color-btn-spinner: #ccc;
-    --border-color-btn-spinner-disabled: #999;
+    --comp-bright: 1.2;
+    --comp-dark: 0.8;
 
-    /* layout */
-    --bg-color-section-bubble-01: #121821;
-    --border-color-section-bubble-01: var(--border-color);
-    --bg-color-section-bubble-02: #1a212c;
-    --border-color-section-bubble-02: var(--border-color);
-
+    --overlay:#0019;
+    
     /* Adicione aqui as suas variáveis de tema personalizadas */
     
 }

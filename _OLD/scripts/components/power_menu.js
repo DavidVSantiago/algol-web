@@ -135,13 +135,12 @@ class PowerMenu extends BaseComponent {
                 justify-content: space-between;
                 align-items: center;
                 height: max-content;
-                background-color: var(--bg-D);
+                background-color: var(--bg-color-menu);
                 z-index: 99;
                 padding-left: calc(1.5vw * var(--scale-factor));
                 padding-right: calc(0.6vw * var(--scale-factor));
                 padding-top: calc(0.4vw * var(--scale-factor));
                 padding-bottom: calc(0.4vw * var(--scale-factor));
-                border-bottom: calc(0.4vw * var(--scale-factor)) solid var(--bg-C);
             }
 
             algol-power-menu .menu .menu-toggle {
@@ -157,9 +156,7 @@ class PowerMenu extends BaseComponent {
                 width: calc(2.5vw * var(--scale-factor));
                 margin: calc(0.5vw * var(--scale-factor)) 0;
                 border-radius: calc(0.5vw * var(--scale-factor));
-                background: var(--text-A);
-                box-shadow: 0 calc(0.1vw * var(--scale-factor)) calc(0.1vw * var(--scale-factor)) var(--bg-A);
-
+                background: var(--text-color-menu);
             }
 
             algol-power-menu .menu .menu-overlay{
@@ -170,7 +167,7 @@ class PowerMenu extends BaseComponent {
                     top: 0;
                     left: 0;
                     z-index: 96;
-                    background-color: var(--overlay);
+                    background-color: black;
             }
             
             algol-power-menu[logolink] .menu .logo{
@@ -180,7 +177,7 @@ class PowerMenu extends BaseComponent {
 
             algol-power-menu .menu .logo-link,
             algol-power-menu .menu .menu-btns ul .li-link-wrapper a{
-                color: var(--text-A);
+                color: var(--text-color);
                 text-decoration: none;
                 cursor: unset;
             }
@@ -222,17 +219,15 @@ class PowerMenu extends BaseComponent {
                 justify-content: center;
                 text-align: center;
                 padding: 0 calc(1vw * var(--scale-factor));
-                text-shadow: 0 calc(0.1vw * var(--scale-factor)) calc(0.1vw * var(--scale-factor)) var(--bg-A);
             }
             algol-power-menu .menu .menu-btns ul .li-link-wrapper{
                 cursor: pointer;
             }
             algol-power-menu .menu .menu-btns ul .li-link-wrapper:hover{
-                background-color: var(--bg-C);
+                background-color: var(--text-color-menu-focus);
             }
             algol-power-menu .menu .menu-btns ul .li-link-wrapper:active{
-                background-color: var(--bg-B);
-
+                background-color: var(--text-color-menu-active);
             }
             
             @media (max-width: 600px) {
@@ -248,8 +243,12 @@ class PowerMenu extends BaseComponent {
                     display: block;
                 }
 
+                algol-power-menu .menu .menu-overlay{
+                    display: none;
+                }
                 algol-power-menu .menu .menu-overlay.show{
                     display: block;
+                    opacity: 0.8;
                 }
 
                 algol-power-menu .menu .logo-link .logo{width: calc(3vw * var(--scale-factor));}
@@ -265,7 +264,7 @@ class PowerMenu extends BaseComponent {
                     padding-bottom: calc(1vw * var(--scale-factor));
                     transform: translateY(-100%);
                     transition: transform 0.3s ease, visibility 0.3s ease;
-                    background-color: var(--bg-D);
+                    background-color: var(--bg-color-menu);
                 }
                 algol-power-menu .menu .menu-btns.show {
                     visibility: visible;

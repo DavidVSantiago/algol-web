@@ -1,52 +1,36 @@
 /* ******************************************************************************************* */
-/* TEMA LIGHT (Claro) ************************************************************************ */
+/* TEMA ************************************************************************************** */
 /* ******************************************************************************************* */
 
 :root {
-    /* Identidade do Esquema */
-    --theme-color-scheme: light; 
-    --bg-color: #fff; /* Um cinza bem clarinho, quase branco, levemente azulado */
+    --theme-color-scheme: dark; /* dark ou light. para colorir componentes nativos do navegador*/
 
-    /* Textos */
-    --text-color: #151d29;
-    --text-color-disabled: #A0AEC0;
-    --text-color-label: #4A5568;
-    --text-color-label-disabled: #abb3bc;
-    --text-color-placeholder: #96a2b9;
-    --text-color-placeholder-disabled: #0000;
+    --accent-A:#ff9a37;
+    --accent-B:#f4a353;
 
-    /* Menus */
-    --bg-color-menu: var(--bg-color-section-bubble-02); /* fundo do site. deve respeitar o color-scheme */
-    --text-color-menu: var(--text-color);
-    --text-color-menu-focus: #b2b6c4;
-    --text-color-menu-active: #c0c4d1;
+    --bg-A:#e7edf1;
+    --bg-B:#dae0e4;
+    --bg-C:#c7ced3;
+    --bg-D:#b2bcc4;
+    
+    --bg-comp-A:#fff;
+    --bg-comp-dis-A:#98938d;
 
-    /* Bordas e Focos */
-    --border-color: #c2c7ce; /* Cinza claro para bordas sutis */
-    --border-color-forms: var(--border-color);
-    --border-color-focus: #005ba5; /* Mantemos o Azul Material (Identidade da marca) */
-    --border-color-focus-glow: #005ba599; /* Glow azul mais suave */
+    --border-A:#9ea8ae;
+    --border-B:var(--border-A);
+    --border-C:var(--border-A);
 
-    /* Inputs e Fundos */
-    --bg-color-inputs: #FFFFFF; /* Fundo branco clássico para inputs */
-    --bg-color-inputs-disabled: #c3c7cb; /* Fundo cinza claro para indicar desabilitado */
-    --bg-color-button: #9dc8eb; /* Mantemos o azul do botão (ou pode escurecer levemente para contraste) */
+    --text-A:#000;
+    --text-B:#222;
+    --text-C:var(--text-A);
+    --text-dis-A:#3f3b39;
 
-    /* components input-number */
-    --bg-color-btn-spinner: #777; 
-    --bg-color-btn-spinner-disabled: #EDF2F7;
-    --bg-color-btn-spinner-hover: #999;
-    --text-color-btn-spinner: #ffffff;
-    --text-color-btn-spinner-disabled: #A0AEC0;
-    --border-color-btn-spinner: #CBD5E0;
-    --border-color-btn-spinner-disabled: #E2E8F0;
+    --comp-bright: 1.1;
+    --comp-dark: 0.9;
 
-    /* Layout (Bubbles/Cards) */
-    --bg-color-section-bubble-01: #eceef4; /* "Cards" brancos sobre o fundo cinza claro */
-    --border-color-section-bubble-01: var(--border-color);
-    --bg-color-section-bubble-02: #dee0e8; /* Um tom muito sutil (opcional) ou #FFFFFF também */
-    --border-color-section-bubble-02: var(--border-color);
+    --overlay:#1109;
 
+    
     /* Adicione aqui as suas variáveis de tema personalizadas */
     
 }

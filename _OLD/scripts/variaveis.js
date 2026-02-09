@@ -87,8 +87,8 @@ function injectGlobalNormalizationStyles() {
         font-size: calc(var(--font-size) * var(--scale-factor));
         line-height: calc(var(--line-height) * var(--scale-factor));
         margin: calc(var(--margin-page) * var(--scale-factor));
-        color: var(--text-A);
-        background-color: var(--bg-A);
+        color: var(--text-color);
+        background-color: var(--bg-color);
     }
     main {
         margin: 0 auto;
@@ -147,14 +147,14 @@ function injectGlobalClasses() {
     /* Groups **************************************************************** */
     .algol-bubble-01 {
         padding: calc(1.0vw * var(--scale-factor));
-        background-color: var(--bg-B);
-        border: calc(0.1vw * var(--scale-factor)) solid var(--border-B);
+        background-color: var(--bg-color-section-bubble-01);
+        border: calc(0.1vw * var(--scale-factor)) solid var(--border-color-section-bubble-01);
         border-radius: calc(var(--border-radius-layout) * var(--scale-factor));
     }
     .algol-bubble-02 {
         padding: calc(1.0vw * var(--scale-factor));
-        background-color: var(--bg-C);
-        border: calc(0.1vw * var(--scale-factor)) solid var(--border-C);
+        background-color: var(--bg-color-section-bubble-02);
+        border: calc(0.1vw * var(--scale-factor)) solid var(--border-color-section-bubble-02);
         border-radius: calc(var(--border-radius-layout) * var(--scale-factor));
     }
   `;

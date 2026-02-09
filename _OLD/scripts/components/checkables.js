@@ -322,7 +322,7 @@ class SwitchRadio extends BaseCheckable {
 const algol_checkables_sheet = new CSSStyleSheet();
 algol_checkables_sheet.replaceSync(`
     :host([disabled]){
-        color: var(--text-dis-A);
+        color: var(--text-color-disabled);
     }
 
     .container{
@@ -338,8 +338,8 @@ algol_checkables_sheet.replaceSync(`
     .container .box-switch-checkbox,
     .container .box-switch-radio{
         position: relative;
-        background-color: var(--bg-comp-A);
-        box-shadow: 0 0 0 calc(0.1vw * var(--scale-factor)) var(--border-A);
+        background-color: var(--bg-color-inputs);
+        box-shadow: 0 0 0 calc(0.1vw * var(--scale-factor)) var(--border-color);
         cursor: pointer;
         display: flex;
         justify-content: center;
@@ -359,7 +359,7 @@ algol_checkables_sheet.replaceSync(`
     .container .box-switch-radio{
         width: calc(3vw * var(--scale-factor));
         height: calc(1.8vw * var(--scale-factor));
-        box-shadow: 0 0 0 calc(0.1vw * var(--scale-factor)) var(--border-A);
+        box-shadow: 0 0 0 calc(0.1vw * var(--scale-factor)) var(--border-color);
         border-radius: calc(0.9vw * var(--scale-factor));
     }
 
@@ -367,7 +367,7 @@ algol_checkables_sheet.replaceSync(`
     .container .box-radio:hover:has(input:not(:checked):not(:disabled)),
     .container .box-switch-checkbox:hover:has(input:not(:checked):not(:disabled)),
     .container .box-switch-radio:hover:has(input:not(:checked):not(:disabled)) {
-        filter: brightness(var(--comp-bright));
+        background-color: var(--border-color-btn-spinner-disabled);
     }
 
     .container span{
@@ -376,7 +376,7 @@ algol_checkables_sheet.replaceSync(`
     }
     .container .box-checkbox .ball-checkbox,
     .container .box-radio .ball-radio{
-        background-color: var(--accent-A);
+        background-color: var(--bg-color-button);
         opacity: 0;
         width: calc(1.1vw * var(--scale-factor));
         height: calc(1.1vw * var(--scale-factor));
@@ -391,11 +391,11 @@ algol_checkables_sheet.replaceSync(`
     }
     .container .box-switch-checkbox .ball-switch-checkbox,
     .container .box-switch-radio .ball-switch-radio{
-        background-color: var(--text-dis-A);
+        background-color: var(--text-color-disabled);
         width: calc(1.2vw * var(--scale-factor));
         height: calc(1.2vw * var(--scale-factor));
         border-radius: calc(1.5vw * var(--scale-factor));
-        transition: left 0.1s ease, background-color 0.1s ease;
+        transition: left 0.3s ease, background-color 0.3s ease;
 
     }
 
@@ -414,14 +414,14 @@ algol_checkables_sheet.replaceSync(`
     .container .box-switch-checkbox input:checked ~ .ball-switch-checkbox,
     .container .box-switch-radio input:checked ~ .ball-switch-radio{
         left: calc(1.5vw * var(--scale-factor));
-        background-color: var(--accent-A);
+        background-color: var(--bg-color-button);
     }
 
     .container .box-checkbox:has(input:disabled),
     .container .box-radio:has(input:disabled),
     .container .box-switch-checkbox:has(input:disabled),
     .container .box-switch-radio:has(input:disabled){
-        background-color: var(--bg-comp-dis-A);
+        background-color: var(--text-color-disabled);
         cursor: not-allowed;
     }
 `);

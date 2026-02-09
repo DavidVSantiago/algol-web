@@ -31,8 +31,8 @@ class Button extends BaseComponent {
     }
     static get ATTR_MAP() {
         return {
-            'bgcolor': '--accent-A', // cor do fundo botão
-            'color': '--text-A', // cor do texto do botão
+            'bgcolor': '--bg-color-button', // cor do fundo botão
+            'color': '--text-color', // cor do texto do botão
         };
     }
     static get observedAttributes() {return [...Object.keys(this.PROP_MAP), ...Object.keys(this.ATTR_MAP)];}
@@ -150,8 +150,8 @@ algol_button_sheet.replaceSync(`
         padding: calc(0.6vw * var(--scale-factor)) calc(1.2vw * var(--scale-factor));
         min-height: calc(2.4vw * var(--scale-factor));
         border-radius: calc(var(--border-radius-components) * var(--scale-factor));
-        background-color: var(--accent-A);
-        color: var(--text-C);
+        background-color: var(--bg-color-button);
+        color: var(--text-color);
         font-family: 'Algol Font';
         font-weight: 200;
         font-size: calc(var(--font-size-btn)* var(--scale-factor));
@@ -159,11 +159,11 @@ algol_button_sheet.replaceSync(`
 
     /* --- Hover e Active --------------------------------------------------------------- */
     button:hover:not(:disabled) {
-        filter: brightness(var(--comp-bright)); /* Clareia levemente */
+        filter: brightness(1.1); /* Clareia levemente */
     }
     button:active:not(:disabled) {
         transform: translateY(calc(0.09vw * var(--scale-factor))); /* Efeito de clique */
-        filter: brightness(var(--comp-dark));
+        filter: brightness(0.9);
     }
 
     /* --- Tamanhos (Size) ---------------------------------------------------------------*/
@@ -181,8 +181,8 @@ algol_button_sheet.replaceSync(`
 
     /* --- Estado Disabled ------------------------------------------------------------- */
     button:disabled {
-        background-color: var(--bg-comp-dis-A);
-        color: var(--text-dis-A);
+        background-color: var(--bg-color-inputs-disabled);
+        color: var(--text-color-disabled);
         cursor: not-allowed;
         opacity: 0.7;
     }
@@ -215,7 +215,7 @@ algol_button_sheet.replaceSync(`
     
     /* Foco acessível */
     :host(:focus-within) button {
-         box-shadow: 0 0 0 calc(0.2vw * var(--scale-factor)) var(--accent-B);
+         box-shadow: 0 0 0 calc(0.2vw * var(--scale-factor)) var(--border-color-focus-glow);
     }
 `);
 

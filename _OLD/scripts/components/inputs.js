@@ -1079,11 +1079,11 @@ algol_input_sheet.replaceSync(`
         
     }
     label {
-        color: var(--text-B);
+        color: var(--text-color-label);
         font-size: calc(1.0vw * var(--scale-factor));
     }
     :host([disabled]) label{
-        color: var(--text-dis-A);
+        color: var(--text-color-label-disabled);
     }
     input::-webkit-calendar-picker-indicator { /* Chrome & others*/
         color-scheme: var(--theme-color-scheme);
@@ -1096,9 +1096,9 @@ algol_input_sheet.replaceSync(`
         box-sizing: border-box;
         width: 100%;
         padding: calc(0.8vw * var(--scale-factor)) calc(1.1vw * var(--scale-factor));
-        background: var(--bg-comp-A);
-        color: var(--text-A);
-        border: calc(0.1vw * var(--scale-factor)) solid var(--border-A);
+        background: var(--bg-color-inputs);
+        color: var(--text-color);
+        border: calc(0.1vw * var(--scale-factor)) solid var(--border-color-forms);
         border-radius: calc(var(--border-radius-components) * var(--scale-factor));
         
         font-family: 'Algol Font';
@@ -1107,19 +1107,19 @@ algol_input_sheet.replaceSync(`
         line-height: calc(var(--line-height) * var(--scale-factor));
     }
     :host([disabled]) input{
-        background-color: var(--bg-comp-dis-A) !important;
-        color: var(--text-dis-A) !important;
+        background-color: var(--bg-color-inputs-disabled) !important;
+        color: var(--text-color-disabled) !important;
         cursor: not-allowed;
     }
     :host(:focus-within) input {
-        border-color: var(--accent-B); /* Exemplo */
-        box-shadow: 0 0 0 calc(0.1vw * var(--scale-factor)) var(--accent-B) /* "Glow" externo */
+        border-color: var(--border-color-focus); /* Exemplo */
+        box-shadow: 0 0 0 calc(0.1vw * var(--scale-factor)) var(--border-color-focus-glow) /* "Glow" externo */
     }
     input::placeholder {
-        color: var(--text-B) !important;
+        color: var(--text-color-placeholder) !important;
     }
     :host([disabled]) input::placeholder {
-        color: var(--text-dis-A) !important;
+        color: var(--text-color-placeholder-disabled) !important;
     }
 
     /* --- ESTILOS ESPECÍFICOS PARA INPUT NUMBER --- */
@@ -1139,8 +1139,8 @@ algol_input_sheet.replaceSync(`
     .btnup, .btndown{
         width: calc(2.0vw * var(--scale-factor));
         height: 100%;
-        background-color: var(--bg-comp-A);
-        color: var(--text-A);
+        background-color: var(--bg-color-btn-spinner);
+        color: var(--text-color-btn-spinner);
         text-align: center;
         border: none;
         cursor: pointer;
@@ -1151,22 +1151,34 @@ algol_input_sheet.replaceSync(`
         -moz-user-select: none;
         -ms-user-select: none;
         -o-user-select: none;
-        border: solid calc(0.1vw * var(--scale-factor)) var(--border-A);
     }
-    :host(:not([disabled])) .btnup:hover, :host(:not([disabled])) .btndown:hover{
-        filter: brightness(var(--comp-bright));
+    .btnup{
+        border-bottom: solid calc(0.1vw * var(--scale-factor)) var(--border-color-btn-spinner);
+    }
+    .btndown{
+        border-top: solid calc(0.1vw * var(--scale-factor)) var(--border-color-btn-spinner);
+    }
+    .btnup:hover, .btndown:hover{
+        background-color: var(--bg-color-btn-spinner-hover);
     }
     .btnup:active, .btndown:active{
-        transform: translateY(calc(0.09vw * var(--scale-factor)));
-        filter: brightness(var(--comp-bright));
+        transform: translateY(calc(0.09vw * var(--scale-factor))); /* Efeito de clique */
+        background-color: var(--bg-color-btn-spinner-hover);
     }
 
     :host([disabled]) .btnup,:host([disabled]) .btndown{
-        background-color: var(--bg-comp-dis-A) !important;
-        color: var(--text-dis-A) !important;
+        background-color: var(--bg-color-btn-spinner-disabled) !important;
+        color: var(--text-color-btn-spinner-disabled) !important;
         cursor: not-allowed;
     }
+    :host([disabled]) .btnup{
+        border-bottom-color:var(--border-color-btn-spinner-disabled) !important;
+    }
+    :host([disabled]) .btndown{
+        border-top-color:var(--border-color-btn-spinner-disabled) !important;
+    }
     
+
     /* --- ESTILOS ESPECÍFICOS PARA INPUT COLOR --- */
     .color-border{
         display: flex;
@@ -1174,14 +1186,14 @@ algol_input_sheet.replaceSync(`
         justify-content: center;
         width: calc(5vw * var(--scale-factor));
         height: calc(3vw * var(--scale-factor));
-        background: var(--bg-comp-A);
-        border: calc(0.1vw * var(--scale-factor)) solid var(--border-A);
+        background: var(--bg-color-inputs);
+        border: calc(0.1vw * var(--scale-factor)) solid var(--border-color-forms);
         border-radius: calc(var(--border-radius-components) * var(--scale-factor));
     }
     :host(:focus-within) .color-border,
     .color-border:focus {
-        border-color: var(--accent-B);
-        box-shadow: 0 0 0 calc(0.1vw * var(--scale-factor)) var(--accent-B);
+        border-color: var(--border-color-focus);
+        box-shadow: 0 0 0 calc(0.1vw * var(--scale-factor)) var(--border-color-focus-glow);
     }
     :host([disabled]) .color-border,
     :host([disabled]) .color-border:focus {
@@ -1189,7 +1201,7 @@ algol_input_sheet.replaceSync(`
         box-shadow: none;
     }
     :host([disabled]) .color-border{
-        background: var(--bg-comp-dis-A) !important;
+        background: var(--bg-color-inputs-disabled) !important;
         cursor: not-allowed;
     }
     
@@ -1199,16 +1211,16 @@ algol_input_sheet.replaceSync(`
         height: calc(2vw * var(--scale-factor));
     }
     :host([disabled]) .color-box{
-        background: var(--bg-comp-dis-A) !important;
+        background: var(--bg-color-inputs-disabled) !important;
         cursor: not-allowed;
-        filter: brightness(var(--comp-dark)); /* leve escurecida */
+        filter: brightness(0.8); /* leve escurecida */
     }
-    :host(:not([disabled])) .color-border:hover{
-        filter: brightness(var(--comp-dark)); /* leve escurecida */
+    :host(:not([disabled])) .color-box:hover, :host(:not([disabled])) .color-border:hover{
+        filter: brightness(0.9); /* leve escurecida */
     }
     :host(:not([disabled])) .color-box:active{
         transform: translateY(calc(0.09vw * var(--scale-factor))); /* Efeito de clique */
-        filter: brightness(var(--comp-dark));
+        filter: brightness(0.8);
     }
 
     /* --- ESTILOS ESPECÍFICOS PARA INPUT RANGE --- */
@@ -1230,24 +1242,24 @@ algol_input_sheet.replaceSync(`
     input[type="range"]::-moz-range-track { /* Firefox */
         width: 100%;
         height: calc(0.4vw * var(--scale-factor));
-        background: var(--bg-comp-A);
+        background: var(--bg-color-inputs);
         border-radius: calc(0.2vw * var(--scale-factor));
         cursor: pointer;
     }
     :host([disabled]) input[type="range"]::-moz-range-track { /* Chrome & others */
-        background: var(--bg-comp-dis-A) !important;
+        background: var(--bg-color-inputs-disabled) !important;
     }
 
     input[type="range"]::-webkit-slider-runnable-track {
         width: 100%;
         height: calc(0.4vw * var(--scale-factor));
-        background: var(--bg-comp-A);
+        background: var(--bg-color-inputs);
         border-radius: calc(0.2vw * var(--scale-factor));
         cursor: pointer;
     }
     :host([disabled]) input[type="range"]::-webkit-slider-runnable-track {
         cursor: not-allowed;
-        background: var(--bg-comp-dis-A) !important;
+        background: var(--bg-color-inputs-disabled) !important;
     }
     /* bolinha do range ----------------------------------------------------------- */
     input[type="range"]::-webkit-slider-thumb {/* bolinha Chrome, Safari, Edge */
@@ -1255,7 +1267,7 @@ algol_input_sheet.replaceSync(`
         height: calc(1.2vw * var(--scale-factor));
         width: calc(1.2vw * var(--scale-factor));
         border-radius: 50%;
-        background: var(--text-A); /* Cor da bolinha */
+        background: var(--text-color); /* Cor da bolinha */
         border: none;
         margin-top: calc(-0.4vw * var(--scale-factor)); 
     }
@@ -1264,32 +1276,32 @@ algol_input_sheet.replaceSync(`
         height: calc(1.2vw * var(--scale-factor));
         width: calc(1.2vw * var(--scale-factor));
         border-radius: 50%;
-        background: var(--text-A);
+        background: var(--text-color);
         border: none;
     }
     input[type="range"]::-webkit-slider-thumb:hover { /* Hover da bolinha Chrome, Safari, Edge */
         transform: scale(1.2); /* Cresce um pouco */
-        background: var(--accent-B);
+        background: var(--border-color-focus);
     }
     input[type="range"]::-moz-range-thumb:hover { /* Hover da bolinha firefox */
         transform: scale(1.2);
-        background: var(--accent-B);
+        background: var(--border-color-focus);
     }
     input[type="range"]:focus::-moz-range-thumb {
-        box-shadow: 0 0 0 calc(0.3vw * var(--scale-factor)) var(--accent-B);
+        box-shadow: 0 0 0 calc(0.3vw * var(--scale-factor)) var(--border-color-focus-glow);
     }
     input[type="range"]:focus::-webkit-slider-thumb {
-        box-shadow: 0 0 0 calc(0.3vw * var(--scale-factor)) var(--accent-B);
+        box-shadow: 0 0 0 calc(0.3vw * var(--scale-factor)) var(--border-color-focus-glow);
     }
     :host([disabled]) input[type="range"]{
         background: #0000 !important; /* remove o fundo */
         cursor: not-allowed;
     }
     :host([disabled]) input[type="range"]::-moz-range-thumb {
-        background: var(--text-dis-A) !important;
+        background: var(--text-color-disabled) !important;
     }
     :host([disabled]) input[type="range"]::-webkit-slider-thumb {
-        background: var(--text-dis-A) !important;
+        background: var(--text-color-disabled) !important;
         cursor: not-allowed;
     }
 
@@ -1308,8 +1320,8 @@ algol_input_sheet.replaceSync(`
         padding: calc(0.6vw * var(--scale-factor)) calc(1.2vw * var(--scale-factor));
         min-height: calc(2.4vw * var(--scale-factor));
         border-radius: 0 calc(var(--border-radius-components) * var(--scale-factor)) calc(var(--border-radius-components) * var(--scale-factor)) 0;
-        background-color: var(--accent-A);
-        color: var(--text-C);
+        background-color: var(--bg-color-button);
+        color: var(--text-color);
         font-family: 'Algol Font';
         font-weight: 200;
         font-size: calc(var(--font-size-btn)* var(--scale-factor));
@@ -1320,15 +1332,15 @@ algol_input_sheet.replaceSync(`
     }
 
     :host .container-file .btn:hover:not(:disabled) {
-        filter: brightness(var(--comp-bright)); /* Clareia levemente */
+        filter: brightness(1.1); /* Clareia levemente */
     }
     :host .container-file .btn:active:not(:disabled) {
         transform: translateY(calc(0.09vw * var(--scale-factor))); /* Efeito de clique */
-        filter: brightness(var(--comp-dark));
+        filter: brightness(0.9);
     }
     :host([disabled]) .container-file .btn {
-        background-color: var(--bg-comp-dis-A);
-        color: var(--text-dis-A);
+        background-color: var(--bg-color-inputs-disabled);
+        color: var(--text-color-disabled);
         cursor: not-allowed;
         opacity: 0.7;
     }

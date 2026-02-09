@@ -166,11 +166,11 @@ algol_textarea_sheet.replaceSync(`
         width: 100%;
     }
     label {
-        color: var(--text-B);
+        color: var(--text-color-label);
         font-size: calc(1.0vw * var(--scale-factor));
     }
     :host([disabled]) label {
-        color: var(--text-dis-A);
+        color: var(--text-color-label-disabled);
     }
     textarea {
         appearance: none;
@@ -178,9 +178,9 @@ algol_textarea_sheet.replaceSync(`
         outline: none;
         box-sizing: border-box;
         width: 100%;
-        background: var(--bg-comp-A);
-        color: var(--text-A);
-        border: calc(0.1vw * var(--scale-factor)) solid var(--border-A);
+        background: var(--bg-color-inputs);
+        color: var(--text-color);
+        border: calc(0.1vw * var(--scale-factor)) solid var(--border-color-forms);
         border-radius: calc(var(--border-radius-components) * var(--scale-factor));
         padding: calc(0.8vw * var(--scale-factor)) calc(1.1vw * var(--scale-factor));
        
@@ -195,14 +195,14 @@ algol_textarea_sheet.replaceSync(`
     }
     /* Para o estado disabled */
     :host([disabled]) textarea{
-        background-color: var(--bg-comp-dis-A) !important;
-        color: var(--text-dis-A) !important;
+        background-color: var(--bg-color-inputs-disabled) !important;
+        color: var(--text-color-disabled) !important;
         cursor: not-allowed !important;
         user-select: none !important;
     }
     :host(:focus-within) textarea {
-        border-color: var(--accent-B); /* Exemplo */
-        box-shadow: 0 0 0 calc(0.1vw * var(--scale-factor)) var(--accent-B) /* "Glow" externo */
+        border-color: var(--border-color-focus); /* Exemplo */
+        box-shadow: 0 0 0 calc(0.1vw * var(--scale-factor)) var(--border-color-focus-glow) /* "Glow" externo */
     }
 `);
 
