@@ -25,7 +25,7 @@ class Image extends BaseComponent {
             'lazy': 'update_lazy',
         };
     }
-    static get observedAttributes() {return Object.keys(this.PROP_MAP);} // retorna a chaves do mapa de atributos
+    static get observedAttributes() {return Object.keys(Image.PROP_MAP);} // retorna a chaves do mapa de atributos
     constructor() {super();}
 
     // ****************************************************************************

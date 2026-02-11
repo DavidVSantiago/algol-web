@@ -25,7 +25,7 @@ class Spacer extends BaseComponent {
             'valuebreak': 'update_valuebreak',
         };
     }
-    static get observedAttributes() {return Object.keys(this.PROP_MAP);} // retorna a chaves do mapa de atributos
+    static get observedAttributes() {return Object.keys(Spacer.PROP_MAP);} // retorna a chaves do mapa de atributos
     constructor() {super();}
 
     // ****************************************************************************

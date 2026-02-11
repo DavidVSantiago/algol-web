@@ -34,7 +34,7 @@ class TextArea extends BaseComponent {
             'readonly': 'update_readonly',
         };
     }
-    static get observedAttributes() {return Object.keys(this.PROP_MAP);} // retorna a chaves do mapa de atributos
+    static get observedAttributes() {return Object.keys(TextArea.PROP_MAP);} // retorna a chaves do mapa de atributos
     constructor() {super();this._internals = this.attachInternals();}
 
     // ****************************************************************************
@@ -46,8 +46,8 @@ class TextArea extends BaseComponent {
         this.root.adoptedStyleSheets = [algol_textarea_sheet]; // aplica o estilo do componente (compartilhado)
         this.root.innerHTML = `
             <div class="container">
-                <label></label>
-                <textarea></textarea>
+                <label aria-label="type... for="connected"></label>
+                <textarea id="connected"></textarea>
             </div>
             <slot></slot>
         `;
@@ -75,14 +75,16 @@ class TextArea extends BaseComponent {
                 }
             }
         });
+        this.elems.textarea.addEventListener('focus', (e) => {
+            this._oldValue = this.elems.textarea.value; // Salva o valor atual do input
+        });
         /* reflete o valor digitado no input no atributo valor do componente */
         this.elems.textarea.addEventListener('input', (e) => {
-            const novoValor = e.target.value; // obtém o valor do textarea
+            const novoValor = e.currentTarget.value; // obtém o valor do textarea
             if (this.value !== novoValor) {
                 this.value = novoValor; // Mantém a propriedade da classe sincronizada
             }
-            // dispara o evento estilizado do textarea
-            this.dispatchEvent(new CustomEvent('algol-textarea-input', { bubbles: true,composed: true,
+            this.dispatchEvent(new CustomEvent('algol-input', { bubbles: true,composed: true,
                 detail: {
                     origin: this,
                     value: e.target.value
@@ -91,7 +93,16 @@ class TextArea extends BaseComponent {
             this._internals.setFormValue(novoValor); // Informa ao formulário nativo (API Internals)
             this._atualizarValidacao();
         });
+    
         this.elems.textarea.addEventListener('change',(e) => {
+            this.dispatchEvent(new CustomEvent('algol-change', { bubbles: true,composed: true,
+                detail: {
+                    origin: this,
+                    oldValue: this._oldValue,
+                    value: e.target.value
+                }
+            }));
+            this._oldValue = this.value;
             this._atualizarValidacao(); 
         });
     }

@@ -32,8 +32,13 @@ class Input extends BaseComponent {
             'maxlength': 'update_maxlength',
         };
     }
-    static get observedAttributes() {return Object.keys(this.PROP_MAP);} // retorna a chaves do mapa de atributos
-    constructor() {super();this._internals = this.attachInternals();}
+    static get observedAttributes() {return Object.keys(Input.PROP_MAP);} // retorna a chaves do mapa de atributos
+    constructor() {
+        super();
+        this._internals = this.attachInternals();
+        this._canEmitInput = true;
+        this._canEmitChange = true;
+    }
 
     // ****************************************************************************
     // Métodos de construção do componente
@@ -44,8 +49,8 @@ class Input extends BaseComponent {
         this.root.adoptedStyleSheets = [algol_input_sheet]; // aplica o estilo do componente (compartilhado)
         this.root.innerHTML = `
             <div class="container">
-                <label></label>
-                <input type="text">
+                <label for="connected" aria-label="type..."></label>
+                <input type="text" id="connected">
             </div>
             <slot></slot>
         `;
@@ -61,25 +66,36 @@ class Input extends BaseComponent {
 
     /** @override */
     attachEvents(){
+        this.elems.input.addEventListener('focus', (e) => {
+            this._oldValue = this.elems.input.value; // Salva o valor atual do input
+        });
         /* reflete o valor digitado no input no atributo valor do componente */
         this.elems.input.addEventListener('input', (e) => {
             const novoValor = e.currentTarget.value; // obtém o valor do input
             if (this.value !== novoValor) {
                 this.value = novoValor; // Mantém a propriedade da classe sincronizada
             }
-            // dispara o evento estilizado do textarea
-            this.dispatchEvent(new CustomEvent('algol-input', { bubbles: true,composed: true,
-                detail: {
-                    origin: this,
-                    value: e.target.value
-                }
-            }));
+
+            this._emitInput(this,e.target.value);
+            
             this._internals.setFormValue(novoValor); // Informa ao formulário nativo (API Internals)
             this._atualizarValidacao();
         });
-        this.elems.input.addEventListener('change',() => {
+        this.elems.input.addEventListener('change',(e) => {
+            this._emitChange(this,this._oldValue,this.value);
+            this._oldValue = this.value;
             this._atualizarValidacao(); 
         });
+    }
+
+    _emitInput(origin, value){
+        if(!this._canEmitInput) return;
+        this.dispatchEvent(new CustomEvent('algol-input', { bubbles: true,composed: true, detail: {origin,value}}));
+    }
+
+    _emitChange(origin, oldValue, value){
+        if(!this._canEmitChange) return;
+        this.dispatchEvent(new CustomEvent('algol-change', { bubbles: true,composed: true, detail: {origin,oldValue,value}}));
     }
 
     // ****************************************************************************
@@ -155,27 +171,6 @@ class Input extends BaseComponent {
 
 // ----------------------------------------------------------------------------------------------------------------------------------
 
-/**
- * Componente Web `<algol-input-number>`.
- *
- * Campo numérico avançado com:
- *  - validação de digitação em tempo real
- *  - botões de incremento/decremento
- *  - suporte a setas do teclado
- *  - validação de min/max
- *
- * Aceita números inteiros e decimais, com tratamento de vírgula e ponto.
- * Mantém compatibilidade total com formulários HTML.
- *
- * Suporta:
- *  - min / max
- *  - required
- *  - incremento por botões ou teclado
- *
- * @fires Image#algol-input-number
- * 
- * @extends Input
- */
 class InputNumber extends Input {
     // Mapa de atributos válidos (chaves) e seus respectivos métodos (valores)
     static get PROP_MAP() {
@@ -187,7 +182,9 @@ class InputNumber extends Input {
         };
     }
     static get observedAttributes() {return Object.keys(this.PROP_MAP);} // retorna a chaves do mapa de atributos
-    constructor() {super();}
+    constructor() {
+        super();
+    }
 
     // ****************************************************************************
     // Métodos de construção do componente
@@ -198,9 +195,9 @@ class InputNumber extends Input {
         this.root.adoptedStyleSheets = [algol_input_sheet]; // aplica o estilo do componente (compartilhado)
         this.root.innerHTML = `
             <div class="container">
-                <label></label>
+                <label for="connected" aria-label="type..."></label>
                 <div class="input-container">
-                    <input type="text" inputmode="numeric">
+                    <input type="text" inputmode="numeric" id="connected">
                     <div class="spinner">
                         <div class="btn btnup">▲</div>
                         <div class="btn btndown">▼</div>
@@ -226,6 +223,9 @@ class InputNumber extends Input {
 
     /** @override */
     attachEvents(){
+        this.elems.input.addEventListener('focus', (e) => {
+            this._oldValue = this.elems.input.value; // Salva o valor atual do input
+        });
         // eventos do input
         this.elems.input.addEventListener('input', (e) => {
             let valor = e.currentTarget.value;
@@ -237,6 +237,7 @@ class InputNumber extends Input {
             }
             this._lastValidValue = valor; // se é válido, salva o último valor válido
             this.value = valor;
+            this._emitInput(this,valor);
         });
         this.elems.input.addEventListener('change',(e) => {
             let valorStr = this.value;
@@ -259,22 +260,21 @@ class InputNumber extends Input {
             this.value = String(valorNum); 
             this.elems.input.value = this.value;
             this._lastValidValue = this.value;
-            this.dispatchEvent(new CustomEvent('algol-input-number', { bubbles: true,composed: true,
-                detail: {
-                    origin: this,
-                    value: this.value
-                }
-            }));
-            // dispara o evento estilizado do textarea
+           
+            this._emitChange(this,this._oldValue,this.value);
+            this._oldValue = this.value;
+
             this._internals.setFormValue(this.value);
             this._atualizarValidacao(); 
         });
         // eventos de clique nos bottões spin (up e down)
         this.elems.btnup.addEventListener('click', (e) => {
+            this._oldValue = this.value;
             if (this.hasAttribute('disabled')) return;
             this._incrementaValor(1);
         });
         this.elems.btndown.addEventListener('click', (e) => {
+            this._oldValue = this.value;
             if (this.hasAttribute('disabled')) return;
             this._incrementaValor(-1);
         });
@@ -282,10 +282,12 @@ class InputNumber extends Input {
         this.addEventListener('keydown', (e) => {
             if (this.hasAttribute('disabled')) return;
             if (e.key === 'ArrowUp') {
+                this._oldValue = this.value;
                 e.preventDefault(); // Evita mover o cursor no texto
                 this._incrementaValor(1);
             }
             if (e.key === 'ArrowDown') {
+                this._oldValue = this.value;
                 e.preventDefault(); // Evita mover o cursor no texto
                 this._incrementaValor(-1);
             }
@@ -324,12 +326,7 @@ class InputNumber extends Input {
         this.elems.input.value = this.value;
         this._lastValidValue = this.value; // se é válido, salva o último valor válido
         this._internals.setFormValue(this.value);
-        this.dispatchEvent(new CustomEvent('algol-input-number', { bubbles: true,composed: true,
-                detail: {
-                    origin: this,
-                    value: this.value
-                }
-        }));
+        this._emitChange(this,this._oldValue,this.value);
         this._atualizarValidacao();
     }
 
@@ -345,24 +342,6 @@ class InputNumber extends Input {
 
 // ----------------------------------------------------------------------------------------------------------------------------------
 
-/**
- * Componente Web `<algol-input-date>`.
- *
- * Campo de data baseado em input nativo, com:
- *  - suporte a min/max
- *  - aceitação de datas no formato brasileiro (DD/MM/AAAA)
- *  - conversão automática para ISO (YYYY-MM-DD)
- *  - validação nativa repassada ao form.
- *
- * Suporta:
- *  - required
- *  - min / max (ISO ou BR)
- *  - validação automática de datas inválidas
- *
- * @fires Image#algol-input (herda de Input)
- * 
- * @extends Input
- */
 class InputDate extends Input {
     // Mapa de atributos válidos (chaves) e seus respectivos métodos (valores)
     static get PROP_MAP() {
@@ -373,7 +352,10 @@ class InputDate extends Input {
         };
     }
     static get observedAttributes() {return Object.keys(this.PROP_MAP);} // retorna a chaves do mapa de atributos
-    constructor() {super();}
+    constructor() {
+        super();
+        this._canEmitInput = false;
+    }
 
     // ****************************************************************************
     // Métodos de construção do componente
@@ -383,11 +365,6 @@ class InputDate extends Input {
     postConfig(){
         super.postConfig();
         this.elems.input.type = 'date';
-    }
-
-    /** @override */
-    attachEvents(){
-        super.attachEvents();
     }
 
     // ****************************************************************************
@@ -461,22 +438,6 @@ class InputDate extends Input {
 
 // ----------------------------------------------------------------------------------------------------------------------------------
 
-/**
- * Componente Web `<algol-input-time>`.
- *
- * Campo de horário baseado em input nativo do tipo time.
- * Suporta controle de intervalo, precisão por step
- * e validação automática integrada ao formulário.
- *
- * Suporta:
- *  - min / max
- *  - step (ex: 60 → HH:MM | 1 → HH:MM:SS)
- *  - required
- *
- * @fires Image#algol-input (herda de Input)
- * 
- * @extends Input
- */
 class InputTime extends Input {
     // Mapa de atributos
     static get PROP_MAP() {
@@ -488,7 +449,10 @@ class InputTime extends Input {
         };
     }
     static get observedAttributes() {return Object.keys(this.PROP_MAP);}
-    constructor() {super();}
+    constructor() {
+        super();
+        this._canEmitInput = false;
+    }
 
     // ****************************************************************************
     // Ciclo de Vida
@@ -496,13 +460,8 @@ class InputTime extends Input {
     
     /** @override */
     postConfig(){
-        super.postConfig(); // Configura container, label, input, slot...
+        super.postConfig();
         this.elems.input.type = 'time';
-    }
-
-    /** @override */
-    attachEvents(){
-        super.attachEvents(); // Ganha validação e update_value de graça
     }
 
     // ****************************************************************************
@@ -566,26 +525,6 @@ class InputTime extends Input {
 
 // ----------------------------------------------------------------------------------------------------------------------------------
 
-/**
- * Componente Web `<algol-input-color>`.
- *
- * Campo seletor de cor customizado.
- * Utiliza input[type="color"] nativo oculto, mantendo:
- *  - acessibilidade
- *  - seletor de cores do sistema
- *  - integração com formulários.
- *
- * Implementa interface visual própria com foco, hover e teclado.
- *
- * Suporta:
- *  - label
- *  - disabled
- *  - value (hex)
- * 
- * @fires Image#algol-input (herda de Input)
- *
- * @extends Input
- */
 class InputColor extends Input {
     // Mapa de atributos (Color é simples: só label, value e disabled importam)
     static get PROP_MAP() {
@@ -607,8 +546,8 @@ class InputColor extends Input {
         this.root.adoptedStyleSheets = [algol_input_sheet]; // aplica o estilo do componente (compartilhado)
         this.root.innerHTML = `
             <div class="container" tabindex="-1">
-                <label></label>
-                <input type="color" style="display:none">
+                <label for="connected" aria-label="choose..."></label>
+                <input type="color" style="display:none" id="connected">
                 <div class="color-border" tabindex="0">
                    <div class="color-box" tabindex="-1"></div>
                 </div>
@@ -627,11 +566,14 @@ class InputColor extends Input {
         // CORREÇÃO: Remove a associação automática do label com o input escondido
         this.elems.label.removeAttribute('for');
 
+        const initialColor = '#f00';
         if (!this.value){
-            this.value = '#f00'; // cor padrão inicial
-            this.elems.input.value = '#f00';
+            this.value = initialColor; // cor padrão inicial
+            this.elems.input.value = initialColor;
+
         }
         this._atualizarVisual(this.value);
+        this._oldValue = initialColor;
     }
 
     /** @override */
@@ -643,7 +585,7 @@ class InputColor extends Input {
         });
         // ao digitar no input color, atualiza a cor do box REAL-TIME
         this.elems.input.addEventListener('input', (e) => {
-            const novaCor = e.target.value;
+            const novaCor = e.currentTarget.value;
             this._atualizarVisual(novaCor);
         });
         // ao mudar o valor do input color, atualiza a cor do box
@@ -703,28 +645,6 @@ class InputColor extends Input {
 
 // ----------------------------------------------------------------------------------------------------------------------------------
 
-/**
- * Componente Web `<algol-input-range>`.
- *
- * Slider de intervalo baseado em input[type="range"].
- * Mantém integração total com formulários e expõe evento próprio
- * para mudanças em tempo real.
- *
- * Dispara:
- *  - algol-input-range-move → enquanto arrasta
- *
- * Suporta:
- *  - min / max
- *  - step
- *  - required
- *
- * @fires Image#algol-input (disparo contínuo enquanto move. herdado de Input)
- * 
- * @fires Image#algol-input-range (disparo ao soltar o controle)
- *
- * @extends Input
- */
-
 class InputRange extends Input {
     static get PROP_MAP() {
         return {
@@ -745,19 +665,6 @@ class InputRange extends Input {
     postConfig(){
         super.postConfig(); // Configura container, label, input, slot...
         this.elems.input.type = "range";
-    }
-
-    /** @override */
-    attachEvents(){
-        super.attachEvents(); // Ganha validação e update_value de graça
-        
-        this.elems.input.addEventListener('change', (e) => {
-            this.dispatchEvent(new CustomEvent('algol-input-range', { 
-                bubbles: true, 
-                composed: true,
-                detail: { value: this.value }
-            }));
-        });
     }
 
     // ****************************************************************************
@@ -816,15 +723,8 @@ class InputRange extends Input {
     }
 }
 
-/**
- * Componente Web `<algol-input-file>`.
- *
- * Campo de seleção de arquivos customizado.
- * Utiliza um input text (readonly) para exibir o nome do arquivo
- * e um botão para disparar o input file oculto.
- *
- * @extends Input
- */
+// ----------------------------------------------------------------------------------------------------------------------------------
+
 class InputFile extends Input {
     // Adicionamos os atributos específicos de arquivo
     static get PROP_MAP() {
@@ -859,9 +759,9 @@ class InputFile extends Input {
         // Estrutura baseada na sua sugestão
         this.root.innerHTML = `
             <div class="container-file">
-                <label></label>
+                <label for="connected" aria-label="select file..."></label>
                 <div class="input-container">
-                    <input type="text" class='input-file' readonly placeholder="Select file...">
+                    <input type="text" class='input-file' readonly placeholder="Select file..." id="connected">
                     <button class="btn">Search</button>
                     <input type="file" style="display: none;">
                 </div>
@@ -886,9 +786,10 @@ class InputFile extends Input {
             if(this.hasAttribute('disabled')) return;
             this.elems.input.click();
         });
-        this.elems.input.addEventListener('change', (e) => {
-            const arquivos = this.elems.input.files; // obtem a lista de arquivos
 
+        this.elems.input.addEventListener('change', (e) => {
+            this._oldFileNames = this._fileNames;
+            const arquivos = this.elems.input.files; // obtém a lista de arquivos
             if(arquivos.length > 0){ // se houver 1 ou mais arquivos, vamos validá-los
                 let temArquivoInvalido = false;
                 for (const file of arquivos) {// Verifica cada arquivo selecionado
@@ -899,7 +800,7 @@ class InputFile extends Input {
                 }
                 if (temArquivoInvalido) {
                     this.elems.input.value = ''; // Limpa o input (rejeita a seleção)
-                    this._atualizarTextoDisplay();
+                    this.elems.textDisplay.value = ''; // Atualiza o visual
                     // 3. Força um erro de validação customizado
                     this._internals.setValidity(
                         { customError: true }, 
@@ -910,9 +811,12 @@ class InputFile extends Input {
                 }
             }
 
-            this._atualizarTextoDisplay(); // Atualiza o visual
+            this._fileNames = this._getFileNames(); // obtem o nome de exibição
+            this.elems.textDisplay.value = this._fileNames; // Atualiza o visual
             this._atualizarValidacao(); // Dispara validação (necessário para 'required')
 
+            this._emitChange(this,this._oldFileNames,this._fileNames);
+            
             if (this.elems.input.files.length > 0) { // se houver arquivos anexados
                 // Se tiver arquivos, passamos um objeto FormData contendo eles
                 const nomeCampo = this.getAttribute('name') || 'file';
@@ -925,14 +829,6 @@ class InputFile extends Input {
             } else {// Se não tiver arquivo, limpa
                 this._internals.setFormValue(null);
             }
-            // Dispara evento customizado caso queira capturar externamente
-            this.dispatchEvent(new CustomEvent('algol-change', {
-                bubbles: true, composed: true,
-                detail: { 
-                    origin: this, 
-                    files: this.elems.input.files 
-                }
-            }));
         });
     }
 
@@ -966,18 +862,14 @@ class InputFile extends Input {
         }
     }
 
-    _atualizarTextoDisplay() {
+    _getFileNames() {
         const files = this.elems.input.files;
         if (!files || files.length === 0) { // Se o usuário abriu a janela e cancelou (ou removeu arquivos)
-            this.elems.textDisplay.value = '';
+            return '';
         } else if (files.length === 1) { // Um arquivo: mostra o nome
-            this.elems.textDisplay.value = files[0].name;
+            return files[0].name;
         } else { // Múltiplos arquivos: mostra a contagem
-            //this.elems.textDisplay.value = `${files.length} arquivos selecionados`;
-            
-            // Opção B (Alternativa): Listar nomes com vírgula (se preferir)
-            const nomes = Array.from(files).map(f => f.name).join(' | ');
-            this.elems.textDisplay.value = nomes;
+            return Array.from(files).map(f => f.name).join(' | ');
         }
     }
     
@@ -1313,6 +1205,7 @@ algol_input_sheet.replaceSync(`
         font-family: 'Algol Font';
         font-weight: 200;
         font-size: calc(var(--font-size-btn)* var(--scale-factor));
+        text-shadow: 0 calc(0.1vw * var(--scale-factor)) calc(0.1vw * var(--scale-factor)) var(--bg-A);
     }
     
     :host .container-file input[type="text"]{

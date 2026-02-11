@@ -44,7 +44,7 @@ class GridItem extends BaseLayout {
             'img': 'update_img',
         };
     }
-    static get observedAttributes() {return [...Object.keys(this.PROP_MAP), ...Object.keys(this.ATTR_MAP)];}
+    static get observedAttributes() {return [...Object.keys(GridItem.PROP_MAP), ...Object.keys(GridItem.ATTR_MAP)];}
     constructor() {super();}
 
     // ****************************************************************************

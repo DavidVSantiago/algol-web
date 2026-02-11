@@ -41,9 +41,9 @@ class Select extends BaseComponent {
         this.root.adoptedStyleSheets = [algol_select_sheet]; // aplica o estilo do componente (compartilhado)
         this.root.innerHTML = `
             <div class="container">
-                <label></label>
+                <label for="connected" aria-label="Select option..."></label>
                 <div class="select-wrapper">
-                    <select></select>
+                    <select id="connected"></select>
                 </div>
             </div>
             <slot></slot>
@@ -73,11 +73,11 @@ class Select extends BaseComponent {
             this._atualizarValidacao(); // atualiza a validação
             
             // dispara o evento estilizado de clique
-            this.dispatchEvent(new CustomEvent('algol-select-value', { bubbles: true,composed: true,
+            this.dispatchEvent(new CustomEvent('algol-change', { bubbles: true,composed: true,
                 detail: {
                     origin: this,
                     oldValue,
-                    newValue: e.target.value
+                    value: e.target.value
                 }
             }));
         });
@@ -154,6 +154,7 @@ algol_select_sheet.replaceSync(`
     :host {
         display: block; /* Garante que o componente respeite largura/altura */
     }
+
     slot{display: none;}
     .container {
         display: flex;

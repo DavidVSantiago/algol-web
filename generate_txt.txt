@@ -9,8 +9,3 @@ find ./scripts \
   cat "$file"
   echo
 done > projeto_completo.txt
-
-
-
-
-stripcomments arquivo.js > arquivo-limpo.js

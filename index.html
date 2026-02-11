@@ -5,14 +5,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-    <link id="theme-link" rel="stylesheet" href="algol-dark.css">
-    <!-- <script src="min.js"></script> -->
+    <link id="theme-link" rel="stylesheet" href="algol-light.css">
+    <script src="min.js"></script>
     <!-- <link rel="preload" 
         href="imgs/landscape.webp"
         as="image"
         fetchpriority="high"> -->
 
-    <script src="scripts/variaveis.js" ></script>
+    <!-- <script src="scripts/variaveis.js" ></script>
     
     <script src="scripts/bases/base_component.js" ></script>
     <script src="scripts/bases/base_layout.js" ></script>
@@ -28,7 +28,7 @@
 
     <script src="scripts/layouts/grid-layout.js" ></script>
     <script src="scripts/layouts/grid-item.js" ></script>
-    <script src="scripts/layouts/flex-item.js" ></script>
+    <script src="scripts/layouts/flex-item.js" ></script> -->
 
     <script defer>
         // temporário. apenas para teste
@@ -63,6 +63,10 @@
         logo="imgs/logo.png"
         logoalt="logo"
         logolink="https://www.google.com.br"
+        logowidth = 91
+        logoheight = 100
+        logosize = "3.3vw"
+        logosizebreak = "7vw"
     >
         <li><a href="">SOBRE</a></li>
         <li><div>INFO DADOS</div></li>
@@ -85,18 +89,13 @@
     </div>
 
     <main>
-    <algol-grid-layout posh="stretch" cols="0.1fr 0.8fr 0.1fr" colsbreak="1fr">
-    <algol-grid-item>
-    </algol-grid-item>
-    <algol-grid-item>
-        <algol-spacer value="8" valuebreak="4"></algol-spacer>
         
         <algol-spacer value="5" valuebreak="2"></algol-spacer>
         <form action="" id="form">
             <algol-grid-layout posh="stretch" id="layout" cols="1fr 1fr 1fr 1fr" colsbreak="1fr" gap="1vw" class="algol-bubble-01">
                 <algol-grid-item posh="center">
                 <algol-checkbox
-                    id="check"
+                    class="check-teste"
                     value="novo valor"
                     name = "check 1"
                     label="algol-checkbox 1"
@@ -104,17 +103,19 @@
                 ></algol-checkbox>
                 <algol-spacer value="1" valuebreak="2"></algol-spacer>
                 <algol-checkbox
+                    class="check-teste"
                     label="algol-checkbox 2"
                 ></algol-checkbox>
                 <algol-spacer value="1" valuebreak="2"></algol-spacer>
                 <algol-checkbox
+                    class="check-teste"
                     label="algol-checkbox 3" disabled
                 ></algol-checkbox>
                 <algol-spacer valuebreak="4"></algol-spacer>
                 </algol-grid-item>
                 <algol-grid-item posh="center">
                     <algol-radio
-                        id="check"
+                        class="check-teste"
                         value="novo valor"
                         name = "radio"
                         label="algol-radio 1"
@@ -122,11 +123,13 @@
                     ></algol-radio>
                     <algol-spacer value="1" valuebreak="2"></algol-spacer>
                     <algol-radio
+                        class="check-teste"
                         label="algol-radio 2"
                         name = "radio"
                     ></algol-radio>
                     <algol-spacer value="1" valuebreak="2"></algol-spacer>
                     <algol-radio
+                        class="check-teste"
                         label="algol-radio 3"
                         name = "radio" disabled
                     ></algol-radio>
@@ -134,31 +137,36 @@
                 </algol-grid-item>
                 <algol-grid-item posh="center">
                     <algol-switch-checkbox
+                        class="check-teste"
                         label="algol-switch-checkbox 1"
                     ></algol-switch-checkbox>
                     <algol-spacer value="1" valuebreak="2"></algol-spacer>
                     <algol-switch-checkbox
+                        class="check-teste"
                         label="algol-switch-checkbox 2"
-                    
                     ></algol-switch-checkbox>
                     <algol-spacer value="1" valuebreak="2"></algol-spacer>
                     <algol-switch-checkbox
+                        class="check-teste"
                         label="algol-switch-checkbox 3" disabled
                     ></algol-switch-checkbox>
                     <algol-spacer valuebreak="4"></algol-spacer>
                 </algol-grid-item>
                 <algol-grid-item posh="center">
                     <algol-switch-radio
+                        class="check-teste"
                         label="algol-switch-radio 1"
                         name="switch-radio"
                     ></algol-switch-radio>
                     <algol-spacer value="1" valuebreak="2"></algol-spacer>
                     <algol-switch-radio
+                        class="check-teste"
                         label="algol-switch-radio 2"
                         name="switch-radio"
                     ></algol-switch-radio>
                     <algol-spacer value="1" valuebreak="2"></algol-spacer>
                     <algol-switch-radio
+                        class="check-teste"
                         label="algol-switch-radio 3"
                         name="switch-radio" disabled
                     ></algol-switch-radio>
@@ -171,6 +179,7 @@
                         placeholder="Selecione o arquivo..."
                         multiple
                         required
+                        accept="image/*"
                     ></algol-input-file>
                     <algol-input-file name="input-file"
                         label="Texto"
@@ -183,12 +192,12 @@
                 </algol-grid-item>
                 <algol-grid-item posh="center">
 
-                    <algol-select id="select" name="select" label='select'>
+                    <algol-select  name="select" label='select'>
                         <option disabled>--Grupo 1--</option>
                         <option value="algol-light.css">Tema Claro</option>  
                         <option value="algol-dark.css">Tema Escuro</option>
                     </algol-select>
-                    <algol-select disabled label='select' required>
+                    <algol-select id="select" label='select' required>
                         <option disabled>--Grupo 1--</option>
                         <option value="A">Opção A</option>  
                         <option value="B">Opção B</option>
@@ -246,33 +255,21 @@
             window.addEventListener('load', function (event) { 
                 const select = document.getElementById('select');
                 const themeLink = document.getElementById('theme-link');
-                select.addEventListener('algol-select-value', function (e) {
-                    const tema = e.detail.newValue;
+                select.addEventListener('algol-change', function (e) {
+                    const tema = e.detail.value;
                     themeLink.setAttribute('href', tema);
                 });
                 
-
-                const inputFile = document.getElementById('input-file');
-                const btnEnviar = document.getElementById('btn-enviar');
-                btnEnviar.addEventListener('algol-click', function (e) {
-                    //e.preventDefault();
-                    const files = inputFile.files;
-                    for(const file of files){
-                        console.log('Objeto completo:', file);
-                    }
-                });
-
-                const check = document.querySelector('#check');
-                check.addEventListener('algol-change', (e)=>{
-                    console.log('algol-change', e.detail);
-                });
+                const elem = document.querySelectorAll('.check-teste');
+                for(const e of elem){
+                    e.addEventListener('algol-input', function (e) {
+                        console.log(`Antigo: ${e.detail.oldValue}`);
+                        console.log(`Novo: ${e.detail.value}`);
+                        console.log(e.detail.origin);
+                    });
+                }
             });
         </script>
-    
-    </algol-grid-item>
-    <algol-grid-item>
-    </algol-grid-item>
-    </algol-grid-layout>
     </main>
 </body>
 

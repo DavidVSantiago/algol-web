@@ -35,7 +35,7 @@ class Button extends BaseComponent {
             'color': '--text-A', // cor do texto do botão
         };
     }
-    static get observedAttributes() {return [...Object.keys(this.PROP_MAP), ...Object.keys(this.ATTR_MAP)];}
+    static get observedAttributes() {return [...Object.keys(Button.PROP_MAP), ...Object.keys(Button.ATTR_MAP)];}
     constructor() {super(); this._internals = this.attachInternals();}
     
     // ****************************************************************************
@@ -155,6 +155,8 @@ algol_button_sheet.replaceSync(`
         font-family: 'Algol Font';
         font-weight: 200;
         font-size: calc(var(--font-size-btn)* var(--scale-factor));
+        text-shadow: 0 calc(0.1vw * var(--scale-factor)) calc(0.1vw * var(--scale-factor)) var(--bg-A);
+
     }
 
     /* --- Hover e Active --------------------------------------------------------------- */

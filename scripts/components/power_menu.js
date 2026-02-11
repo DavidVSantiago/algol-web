@@ -6,9 +6,17 @@ class PowerMenu extends BaseComponent {
             'logo': 'update_logo',
             'logoalt': 'update_logoalt',
             'logolink': 'update_logolink',
+            'logowidth': 'update_logowidth',
+            'logoheight': 'update_logoheight',
         };
     }
-    static get observedAttributes() {return Object.keys(PowerMenu.PROP_MAP);} // retorna a chaves do mapa de atributos
+    static get ATTR_MAP() {
+        return {
+            'logosize': '--power-menu-logosize',
+            'logosizebreak': '--power-menu-logosizebreak',
+        }
+    }
+    static get observedAttributes() {return [...Object.keys(PowerMenu.PROP_MAP), ...Object.keys(PowerMenu.ATTR_MAP)];}
     constructor() {super();}
 
     static template = document.createElement('template');
@@ -83,6 +91,18 @@ class PowerMenu extends BaseComponent {
         if (!this.elems.logo) return; // guard
         this.elems.logoLink.href = val;
     }
+    update_logowidth(val){
+        if (!this.elems.logo) return; // guard
+        this.elems.logo.width = val;
+    }
+    update_logoheight(val){
+        if (!this.elems.logo) return; // guard
+        this.elems.logo.height = val;
+    }
+    update_logoheight(val){
+        if (!this.elems.logo) return; // guard
+        this.elems.logo.height = val;
+    }
    
     // ****************************************************************************
     // Utils
@@ -99,17 +119,14 @@ class PowerMenu extends BaseComponent {
                 const node = li.firstElementChild; // obtém o conteúdo    
                 if (!node) continue; // se não tem filho, ignora e não adiciona
                 
-                const div = document.createElement('div'); // cria um wrapper para o <li>
-                
                 // caso de um elemento <a>
                 if(node.tagName.toLowerCase() === 'a' || node.tagName.toLowerCase() === 'div'){
-                    div.classList.add('li-link-wrapper');
+                    li.classList.add('li-link-wrapper');
                 }else { // caso seja um outro tipo de elemento
-                    div.classList.add('li-element-wrapper');
+                    li.classList.add('li-element-wrapper');
                 }
                  
-                div.appendChild(li); // adiciona o conteúdo ao wrapper...
-                ul.appendChild(div); // ... e o wrapper à lista
+                ul.appendChild(li);
                 childCount++; // incrementa o contador de filhos
             }
         };
@@ -176,7 +193,10 @@ class PowerMenu extends BaseComponent {
             algol-power-menu[logolink] .menu .logo{
                 cursor: pointer;
                 text-decoration: none;
+                width: 100%;
+                height: 100%;
             }
+            algol-power-menu[logosize] .menu .logo{width: var(--power-menu-logosize) !important;}
 
             algol-power-menu .menu .logo-link,
             algol-power-menu .menu .menu-btns ul .li-link-wrapper a{
@@ -234,8 +254,8 @@ class PowerMenu extends BaseComponent {
                 background-color: var(--bg-B);
 
             }
-            
-            @media (max-width: 600px) {
+        
+            @media (max-width: ${MOBILE_BREAKPOINT}) {
                 algol-power-menu .menu{
                     padding: calc(0.5vw * var(--scale-factor)) calc(1vw * var(--scale-factor));
                     position: fixed;
@@ -251,6 +271,8 @@ class PowerMenu extends BaseComponent {
                 algol-power-menu .menu .menu-overlay.show{
                     display: block;
                 }
+
+                algol-power-menu[logosizebreak] .menu .logo{width: var(--power-menu-logosizebreak) !important;}
 
                 algol-power-menu .menu .logo-link .logo{width: calc(3vw * var(--scale-factor));}
 

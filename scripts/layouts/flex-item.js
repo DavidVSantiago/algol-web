@@ -40,7 +40,7 @@ class FlexItem extends BaseLayout {
             'img': 'update_img',
         };
     }
-    static get observedAttributes() {return [...Object.keys(this.PROP_MAP), ...Object.keys(this.ATTR_MAP)];}
+    static get observedAttributes() {return [...Object.keys(FlexItem.PROP_MAP), ...Object.keys(FlexItem.ATTR_MAP)];}
     constructor() {super();}
 
     // ****************************************************************************

@@ -1,5 +1,2 @@
-reimplementar todo o esquema de eventos, com nomes padronizados e dissociados do nome do componente
-
-
 Começar a implementar o site algol.dev 
 

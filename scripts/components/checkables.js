@@ -31,38 +31,35 @@ class BaseCheckable extends BaseComponent {
         this.elems.labelText = labels[1]; // O segundo é o texto (se existir)
         // Remove associação 'for' automática para evitar bugs em ShadowDOM,
         // pois o input está dentro do mesmo escopo.
-        if(this.elems.labelBox) this.elems.labelBox.removeAttribute('for');
-        if(this.elems.labelText) this.elems.labelText.removeAttribute('for');
+            // if(this.elems.labelBox) this.elems.labelBox.removeAttribute('for');
+            // if(this.elems.labelText) this.elems.labelText.removeAttribute('for');
     }
 
     attachEvents() {
-        // 1. Escuta a mudança no input nativo
-        this.elems.input.addEventListener('change', (e) => {
-            // Sincroniza o atributo do componente com o estado do input
-            // IMPORTANTE: Isso chama o setter 'checked' da classe, ou o update_checked
+        this.elems.input.addEventListener('input', (e) => {
             this.checked = this.elems.input.checked;
-            this.dispatchEvent(new CustomEvent('algol-change', {
+            const value =  this.checked ? (this.getAttribute('value') || 'on') : null;
+            this.dispatchEvent(new CustomEvent('algol-input', {
                 bubbles: true, composed: true,
                 detail: { 
                     origin: this, 
-                    value: this.checked ? (this.getAttribute('value') || 'on') : null,
-                    checked: this.checked
+                    value: value
                 }
             }));
         });
 
         // 2. Torna o componente inteiro clicável (melhora UX)
-        this.elems.labelText.addEventListener('click', (e) => {
-            if (this.hasAttribute('disabled')) return;
+        // this.elems.labelText.addEventListener('click', (e) => {
+        //     if (this.hasAttribute('disabled')) return;
             
-            // Se o clique não foi direto no input (foi no texto ou container),
-            // transferimos o clique para o input nativo.
-            if (e.target !== this.elems.input) {
-                // Evita loop infinito se o label já estiver associado corretamente
-                // Mas como estamos em ShadowDOM, forçar o click é seguro.
-                this.elems.input.click();
-            }
-        });
+        //     // Se o clique não foi direto no input (foi no texto ou container),
+        //     // transferimos o clique para o input nativo.
+        //     if (e.target !== this.elems.input) {
+        //         // Evita loop infinito se o label já estiver associado corretamente
+        //         // Mas como estamos em ShadowDOM, forçar o click é seguro.
+        //         this.elems.input.click();
+        //     }
+        // });
     }
 
     // ****************************************************************************
@@ -165,11 +162,11 @@ class Checkbox extends BaseCheckable{
         this.root.adoptedStyleSheets = [algol_checkables_sheet];
         this.root.innerHTML = `
             <div class="container">
-                <label class="box-checkbox">
-                    <input type="checkbox">
+                <label class="box-checkbox" for="connected" aria-label="check">
+                    <input type="checkbox" id="connected">
                     <span class="ball-checkbox" style="user-select: none;"></span>
                 </label>
-                <label style="cursor: pointer; user-select: none;"></label>
+                <label style="cursor: pointer; user-select: none;" for="connected" aria-label="check"></label>
                 <slot></slot>
             </div>
         `;
@@ -185,11 +182,11 @@ class SwitchCheckbox extends BaseCheckable{
         this.root.adoptedStyleSheets = [algol_checkables_sheet];
         this.root.innerHTML = `
             <div class="container">
-                <label class="box-switch-checkbox">
-                    <input type="checkbox">
+                <label class="box-switch-checkbox" for="connected" aria-label="check">
+                    <input type="checkbox" id="connected">
                     <span class="ball-switch-checkbox" style="user-select: none;"></span>
                 </label>
-                <label style="cursor: pointer; user-select: none;"></label>
+                <label style="cursor: pointer; user-select: none;" for="connected" aria-label="check"></label>
                 <slot></slot>
             </div>
         `;
@@ -208,11 +205,11 @@ class Radio extends BaseCheckable {
         this.root.adoptedStyleSheets = [algol_checkables_sheet];
         this.root.innerHTML = `
             <div class="container">
-                <label class="box-radio">
-                    <input type="radio">
+                <label class="box-radio" for="connected" aria-label="check">
+                    <input type="radio" id="connected">
                     <span class="ball-radio"></span>
                 </label>
-                <label style="cursor: pointer; user-select: none;"></label>
+                <label style="cursor: pointer; user-select: none;" for="connected" aria-label="check"></label>
                 <slot></slot>
             </div>
         `;
@@ -271,10 +268,11 @@ class SwitchRadio extends BaseCheckable {
         // que você definiu no CSS compartilhado.
         this.root.innerHTML = `
             <div class="container">
-                <label class="box-switch-radio">
-                    <input type="radio"> <span class="ball-switch-radio" style="user-select: none;"></span>
+                <label class="box-switch-radio" for="connected" aria-label="check">
+                    <input type="radio" id="connected">
+                    <span class="ball-switch-radio" style="user-select: none;"></span>
                 </label>
-                <label style="cursor: pointer; user-select: none;"></label>
+                <label style="cursor: pointer; user-select: none;" for="connected" aria-label="check"></label>
                 <slot></slot>
             </div>
         `;
