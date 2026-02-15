@@ -203,6 +203,10 @@ class PowerMenu extends BaseComponent {
                 color: var(--text-A);
                 text-decoration: none;
                 cursor: unset;
+                display: flex;
+                min-height: calc(3.5vw * var(--scale-factor));
+                align-items: center;
+                padding: 0 calc(1vw * var(--scale-factor));
             }
 
             algol-power-menu .menu .logo-link .logo{width: calc(3vw * var(--scale-factor));}
@@ -241,7 +245,6 @@ class PowerMenu extends BaseComponent {
                 align-items: center;
                 justify-content: center;
                 text-align: center;
-                padding: 0 calc(1vw * var(--scale-factor));
                 text-shadow: 0 calc(0.1vw * var(--scale-factor)) calc(0.1vw * var(--scale-factor)) var(--bg-A);
             }
             algol-power-menu .menu .menu-btns ul .li-link-wrapper{

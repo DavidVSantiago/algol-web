@@ -15,6 +15,12 @@
  */
 class Image extends BaseComponent {
     // Mapa de atributos válidos (chaves) e seus respectivos métodos (valores)
+    static get ATTR_MAP() {
+        return {
+            'radius': '--image-radius',
+            'radiusbreak': '--image-radiusbreak',
+        };
+    }
     static get PROP_MAP() {
         return {
             'src': 'update_src',
@@ -25,8 +31,8 @@ class Image extends BaseComponent {
             'lazy': 'update_lazy',
         };
     }
-    static get observedAttributes() {return Object.keys(Image.PROP_MAP);} // retorna a chaves do mapa de atributos
-    constructor() {super();}
+    static get observedAttributes() { return [...Object.keys(Image.PROP_MAP), ...Object.keys(Image.ATTR_MAP)]; }
+    constructor() { super(); }
 
     // ****************************************************************************
     // Métodos de construção do componente
@@ -42,15 +48,15 @@ class Image extends BaseComponent {
         `;
     }
     /** @override */
-    postConfig(){
+    postConfig() {
         // salva as referências globais dos componentes
         this.elems.img = this.root.querySelector('img');
         this.elems.error = this.root.querySelector('.error');
         this.elems.slot = this.root.querySelector('slot');
     }
     /** @override */
-    attachEvents(){
-        this.elems.img.addEventListener('load', () => { 
+    attachEvents() {
+        this.elems.img.addEventListener('load', () => {
             this.elems.error.style.display = 'none';
             this.elems.img.style.display = 'block';
             // Dispara evento customizado para o pai saber que carregou
@@ -92,12 +98,12 @@ class Image extends BaseComponent {
     }
     update_expand(val) {
         if (!this.elems.img) return;
-        if(this.hasAttribute('expand')) this.elems.img.style.width = '100%';
+        if (this.hasAttribute('expand')) this.elems.img.style.width = '100%';
         else this.elems.img.style.removeProperty('width');
     }
     update_lazy(val) {
         if (!this.elems.img) return;
-        this.elems.img.loading = this.hasAttribute('lazy')?'lazy':'eager';
+        this.elems.img.loading = this.hasAttribute('lazy') ? 'lazy' : 'eager';
     }
 
     // ****************************************************************************
@@ -139,6 +145,11 @@ algol_image_sheet.replaceSync(`
     .error{
         display: none;
         text-align: center;
+    }
+    :host([radius]) img {border-radius: var(--image-radius)}
+    
+    @media (max-width: ${MOBILE_BREAKPOINT}) {
+        :host([radiusbreak]) img {border-radius: var(--image-radiusbreak) !important;}
     }
 `);
 

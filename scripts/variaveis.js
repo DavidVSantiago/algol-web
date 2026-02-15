@@ -113,17 +113,6 @@ function injectGlobalNormalizationStyles() {
         font-size: calc(1.0vw * var(--scale-factor));
     }
 
-    h1,
-    h2,
-    h3,
-    h4,
-    h5,
-    h6 {
-        margin-top: calc(1vw * var(--scale-factor));
-        margin-bottom: calc(2vw * var(--scale-factor));
-        font-weight: 600;
-    }
-
     @media (max-width: ${MOBILE_BREAKPOINT}) {
         body {
             font-size: calc(var(--font-size-break) * var(--scale-factor));

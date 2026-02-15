@@ -100,7 +100,7 @@ class GridItem extends BaseLayout {
             algol-grid-item[rowspan]{grid-row-end: var(--grid-item-rowspan);}
             algol-grid-item[posh]{justify-self: var(--grid-item-posh);}
             algol-grid-item[posv]{align-self: var(--grid-item-posv);}
-            algol-grid-item[img]{background-image: var(--grid-item-img); width: 100%; height: 100%;}
+            algol-grid-item[img]{background-image: var(--grid-item-img);}
             algol-grid-item[imgattach]{background-attachment: var(--grid-item-imgattach);}
             algol-grid-item[imgrepeat]{background-repeat: var(--grid-item-imgrepeat);}
             algol-grid-item[imgpos]{background-position: var(--grid-item-imgpos);}
