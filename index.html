@@ -5,13 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    
     <link id="theme-link" rel="stylesheet" href="algol-light.css">
-    <!-- <script src="min.js"></script> -->
-    <!-- <link rel="preload" 
-        href="imgs/landscape.webp"
-        as="image"
-        fetchpriority="high"> -->
-
+    
     <script src="scripts/variaveis.js" ></script>
     
     <script src="scripts/bases/base_component.js" ></script>
@@ -25,10 +21,12 @@
     <script src="scripts/components/spacer.js" ></script>
     <script src="scripts/components/power_menu.js" ></script>
     <script src="scripts/components/checkables.js" ></script>
-
+    
     <script src="scripts/layouts/grid-layout.js" ></script>
     <script src="scripts/layouts/grid-item.js" ></script>
     <script src="scripts/layouts/flex-item.js" ></script>
+
+    <!-- <script src="min.js"></script> -->
 
     <script defer>
         // temporário. apenas para teste
@@ -92,7 +90,8 @@
         
         <algol-spacer value="5" valuebreak="2"></algol-spacer>
         <form action="" id="form">
-            <algol-grid-layout invertbreak posh="stretch" id="layout" cols="1fr 1fr 1fr 1fr" colsbreak="1fr" gap="1vw" class="algol-bubble-01">
+            <algol-grid-layout 
+            invertbreak posh="stretch" id="layout" cols="1fr 1fr 1fr 1fr" colsbreak="1fr" gap="1vw" class="algol-bubble-01">
                 <algol-grid-item posh="center">
                 <algol-checkbox
                     class="check-teste"
@@ -189,9 +188,9 @@
                         disabled
                     ></algol-input-file>
                     <algol-image
+                        size="10vw"
+                        sizebreak="100%"
                         expand src="imgs/landscape.webp" alt="landscape" width="400" height="200"
-                        radius="5vw"
-                        radiusbreak="5vw"
                         ></algol-image>
                 </algol-grid-item>
                 <algol-grid-item posh="center">

@@ -1,24 +1,11 @@
-/**
- * Componente Web `<algol-image>`.
- *
- * Encapsula um elemento `<img>` com:
- *  - fallback visual para erro de carregamento
- *  - suporte a lazy loading
- *  - modo expandido (width: 100%)
- *  - disparo de eventos customizados
- *  - integração com validação de formulários (ElementInternals)
- *
- * @fires Image#algol-image-load
- * @fires Image#algol-image-error
- *
- * @extends BaseComponent
- */
 class Image extends BaseComponent {
     // Mapa de atributos válidos (chaves) e seus respectivos métodos (valores)
     static get ATTR_MAP() {
         return {
             'radius': '--image-radius',
             'radiusbreak': '--image-radiusbreak',
+            'size': '--image-size',
+            'sizebreak': '--image-sizebreak',
         };
     }
     static get PROP_MAP() {
@@ -27,7 +14,6 @@ class Image extends BaseComponent {
             'alt': 'update_alt',
             'width': 'update_width',
             'height': 'update_height',
-            'expand': 'update_expand',
             'lazy': 'update_lazy',
         };
     }
@@ -96,11 +82,6 @@ class Image extends BaseComponent {
         if (!this.elems.img) return; // guard
         this.elems.img.height = val;
     }
-    update_expand(val) {
-        if (!this.elems.img) return;
-        if (this.hasAttribute('expand')) this.elems.img.style.width = '100%';
-        else this.elems.img.style.removeProperty('width');
-    }
     update_lazy(val) {
         if (!this.elems.img) return;
         this.elems.img.loading = this.hasAttribute('lazy') ? 'lazy' : 'eager';
@@ -141,15 +122,19 @@ algol_image_sheet.replaceSync(`
         height: auto;
         display: block;     /* remove espaço fantasma */
         object-fit: cover;   /* preenche tudo, pode cortar */
+        margin: auto;
     }
     .error{
         display: none;
         text-align: center;
     }
     :host([radius]) img {border-radius: var(--image-radius)}
+    :host([size]) img{width: var(--image-size)}
+    
     
     @media (max-width: ${MOBILE_BREAKPOINT}) {
         :host([radiusbreak]) img {border-radius: var(--image-radiusbreak) !important;}
+        :host([sizebreak]) img{width: var(--image-sizebreak) !important;}
     }
 `);
 
