@@ -1,0 +1,2 @@
+Começar a implementar o site algol.dev 
+

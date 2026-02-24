@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    
+
+    <!-- INICIO - Importação da lib ALGOL WEB -------------------------------->
+    <link id="theme-link" rel="stylesheet" href="css/algol-light.css">
+    <script src="algol-web/scripts/variaveis.js" ></script>
+    <script src="algol-web/scripts/bases/base_component.js" ></script>
+    <script src="algol-web/scripts/bases/base_layout.js" ></script>
+    <script src="algol-web/scripts/components/inputs.js" ></script>
+    <script src="algol-web/scripts/components/buttons.js" ></script>
+    <script src="algol-web/scripts/components/textarea.js" ></script>
+    <script src="algol-web/scripts/components/select.js" ></script>
+    <script src="algol-web/scripts/components/image.js" ></script>
+    <script src="algol-web/scripts/components/spacer.js" ></script>
+    <script src="algol-web/scripts/components/power_menu.js" ></script>
+    <script src="algol-web/scripts/components/checkables.js" ></script>
+    <script src="algol-web/scripts/layouts/grid-layout.js" ></script>
+    <script src="algol-web/scripts/layouts/grid-item.js" ></script>
+    <script src="algol-web/scripts/layouts/flex-item.js" ></script>
+    <!-- FIM - Importação da lib ALGOL WEB ------------------------------------>
+    <script src="js/index.js" defer></script>
+    <!-- <script src="/js/pages/home.js" defer></script> -->
+    <!-- <script src="/js/pages/posts.js" defer></script> -->
+    <!-- <script src="/js/pages/publications.js" defer></script> -->
+    <!-- <script src="/js/pages/404.js" defer></script> -->
+    <!-- <script src="/js/router.js" defer></script> -->
+    <!-- <link rel="stylesheet" href="css/fonts.css"> -->
+    <style>
+        #menu{
+            font-family: 'Roboto Condensed Regular' !important;
+        }
+        @media(max-width: 1280px    ){
+            #layout-screen{
+                grid-template-columns: 1fr;
+            }
+        }
+        .card-bg{
+            background-color: var(--bg-card-A);
+            box-shadow: 0 calc(0.1vw * var(--scale-factor)) calc(0.1vw * var(--scale-factor)) var(--bg-C);
+        }
+        #footer{
+            background-color: #24272d;
+            color: white;
+            #ano{
+                background-color: #222;
+                text-align: center;
+            }
+            a{color: white; text-decoration: none;}
+            a:hover{color: rgb(172, 190, 255);}
+            a:active{color: rgb(97, 124, 222);}
+        }
+
+    </style>
+</head>
+<body>
+    <algol-grid-layout id="layout-screen" posh="stretch" cols="0.1fr 0.8fr 0.1fr" colsbreak="1fr">
+        <algol-grid-item></algol-grid-item>
+        
+        <!-- INICIO - PAGE CONTENT ---------------------------------------->
+        <algol-grid-item id="page-content">        
+            <algol-spacer value="1" valuebreak="3"></algol-spacer>
+
+            <div id="spa-container">
+                <!-- Contreíd-->
+            </div>
+
+            <!-- RODAPÉ inserido dinamicamente aqui --------------------------->
+            
+        </algol-grid-item>
+        <!-- INICIO - PAGE CONTENT ---------------------------------------->
+
+        <algol-grid-item></algol-grid-item>
+    </algol-grid-layout>
+</body>
+</html>

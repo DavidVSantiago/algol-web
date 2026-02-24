@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <link rel="stylesheet" href="../algol-light.css">
+    <style>
+        :root{
+            --scale-factor: 1.0;
+        }
+
+        body{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: var(--bg-color);
+            background-color: var(--bg-color-section-bubble-01);
+        }
+
+        .container{
+            font-size: calc(3.5vw * var(--scale-factor));
+            display: flex;
+            flex-direction: row;
+            gap: calc(2vw * var(--scale-factor));
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container .box-switch-checkox{
+            position: relative;
+            background-color: var(--bg-color-inputs);
+            width: calc(7vw * var(--scale-factor));
+            height: calc(4vw * var(--scale-factor));
+            box-shadow: 0 0 0 calc(0.3vw * var(--scale-factor)) var(--border-color);
+            border-radius: calc(2vw * var(--scale-factor));
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center
+        }
+        .container .box-switch-checkox .ball-switch-checkox{
+            position: absolute;
+            left: calc(0.5vw * var(--scale-factor));
+            background-color: var(--text-color-disabled);
+            width: calc(3vw * var(--scale-factor));
+            height: calc(3vw * var(--scale-factor));
+            border-radius: calc(1.5vw * var(--scale-factor));
+            transition: left 0.3s ease, background-color 0.3s ease;
+        }
+        .container .box-switch-checkox input{
+            display: none;
+        }
+
+        .container .box-switch-checkox input:checked ~ .ball-switch-checkox{
+            left: calc(3.5vw * var(--scale-factor));
+            background-color: var(--bg-color-button);
+        }
+
+        .container .box-switch-checkox:has(input:disabled){
+            background-color: var(--text-color-disabled);
+        }
+
+
+    </style>
+</head>
+<body>
+    <div style="display: flex; flex-direction: column; gap: calc(2vw * var(--scale-factor))">
+        <div class="container">
+            <label for="input-1" class="box">
+                <input id="input-1" type="checkbox">
+                <span class="ball"></span>
+            </label>
+            <label for="input-1" style="cursor: pointer;">Opção 1</label>
+        </div>
+        <div class="container">
+            <label for="input-2" class="box">
+                <input id="input-2" type="checkbox">
+                <span class="ball"></span>
+            </label>
+            <label for="input-2" style="cursor: pointer;">Opção 2</label>
+        </div>
+        <div class="container">
+            <label for="input-3" class="box">
+                <input id="input-3" type="checkbox">
+                <span class="ball"></span>
+            </label>
+            <label for="input-3" style="cursor: pointer;">Opção 3</label>
+        </div>
+    </div>
+</body>
+</html>

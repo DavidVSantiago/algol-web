@@ -1,0 +1,9 @@
+reimplementar todo o esquema de variáveis de cores
+reimplementar todo o esquema de eventos, com nomes padronizados e dissociados do nome do componente
+
+Inmplementar
+- input radio (implementar como um select, onde os slots são as opções do radio)
+- input checkbox (idem)
+
+Começar a implementar o site algol.dev 
+

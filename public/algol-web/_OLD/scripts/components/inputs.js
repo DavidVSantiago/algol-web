@@ -1,0 +1,1357 @@
+/**
+ * Componente Web `<algol-input>`.
+ *
+ * Campo de entrada base para formulários da Algol UI.
+ * Integra-se nativamente com formulários HTML via ElementInternals,
+ * suportando validação automática, required, minlength, maxlength e tipos de input.
+ *
+ * Atua como classe base para todos os outros inputs especializados.
+ *
+ * Suporta:
+ *  - label associado automaticamente
+ *  - sincronização atributo ↔ input interno
+ *  - validação nativa (required, minlength, maxlength, type, pattern)
+ *  - integração total com <form>
+ * 
+ * @fires Image#algol-input
+ * 
+ * @extends BaseComponent
+ */
+class Input extends BaseComponent {
+    static get formAssociated() { return true; }
+    // Mapa de atributos válidos (chaves) e seus respectivos métodos (valores)
+    static get PROP_MAP() {
+        return {
+            'label': 'update_label',
+            'value': 'update_value',
+            'placeholder': 'update_placeholder',
+            'disabled': 'update_disabled',
+            'required': 'update_required',
+            'type': 'update_type',
+            'minlength': 'update_minlength',
+            'maxlength': 'update_maxlength',
+        };
+    }
+    static get observedAttributes() {return Object.keys(this.PROP_MAP);} // retorna a chaves do mapa de atributos
+    constructor() {super();this._internals = this.attachInternals();}
+
+    // ****************************************************************************
+    // Métodos de construção do componente
+    // ****************************************************************************
+
+    /** @override */    
+    render() {
+        this.root.adoptedStyleSheets = [algol_input_sheet]; // aplica o estilo do componente (compartilhado)
+        this.root.innerHTML = `
+            <div class="container">
+                <label></label>
+                <input type="text">
+            </div>
+            <slot></slot>
+        `;
+    }
+    /** @override */
+    postConfig(){
+        // salva as referências globais dos componentes
+        this.elems.container = this.root.querySelector('.container');
+        this.elems.label = this.root.querySelector('label');
+        this.elems.input = this.root.querySelector('input');
+        this.elems.slot = this.root.querySelector('slot');
+    }
+
+    /** @override */
+    attachEvents(){
+        /* reflete o valor digitado no input no atributo valor do componente */
+        this.elems.input.addEventListener('input', (e) => {
+            const novoValor = e.currentTarget.value; // obtém o valor do input
+            if (this.value !== novoValor) {
+                this.value = novoValor; // Mantém a propriedade da classe sincronizada
+            }
+            // dispara o evento estilizado do textarea
+            this.dispatchEvent(new CustomEvent('algol-input', { bubbles: true,composed: true,
+                detail: {
+                    origin: this,
+                    value: e.target.value
+                }
+            }));
+            this._internals.setFormValue(novoValor); // Informa ao formulário nativo (API Internals)
+            this._atualizarValidacao();
+        });
+        this.elems.input.addEventListener('change',() => {
+            this._atualizarValidacao(); 
+        });
+    }
+
+    // ****************************************************************************
+    // Métodos dos atributos
+    // ****************************************************************************
+
+    update_label(val) {if (this.elems.label) this.elems.label.textContent = val;}
+    update_value(val) {
+        const valorSeguro = val === null || val === undefined ? '' : val; // Se o valor for nulo/undefined, transformamos em string vazia
+        if (this.elems.input && this.elems.input.value !== valorSeguro){
+            this.elems.input.value = valorSeguro;
+            this._internals.setFormValue(valorSeguro); // informa o que será enviado pro form
+            this._atualizarValidacao(); // atualiza a validação
+        }
+    }
+    update_placeholder(val) {if (this.elems.input) this.elems.input.placeholder = val;    }
+    update_required(val) {if (this.elems.input) this.elems.input.required = this.hasAttribute('required'); this._atualizarValidacao();}
+    update_disabled(val) {if (this.elems.input) this.elems.input.disabled = this.hasAttribute('disabled');}
+    update_type(val) {
+        if (!this.elems.input) return;
+        const tipo = ['text','email','password','url','search'].includes(val) ? val : 'text'; // validação com fallback
+        this.elems.input.type = tipo;
+        this._atualizarValidacao();
+    }
+    update_minlength(val) {
+        if (this.elems.input) {
+            if(val) this.elems.input.minLength = val;
+            else this.elems.input.removeAttribute('minlength');
+            this._atualizarValidacao();
+        }
+    }
+    update_maxlength(val) {
+        if (this.elems.input) {
+            if(val) this.elems.input.maxLength = val;
+            else this.elems.input.removeAttribute('maxlength');
+            this._atualizarValidacao();
+        }
+    }
+    update_pattern(val) {
+        if (this.elems.input) {
+            if (val) this.elems.input.pattern = val;
+            else this.elems.input.removeAttribute('pattern');
+            this._atualizarValidacao();
+        }
+    }
+
+    // ****************************************************************************
+    // Utils
+    // ****************************************************************************
+
+    // Atualiza a validação de form do elemento customizado
+    _atualizarValidacao() {
+        if (!this.elems.input) return;
+        // Pega a validade nativa do textarea escondido
+        const validadeInterna = this.elems.input.validity; // obtem a validade do select interno
+        if (!validadeInterna.valid) { // Se for inválido
+            // Repassa TODAS as flags possíveis para inputs de texto
+            const flags = {
+                valueMissing: validadeInterna.valueMissing,    // Required
+                typeMismatch: validadeInterna.typeMismatch,    // Email inválido
+                tooShort: validadeInterna.tooShort,            // Minlength
+                tooLong: validadeInterna.tooLong,              // Maxlength
+                patternMismatch: validadeInterna.patternMismatch, // Regex (se usar pattern)
+            };
+            this._internals.setValidity(
+                flags,
+                this.elems.input.validationMessage, // Mensagem nativa do browser
+                this.elems.input 
+            );
+        } else this._internals.setValidity({}); // Se for válido, limpa o erro
+    }
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------
+
+/**
+ * Componente Web `<algol-input-number>`.
+ *
+ * Campo numérico avançado com:
+ *  - validação de digitação em tempo real
+ *  - botões de incremento/decremento
+ *  - suporte a setas do teclado
+ *  - validação de min/max
+ *
+ * Aceita números inteiros e decimais, com tratamento de vírgula e ponto.
+ * Mantém compatibilidade total com formulários HTML.
+ *
+ * Suporta:
+ *  - min / max
+ *  - required
+ *  - incremento por botões ou teclado
+ *
+ * @fires Image#algol-input-number
+ * 
+ * @extends Input
+ */
+class InputNumber extends Input {
+    // Mapa de atributos válidos (chaves) e seus respectivos métodos (valores)
+    static get PROP_MAP() {
+        return {
+            ...super.PROP_MAP, // Herda tudo de Input
+            // exclusivos de input number
+            'min': 'update_min',
+            'max': 'update_max',
+        };
+    }
+    static get observedAttributes() {return Object.keys(this.PROP_MAP);} // retorna a chaves do mapa de atributos
+    constructor() {super();}
+
+    // ****************************************************************************
+    // Métodos de construção do componente
+    // ****************************************************************************
+
+    /** @override */    
+    render() {
+        this.root.adoptedStyleSheets = [algol_input_sheet]; // aplica o estilo do componente (compartilhado)
+        this.root.innerHTML = `
+            <div class="container">
+                <label></label>
+                <div class="input-container">
+                    <input type="text" inputmode="numeric">
+                    <div class="spinner">
+                        <div class="btn btnup">▲</div>
+                        <div class="btn btndown">▼</div>
+                    </div>
+                </div>
+            </div>
+            <slot></slot>
+            
+        `;
+    }
+    /** @override */
+    postConfig(){
+        super.postConfig();
+        this.elems.spinner = this.root.querySelector('.spinner');
+        this.elems.btnup = this.root.querySelector('.btnup');
+        this.elems.btndown = this.root.querySelector('.btndown');
+        
+        this.elems.btnup.setAttribute('role', 'button');
+        this.elems.btndown.setAttribute('role', 'button');
+
+        this._lastValidValue='';
+    }
+
+    /** @override */
+    attachEvents(){
+        // eventos do input
+        this.elems.input.addEventListener('input', (e) => {
+            let valor = e.currentTarget.value;
+            const isValido = /^-?\d*([.,]\d*)?$/.test(valor); // regra: só número (ajuste regex se aceitar decimal, negativo etc)
+            if (!isValido) {
+                this.elems.input.value = this._lastValidValue; // restaura o último valor válido
+                this.value = this._lastValidValue; // restaura o último valor válido
+                return;
+            }
+            this._lastValidValue = valor; // se é válido, salva o último valor válido
+            this.value = valor;
+        });
+        this.elems.input.addEventListener('change',(e) => {
+            let valorStr = this.value;
+            // Limpeza de sujeira (- e   .)
+            if (['-', '-.', '.', '', ','].includes(valorStr)) {
+                this._resetToEmpty();
+                return;
+            }
+            
+            // Tratar vírgula antes de converter
+            let valorNum = Number(valorStr.replace(',', '.'));
+            
+            if (isNaN(valorNum)) {
+                this._resetToEmpty();
+                return;
+            }
+            
+            valorNum = this._validaLimites(valorNum); // valida min/max
+            
+            this.value = String(valorNum); 
+            this.elems.input.value = this.value;
+            this._lastValidValue = this.value;
+            this.dispatchEvent(new CustomEvent('algol-input-number', { bubbles: true,composed: true,
+                detail: {
+                    origin: this,
+                    value: this.value
+                }
+            }));
+            // dispara o evento estilizado do textarea
+            this._internals.setFormValue(this.value);
+            this._atualizarValidacao(); 
+        });
+        // eventos de clique nos bottões spin (up e down)
+        this.elems.btnup.addEventListener('click', (e) => {
+            if (this.hasAttribute('disabled')) return;
+            this._incrementaValor(1);
+        });
+        this.elems.btndown.addEventListener('click', (e) => {
+            if (this.hasAttribute('disabled')) return;
+            this._incrementaValor(-1);
+        });
+        // para fazer o 'up' e 'down' funcionarem pra subir e descer o valor do inputnumber
+        this.addEventListener('keydown', (e) => {
+            if (this.hasAttribute('disabled')) return;
+            if (e.key === 'ArrowUp') {
+                e.preventDefault(); // Evita mover o cursor no texto
+                this._incrementaValor(1);
+            }
+            if (e.key === 'ArrowDown') {
+                e.preventDefault(); // Evita mover o cursor no texto
+                this._incrementaValor(-1);
+            }
+        });
+        
+    }
+
+    // ****************************************************************************
+    // Métodos dos atributos
+    // ****************************************************************************
+
+    update_min(val) {}
+    update_max(val) {}
+    
+
+    // ****************************************************************************
+    // Utils
+    // ****************************************************************************
+
+    _validaLimites(valor){
+        valor = (this.hasAttribute('max') && (valor > this.max))? Number(this.max) : valor;
+        valor = (this.hasAttribute('min') && (valor < this.min))? Number(this.min) : valor;
+        return valor;
+    }
+
+    _incrementaValor(inc){
+        let atualStr = this.value ? this.value.replace(',', '.') : '0'; // Trata vírgula e valor vazio (vazio vira 0)
+        let valorNum = Number(atualStr); // converte para numero
+        if(isNaN(valorNum)) valorNum = 0; // guard
+        valorNum += inc;
+        valorNum = this._validaLimites(valorNum); // verifica min/max
+        
+        valorNum = parseFloat(valorNum.toFixed(2)); // Opcional: arredonda para 2 casas se tiver decimal, ou mantém inteiro
+
+        this.value = String(valorNum);
+        this.elems.input.value = this.value;
+        this._lastValidValue = this.value; // se é válido, salva o último valor válido
+        this._internals.setFormValue(this.value);
+        this.dispatchEvent(new CustomEvent('algol-input-number', { bubbles: true,composed: true,
+                detail: {
+                    origin: this,
+                    value: this.value
+                }
+        }));
+        this._atualizarValidacao();
+    }
+
+    _resetToEmpty() {
+        this.value = '';
+        this.elems.input.value = '';
+        this._lastValidValue = '';
+        this._internals.setFormValue('');
+        this._atualizarValidacao();
+    }
+
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------
+
+/**
+ * Componente Web `<algol-input-date>`.
+ *
+ * Campo de data baseado em input nativo, com:
+ *  - suporte a min/max
+ *  - aceitação de datas no formato brasileiro (DD/MM/AAAA)
+ *  - conversão automática para ISO (YYYY-MM-DD)
+ *  - validação nativa repassada ao form.
+ *
+ * Suporta:
+ *  - required
+ *  - min / max (ISO ou BR)
+ *  - validação automática de datas inválidas
+ *
+ * @fires Image#algol-input (herda de Input)
+ * 
+ * @extends Input
+ */
+class InputDate extends Input {
+    // Mapa de atributos válidos (chaves) e seus respectivos métodos (valores)
+    static get PROP_MAP() {
+        return {
+            ...super.PROP_MAP, // Herda tudo de Input
+            'min': 'update_min',
+            'max': 'update_max',
+        };
+    }
+    static get observedAttributes() {return Object.keys(this.PROP_MAP);} // retorna a chaves do mapa de atributos
+    constructor() {super();}
+
+    // ****************************************************************************
+    // Métodos de construção do componente
+    // ****************************************************************************
+    
+    /** @override */
+    postConfig(){
+        super.postConfig();
+        this.elems.input.type = 'date';
+    }
+
+    /** @override */
+    attachEvents(){
+        super.attachEvents();
+    }
+
+    // ****************************************************************************
+    // Métodos dos atributos
+    // ****************************************************************************
+    
+    update_min(val) {
+        if (!this.elems.input) return;
+        if (!val) { // se não houver valor, remove o atributo
+            this.elems.input.removeAttribute('min');
+            this._atualizarValidacao();
+            return;
+        }
+        let valorFinal = val;
+        // verifica formato brasileiro DD/MM/AAAA e atualiza o valor final
+        if (/^\d{2}\/\d{2}\/\d{4}$/.test(val)) {
+            const [dia, mes, ano] = val.split('/');
+            valorFinal = `${ano}-${mes}-${dia}`; // Converte para ISO (AAAA-MM-DD)
+        }
+        this.elems.input.min = valorFinal;
+        this._atualizarValidacao();
+    }
+
+    update_max(val) {
+        if (!this.elems.input) return;
+        if (!val) { // se não houver valor, remove o atributo
+            this.elems.input.removeAttribute('max');
+            this._atualizarValidacao();
+            return;
+        }
+        let valorFinal = val;
+        // verifica formato brasileiro DD/MM/AAAA e atualiza o valor final
+        if (/^\d{2}\/\d{2}\/\d{4}$/.test(val)) {
+            const [dia, mes, ano] = val.split('/');
+            valorFinal = `${ano}-${mes}-${dia}`; // Converte para ISO (AAAA-MM-DD)
+        }
+        this.elems.input.max = valorFinal;
+        this._atualizarValidacao();
+    }
+
+    // ****************************************************************************
+    // Validação Específica para Datas
+    // ****************************************************************************
+
+    /** @override */
+    _atualizarValidacao() {
+        if (!this.elems.input) return;
+
+        const validadeInterna = this.elems.input.validity;
+
+        if (!validadeInterna.valid) {
+            // Mapeamento de flags específicas para DATA/NÚMERO
+            const flags = {
+                valueMissing: validadeInterna.valueMissing,     // Required
+                rangeUnderflow: validadeInterna.rangeUnderflow, // Data anterior ao 'min'
+                rangeOverflow: validadeInterna.rangeOverflow,   // Data posterior ao 'max'
+                badInput: validadeInterna.badInput,             // Data inválida (ex: 31/02)
+                stepMismatch: validadeInterna.stepMismatch      // Fora do 'step' (se usar)
+            };
+
+            this._internals.setValidity(
+                flags,
+                this.elems.input.validationMessage, // Mensagem nativa ("Selecione uma data válida...")
+                this.elems.input
+            );
+        } else {
+            this._internals.setValidity({});
+        }
+    }
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------
+
+/**
+ * Componente Web `<algol-input-time>`.
+ *
+ * Campo de horário baseado em input nativo do tipo time.
+ * Suporta controle de intervalo, precisão por step
+ * e validação automática integrada ao formulário.
+ *
+ * Suporta:
+ *  - min / max
+ *  - step (ex: 60 → HH:MM | 1 → HH:MM:SS)
+ *  - required
+ *
+ * @fires Image#algol-input (herda de Input)
+ * 
+ * @extends Input
+ */
+class InputTime extends Input {
+    // Mapa de atributos
+    static get PROP_MAP() {
+        return {
+            ...super.PROP_MAP, // Herda label, required, disabled, etc.
+            'min': 'update_min',
+            'max': 'update_max',
+            'step': 'update_step' // Controla a precisão (segundos/milissegundos)
+        };
+    }
+    static get observedAttributes() {return Object.keys(this.PROP_MAP);}
+    constructor() {super();}
+
+    // ****************************************************************************
+    // Ciclo de Vida
+    // ****************************************************************************
+    
+    /** @override */
+    postConfig(){
+        super.postConfig(); // Configura container, label, input, slot...
+        this.elems.input.type = 'time';
+    }
+
+    /** @override */
+    attachEvents(){
+        super.attachEvents(); // Ganha validação e update_value de graça
+    }
+
+    // ****************************************************************************
+    // Métodos dos atributos
+    // ****************************************************************************
+    
+    update_min(val) {
+        if (!this.elems.input) return;
+        // Time usa formato HH:MM ou HH:MM:SS. Não requer conversão complexa de data.
+        if (val) this.elems.input.min = val;
+        else this.elems.input.removeAttribute('min');
+        this._atualizarValidacao();
+    }
+
+    update_max(val) {
+        if (!this.elems.input) return;
+        if (val) this.elems.input.max = val;
+        else this.elems.input.removeAttribute('max');
+        this._atualizarValidacao();
+    }
+
+    // O atributo STEP é crucial para Time.
+    // step="60" (padrão) -> Mostra apenas HH:MM
+    // step="1" -> Mostra HH:MM:SS
+    update_step(val) {
+        if (!this.elems.input) return;
+        if (val) this.elems.input.step = val;
+        else this.elems.input.removeAttribute('step');
+        this._atualizarValidacao();
+    }
+
+    // ****************************************************************************
+    // Validação Específica (Idêntica à de Data)
+    // ****************************************************************************
+
+    /** @override */
+    _atualizarValidacao() {
+        if (!this.elems.input) return;
+
+        const validadeInterna = this.elems.input.validity;
+
+        if (!validadeInterna.valid) {
+            const flags = {
+                valueMissing: validadeInterna.valueMissing,     // Required
+                rangeUnderflow: validadeInterna.rangeUnderflow, // Hora anterior ao 'min'
+                rangeOverflow: validadeInterna.rangeOverflow,   // Hora posterior ao 'max'
+                badInput: validadeInterna.badInput,             // Hora inválida
+                stepMismatch: validadeInterna.stepMismatch      // Fora do 'step' (ex: digitou segundos sem step=1)
+            };
+
+            this._internals.setValidity(
+                flags,
+                this.elems.input.validationMessage, 
+                this.elems.input
+            );
+        } else {
+            this._internals.setValidity({});
+        }
+    }
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------
+
+/**
+ * Componente Web `<algol-input-color>`.
+ *
+ * Campo seletor de cor customizado.
+ * Utiliza input[type="color"] nativo oculto, mantendo:
+ *  - acessibilidade
+ *  - seletor de cores do sistema
+ *  - integração com formulários.
+ *
+ * Implementa interface visual própria com foco, hover e teclado.
+ *
+ * Suporta:
+ *  - label
+ *  - disabled
+ *  - value (hex)
+ * 
+ * @fires Image#algol-input (herda de Input)
+ *
+ * @extends Input
+ */
+class InputColor extends Input {
+    // Mapa de atributos (Color é simples: só label, value e disabled importam)
+    static get PROP_MAP() {
+        return {
+            'label': 'update_label',
+            'value': 'update_value',
+            'disabled': 'update_disabled'
+        };
+    }
+    static get observedAttributes() {return Object.keys(this.PROP_MAP);}
+    constructor() {super();}
+
+    // ****************************************************************************
+    // Ciclo de Vida
+    // ****************************************************************************
+    
+    /** @override */    
+    render() {
+        this.root.adoptedStyleSheets = [algol_input_sheet]; // aplica o estilo do componente (compartilhado)
+        this.root.innerHTML = `
+            <div class="container" tabindex="-1">
+                <label></label>
+                <input type="color" style="display:none">
+                <div class="color-border" tabindex="0">
+                   <div class="color-box" tabindex="-1"></div>
+                </div>
+            </div>
+            <slot></slot>
+        `;
+    }
+
+    /** @override */
+    postConfig(){
+        super.postConfig();
+        
+        this.elems.colorBorder = this.root.querySelector('.color-border');
+        this.elems.colorBox = this.root.querySelector('.color-box');
+
+        // CORREÇÃO: Remove a associação automática do label com o input escondido
+        this.elems.label.removeAttribute('for');
+
+        if (!this.value){
+            this.value = '#f00'; // cor padrão inicial
+            this.elems.input.value = '#f00';
+        }
+        this._atualizarVisual(this.value);
+    }
+
+    /** @override */
+    attachEvents(){
+        super.attachEvents();
+        this.elems.colorBox.addEventListener('click', (e) => {
+            if (this.hasAttribute('disabled')) return;
+            this.elems.input.click(); // abre o seletor de cor nativo
+        });
+        // ao digitar no input color, atualiza a cor do box REAL-TIME
+        this.elems.input.addEventListener('input', (e) => {
+            const novaCor = e.target.value;
+            this._atualizarVisual(novaCor);
+        });
+        // ao mudar o valor do input color, atualiza a cor do box
+        this.elems.input.addEventListener('change', (e) => {
+            this._atualizarVisual(e.target.value);
+        });
+        this.addEventListener('keydown', (e) => {
+            if (e.code === "Space" || e.code === "Enter") {
+                e.preventDefault(); // evita scroll no Space
+                this.elems.input.click(); // abre o seletor de cor nativo
+            }
+        });
+
+    }
+
+    // ****************************************************************************
+    // Métodos dos atributos
+    // ****************************************************************************
+    
+    /** @override */
+    update_value(val) {
+        if (!this.elems.input) return;
+        super.update_value(val);
+        this._atualizarVisual(val);
+    }
+    update_disabled(val) {
+        super.update_disabled(val);
+        if (!this.elems.colorBorder) return;
+        if (this.hasAttribute('disabled')) {
+            this.elems.colorBorder.removeAttribute('tabindex');
+        } else {
+            this.elems.colorBorder.setAttribute('tabindex', '0');
+        }
+        this._atualizarVisual(val);
+    }
+
+    // ****************************************************************************
+    // Utils
+    // ****************************************************************************
+
+    _atualizarVisual(cor) {
+        if(this.elems.colorBox) {
+            this.elems.colorBox.style.backgroundColor = cor;
+        }
+    }
+
+    // ****************************************************************************
+    // Validação
+    // ****************************************************************************
+
+    /** @override */
+    _atualizarValidacao() {
+        // Input color é sempre válido (validity.valid é sempre true),
+        if (this._internals) this._internals.setValidity({});
+    }
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------
+
+/**
+ * Componente Web `<algol-input-range>`.
+ *
+ * Slider de intervalo baseado em input[type="range"].
+ * Mantém integração total com formulários e expõe evento próprio
+ * para mudanças em tempo real.
+ *
+ * Dispara:
+ *  - algol-input-range-move → enquanto arrasta
+ *
+ * Suporta:
+ *  - min / max
+ *  - step
+ *  - required
+ *
+ * @fires Image#algol-input (disparo contínuo enquanto move. herdado de Input)
+ * 
+ * @fires Image#algol-input-range (disparo ao soltar o controle)
+ *
+ * @extends Input
+ */
+
+class InputRange extends Input {
+    static get PROP_MAP() {
+        return {
+            ...super.PROP_MAP, // Herda label, required, disabled, etc.
+            'min': 'update_min',
+            'max': 'update_max',
+            'step': 'update_step'
+        };
+    }
+    static get observedAttributes() {return Object.keys(this.PROP_MAP);}
+    constructor() {super();}
+
+    // ****************************************************************************
+    // Ciclo de Vida
+    // ****************************************************************************
+    
+    /** @override */
+    postConfig(){
+        super.postConfig(); // Configura container, label, input, slot...
+        this.elems.input.type = "range";
+    }
+
+    /** @override */
+    attachEvents(){
+        super.attachEvents(); // Ganha validação e update_value de graça
+        
+        this.elems.input.addEventListener('change', (e) => {
+            this.dispatchEvent(new CustomEvent('algol-input-range', { 
+                bubbles: true, 
+                composed: true,
+                detail: { value: this.value }
+            }));
+        });
+    }
+
+    // ****************************************************************************
+    // Métodos dos atributos
+    // ****************************************************************************
+    
+    update_min(val) {
+        if (!this.elems.input) return;
+        if (val) this.elems.input.min = val;
+        else this.elems.input.removeAttribute('min');
+        this._atualizarValidacao();
+    }
+
+    update_max(val) {
+        if (!this.elems.input) return;
+        if (val) this.elems.input.max = val;
+        else this.elems.input.removeAttribute('max');
+        this._atualizarValidacao();
+    }
+
+    update_step(val) {
+        if (!this.elems.input) return;
+        if (val) this.elems.input.step = val;
+        else this.elems.input.removeAttribute('step');
+        this._atualizarValidacao();
+    }
+
+    // ****************************************************************************
+    // Validação Específica (Idêntica à de Data)
+    // ****************************************************************************
+
+    /** @override */
+    _atualizarValidacao() {
+        if (!this.elems.input) return;
+
+        const validadeInterna = this.elems.input.validity;
+
+        // Nota: Range dificilmente falha na interação do usuário, 
+        // mas protege contra valores inválidos via JS.
+        if (!validadeInterna.valid) {
+            const flags = {
+                valueMissing: validadeInterna.valueMissing,    
+                rangeUnderflow: validadeInterna.rangeUnderflow, 
+                rangeOverflow: validadeInterna.rangeOverflow,   
+                stepMismatch: validadeInterna.stepMismatch      
+            };
+
+            this._internals.setValidity(
+                flags,
+                this.elems.input.validationMessage, 
+                this.elems.input
+            );
+        } else {
+            this._internals.setValidity({});
+        }
+    }
+}
+
+/**
+ * Componente Web `<algol-input-file>`.
+ *
+ * Campo de seleção de arquivos customizado.
+ * Utiliza um input text (readonly) para exibir o nome do arquivo
+ * e um botão para disparar o input file oculto.
+ *
+ * @extends Input
+ */
+class InputFile extends Input {
+    // Adicionamos os atributos específicos de arquivo
+    static get PROP_MAP() {
+        return {
+            // --- Herdados do conceito de Input (mas alguns sobrescritos)
+            'label': 'update_label',         // Usa o do pai (Input)
+            'required': 'update_required',   // Usa o do pai (Input)
+            'disabled': 'update_disabled',   // Sobrescreveremos para afetar o botão
+            'placeholder': 'update_placeholder', // Sobrescreveremos (substitui o inputtext)
+            'value': 'update_value',
+
+            // --- Específicos de File ---
+            'accept': 'update_accept',
+            'multiple': 'update_multiple',
+            'text': 'update_text'
+
+        };
+    }
+    
+    static get observedAttributes() { return Object.keys(this.PROP_MAP); }
+
+    constructor() { super(); }
+
+    // ****************************************************************************
+    // Métodos de construção do componente
+    // ****************************************************************************
+
+    /** @override */
+    render() {
+        this.root.adoptedStyleSheets = [algol_input_sheet]; // Mantemos o estilo base por enquanto
+        
+        // Estrutura baseada na sua sugestão
+        this.root.innerHTML = `
+            <div class="container-file">
+                <label></label>
+                <div class="input-container">
+                    <input type="text" class='input-file' readonly placeholder="Select file...">
+                    <button class="btn">Search</button>
+                    <input type="file" style="display: none;">
+                </div>
+            </div>
+            <slot></slot>
+        `;
+    }
+
+    /** @override */
+    postConfig() {
+        super.postConfig(); // O pai já captura: container, label, slot
+        
+        // Capturamos as referências específicas dessa estrutura
+        this.elems.textDisplay = this.root.querySelector('.input-file');
+        this.elems.btnSearch = this.root.querySelector('.btn');
+        this.elems.input = this.root.querySelector('input[type="file"]');
+    }
+
+    /** @override */
+    attachEvents(){
+        this.elems.btnSearch.addEventListener('click', (e) => {
+            if(this.hasAttribute('disabled')) return;
+            this.elems.input.click();
+        });
+        this.elems.input.addEventListener('change', (e) => {
+            const arquivos = this.elems.input.files; // obtem a lista de arquivos
+
+            if(arquivos.length > 0){ // se houver 1 ou mais arquivos, vamos validá-los
+                let temArquivoInvalido = false;
+                for (const file of arquivos) {// Verifica cada arquivo selecionado
+                    if (!this._validaArquivo(file)) {
+                        temArquivoInvalido = true;
+                        break;
+                    }
+                }
+                if (temArquivoInvalido) {
+                    this.elems.input.value = ''; // Limpa o input (rejeita a seleção)
+                    this._atualizarTextoDisplay();
+                    // 3. Força um erro de validação customizado
+                    this._internals.setValidity(
+                        { customError: true }, 
+                        `Invalid file! Only: ${this.getAttribute('accept')}`,
+                        this.elems.btnSearch
+                    );
+                    return;
+                }
+            }
+
+            this._atualizarTextoDisplay(); // Atualiza o visual
+            this._atualizarValidacao(); // Dispara validação (necessário para 'required')
+
+            if (this.elems.input.files.length > 0) { // se houver arquivos anexados
+                // Se tiver arquivos, passamos um objeto FormData contendo eles
+                const nomeCampo = this.getAttribute('name') || 'file';
+                const formData = new FormData();
+                // Adiciona todos os arquivos selecionados ao FormData
+                for (const file of this.elems.input.files) {
+                    formData.append(nomeCampo, file);
+                }
+                this._internals.setFormValue(formData); // Informa ao formulário pai
+            } else {// Se não tiver arquivo, limpa
+                this._internals.setFormValue(null);
+            }
+            // Dispara evento customizado caso queira capturar externamente
+            this.dispatchEvent(new CustomEvent('algol-change', {
+                bubbles: true, composed: true,
+                detail: { 
+                    origin: this, 
+                    files: this.elems.input.files 
+                }
+            }));
+        });
+    }
+
+    // ****************************************************************************
+    // Utils Específicos
+    // ****************************************************************************
+
+     /** @override */
+    _atualizarValidacao() {
+        if (!this.elems.input) return;
+
+        // Pega a validade nativa do input file oculto
+        const validadeInterna = this.elems.input.validity;
+
+        if (!validadeInterna.valid) {
+            // Para arquivos, a validação principal é 'valueMissing' (required)
+            // Mas repassamos 'customError' caso você queira validar tamanho/extensão manualmente no futuro
+            const flags = {
+                valueMissing: validadeInterna.valueMissing,
+                customError: validadeInterna.customError 
+            };
+
+            // Define a mensagem e a validade na API Internals
+            this._internals.setValidity(
+                flags,
+                this.elems.input.validationMessage, // Mensagem nativa ("Selecione um arquivo.")
+                this.elems.btnSearch // <--- IMPORTANTE: Aponta o erro para o botão visível, não para o input oculto
+            );
+        } else {
+            this._internals.setValidity({});
+        }
+    }
+
+    _atualizarTextoDisplay() {
+        const files = this.elems.input.files;
+        if (!files || files.length === 0) { // Se o usuário abriu a janela e cancelou (ou removeu arquivos)
+            this.elems.textDisplay.value = '';
+        } else if (files.length === 1) { // Um arquivo: mostra o nome
+            this.elems.textDisplay.value = files[0].name;
+        } else { // Múltiplos arquivos: mostra a contagem
+            //this.elems.textDisplay.value = `${files.length} arquivos selecionados`;
+            
+            // Opção B (Alternativa): Listar nomes com vírgula (se preferir)
+            const nomes = Array.from(files).map(f => f.name).join(' | ');
+            this.elems.textDisplay.value = nomes;
+        }
+    }
+    
+    _validaArquivo(file){
+        const accept = this.getAttribute('accept');
+        if (!accept) return true; // Se não tem filtro, tudo é válido
+        // Divide a string "image/*, .pdf, application/json" em regras
+        const regras = accept.split(',').map(r => r.trim().toLowerCase());
+        const nomeArquivo = file.name.toLowerCase();
+        const tipoArquivo = file.type.toLowerCase();
+
+        // Verifica se o arquivo bate com ALGUMA das regras
+        return regras.some(regra => {
+            if (regra.startsWith('.')) {
+                // Validação por extensão (ex: .pdf)
+                return nomeArquivo.endsWith(regra);
+            } else if (regra.endsWith('/*')) {
+                // Validação por coringa MIME (ex: image/*)
+                const baseMime = regra.replace('/*', ''); // vira "image"
+                return tipoArquivo.startsWith(baseMime);
+            } else {
+                // Validação por MIME exato (ex: application/json)
+                return tipoArquivo === regra;
+            }
+        });
+    }
+
+    /** Obtêm os dados dos arquivos selecionados (FileList) */
+    get files() {
+        return this.elems.input ? this.elems.input.files : null;
+    }
+
+
+    // ****************************************************************************
+    // Métodos dos atributos (Stubs para implementação futura)
+    // ****************************************************************************
+    
+    /** @override */
+    update_placeholder(val) {
+        if (this.elems.textDisplay) {
+            this.elems.textDisplay.placeholder = val || "Select file...";
+        }
+    }
+
+    /** @override */
+    update_disabled(val) {
+        // Chama a lógica do pai (que lida com o this.elems.input oculto)
+        // Mas como Input.update_disabled é simples, podemos reescrever tudo aqui para garantir
+        const isDisabled = this.hasAttribute('disabled');
+        if (this.elems.input) this.elems.input.disabled = isDisabled;
+        if (this.elems.btnSearch) {
+            this.elems  .btnSearch.disabled = isDisabled;
+        }
+        if (this.elems.textDisplay) {
+            this.elems.textDisplay.disabled = isDisabled; 
+        }
+    }
+    /** @override */
+    update_value(val) {
+        if (!val && this.elems.input) {
+            this.elems.input.value = '';
+            this.elems.textDisplay.value = '';
+        }
+    }
+    update_accept(val) {
+        if (this.elems.input) {
+            if (val) this.elems.input.accept = val;
+            else this.elems.input.removeAttribute('accept');
+        }
+    }
+
+    update_multiple(val) {
+        if (this.elems.input) {
+            this.elems.input.multiple = this.hasAttribute('multiple');
+        }
+    }
+    
+    update_text(val) {
+        if (this.elems.btnSearch) {
+            this.elems.btnSearch.textContent = val || "Search";
+        }
+    }
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------
+// 1. CSS Fora da Classe, Mais performático e limpo (adoptedStyleSheets)
+const algol_input_sheet = new CSSStyleSheet();
+algol_input_sheet.replaceSync(`
+    :host {
+        display: block; /* Garante que o componente respeite largura/altura */
+    }
+    slot{display: none;}
+    .container {
+        display: flex;
+        flex-direction: column;
+        gap: calc(0.3vw * var(--scale-factor));
+        margin-bottom: calc(1.0vw * var(--scale-factor));
+        width: 100%;
+        
+    }
+    label {
+        color: var(--text-color-label);
+        font-size: calc(1.0vw * var(--scale-factor));
+    }
+    :host([disabled]) label{
+        color: var(--text-color-label-disabled);
+    }
+    input::-webkit-calendar-picker-indicator { /* Chrome & others*/
+        color-scheme: var(--theme-color-scheme);
+    }
+    input {
+        color-scheme: var(--theme-color-scheme);
+        appearance: none;
+        -webkit-appearance: none;
+        outline: none;
+        box-sizing: border-box;
+        width: 100%;
+        padding: calc(0.8vw * var(--scale-factor)) calc(1.1vw * var(--scale-factor));
+        background: var(--bg-color-inputs);
+        color: var(--text-color);
+        border: calc(0.1vw * var(--scale-factor)) solid var(--border-color-forms);
+        border-radius: calc(var(--border-radius-components) * var(--scale-factor));
+        
+        font-family: 'Algol Font';
+        font-weight: 100;
+        font-size: calc(1.1vw * var(--scale-factor));
+        line-height: calc(var(--line-height) * var(--scale-factor));
+    }
+    :host([disabled]) input{
+        background-color: var(--bg-color-inputs-disabled) !important;
+        color: var(--text-color-disabled) !important;
+        cursor: not-allowed;
+    }
+    :host(:focus-within) input {
+        border-color: var(--border-color-focus); /* Exemplo */
+        box-shadow: 0 0 0 calc(0.1vw * var(--scale-factor)) var(--border-color-focus-glow) /* "Glow" externo */
+    }
+    input::placeholder {
+        color: var(--text-color-placeholder) !important;
+    }
+    :host([disabled]) input::placeholder {
+        color: var(--text-color-placeholder-disabled) !important;
+    }
+
+    /* --- ESTILOS ESPECÍFICOS PARA INPUT NUMBER --- */
+
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button {-webkit-appearance: none;margin: 0;}
+    input[type="number"] {-moz-appearance: textfield;}
+    
+    .input-container{
+        display: flex;
+        flex-direction: row;
+    }
+    .spinner{
+        display: flex;
+        flex-direction: column;
+    }
+    .btnup, .btndown{
+        width: calc(2.0vw * var(--scale-factor));
+        height: 100%;
+        background-color: var(--bg-color-btn-spinner);
+        color: var(--text-color-btn-spinner);
+        text-align: center;
+        border: none;
+        cursor: pointer;
+        font-size: calc(1.0vw * var(--scale-factor));
+        padding: 0;
+        user-select: none;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        -o-user-select: none;
+    }
+    .btnup{
+        border-bottom: solid calc(0.1vw * var(--scale-factor)) var(--border-color-btn-spinner);
+    }
+    .btndown{
+        border-top: solid calc(0.1vw * var(--scale-factor)) var(--border-color-btn-spinner);
+    }
+    .btnup:hover, .btndown:hover{
+        background-color: var(--bg-color-btn-spinner-hover);
+    }
+    .btnup:active, .btndown:active{
+        transform: translateY(calc(0.09vw * var(--scale-factor))); /* Efeito de clique */
+        background-color: var(--bg-color-btn-spinner-hover);
+    }
+
+    :host([disabled]) .btnup,:host([disabled]) .btndown{
+        background-color: var(--bg-color-btn-spinner-disabled) !important;
+        color: var(--text-color-btn-spinner-disabled) !important;
+        cursor: not-allowed;
+    }
+    :host([disabled]) .btnup{
+        border-bottom-color:var(--border-color-btn-spinner-disabled) !important;
+    }
+    :host([disabled]) .btndown{
+        border-top-color:var(--border-color-btn-spinner-disabled) !important;
+    }
+    
+
+    /* --- ESTILOS ESPECÍFICOS PARA INPUT COLOR --- */
+    .color-border{
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: calc(5vw * var(--scale-factor));
+        height: calc(3vw * var(--scale-factor));
+        background: var(--bg-color-inputs);
+        border: calc(0.1vw * var(--scale-factor)) solid var(--border-color-forms);
+        border-radius: calc(var(--border-radius-components) * var(--scale-factor));
+    }
+    :host(:focus-within) .color-border,
+    .color-border:focus {
+        border-color: var(--border-color-focus);
+        box-shadow: 0 0 0 calc(0.1vw * var(--scale-factor)) var(--border-color-focus-glow);
+    }
+    :host([disabled]) .color-border,
+    :host([disabled]) .color-border:focus {
+        border-color: #0000 !important;
+        box-shadow: none;
+    }
+    :host([disabled]) .color-border{
+        background: var(--bg-color-inputs-disabled) !important;
+        cursor: not-allowed;
+    }
+    
+    .color-box{
+        cursor: pointer;
+        width: calc(4vw * var(--scale-factor));
+        height: calc(2vw * var(--scale-factor));
+    }
+    :host([disabled]) .color-box{
+        background: var(--bg-color-inputs-disabled) !important;
+        cursor: not-allowed;
+        filter: brightness(0.8); /* leve escurecida */
+    }
+    :host(:not([disabled])) .color-box:hover, :host(:not([disabled])) .color-border:hover{
+        filter: brightness(0.9); /* leve escurecida */
+    }
+    :host(:not([disabled])) .color-box:active{
+        transform: translateY(calc(0.09vw * var(--scale-factor))); /* Efeito de clique */
+        filter: brightness(0.8);
+    }
+
+    /* --- ESTILOS ESPECÍFICOS PARA INPUT RANGE --- */
+
+    input[type="range"] {        
+        background: transparent; /* Importante: remove o fundo de input texto */
+        padding: 0;              /* Slider não deve ter padding interno */
+        width: 100%;
+        border:none;
+        min-height: calc(2.4vw * var(--scale-factor)); /* Mantém a altura para alinhamento */
+        cursor: pointer;
+    }
+    input[type="range"]:focus {
+        outline: none;
+        box-shadow: none;
+    }
+    
+    /* trilho do range ----------------------------------------------------------- */
+    input[type="range"]::-moz-range-track { /* Firefox */
+        width: 100%;
+        height: calc(0.4vw * var(--scale-factor));
+        background: var(--bg-color-inputs);
+        border-radius: calc(0.2vw * var(--scale-factor));
+        cursor: pointer;
+    }
+    :host([disabled]) input[type="range"]::-moz-range-track { /* Chrome & others */
+        background: var(--bg-color-inputs-disabled) !important;
+    }
+
+    input[type="range"]::-webkit-slider-runnable-track {
+        width: 100%;
+        height: calc(0.4vw * var(--scale-factor));
+        background: var(--bg-color-inputs);
+        border-radius: calc(0.2vw * var(--scale-factor));
+        cursor: pointer;
+    }
+    :host([disabled]) input[type="range"]::-webkit-slider-runnable-track {
+        cursor: not-allowed;
+        background: var(--bg-color-inputs-disabled) !important;
+    }
+    /* bolinha do range ----------------------------------------------------------- */
+    input[type="range"]::-webkit-slider-thumb {/* bolinha Chrome, Safari, Edge */
+        -webkit-appearance: none; /* Necessário para estilizar */
+        height: calc(1.2vw * var(--scale-factor));
+        width: calc(1.2vw * var(--scale-factor));
+        border-radius: 50%;
+        background: var(--text-color); /* Cor da bolinha */
+        border: none;
+        margin-top: calc(-0.4vw * var(--scale-factor)); 
+    }
+   
+    input[type="range"]::-moz-range-thumb { /* bolinha Firefox */
+        height: calc(1.2vw * var(--scale-factor));
+        width: calc(1.2vw * var(--scale-factor));
+        border-radius: 50%;
+        background: var(--text-color);
+        border: none;
+    }
+    input[type="range"]::-webkit-slider-thumb:hover { /* Hover da bolinha Chrome, Safari, Edge */
+        transform: scale(1.2); /* Cresce um pouco */
+        background: var(--border-color-focus);
+    }
+    input[type="range"]::-moz-range-thumb:hover { /* Hover da bolinha firefox */
+        transform: scale(1.2);
+        background: var(--border-color-focus);
+    }
+    input[type="range"]:focus::-moz-range-thumb {
+        box-shadow: 0 0 0 calc(0.3vw * var(--scale-factor)) var(--border-color-focus-glow);
+    }
+    input[type="range"]:focus::-webkit-slider-thumb {
+        box-shadow: 0 0 0 calc(0.3vw * var(--scale-factor)) var(--border-color-focus-glow);
+    }
+    :host([disabled]) input[type="range"]{
+        background: #0000 !important; /* remove o fundo */
+        cursor: not-allowed;
+    }
+    :host([disabled]) input[type="range"]::-moz-range-thumb {
+        background: var(--text-color-disabled) !important;
+    }
+    :host([disabled]) input[type="range"]::-webkit-slider-thumb {
+        background: var(--text-color-disabled) !important;
+        cursor: not-allowed;
+    }
+
+    /* --- ESTILOS ESPECÍFICOS PARA INPUT FILE --- */
+    
+    :host .container-file .btn{
+        appearance: none;
+        outline: none;
+        border: none;
+        user-select: none; // evita seleção de texto
+        cursor: pointer;
+
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: calc(0.6vw * var(--scale-factor)) calc(1.2vw * var(--scale-factor));
+        min-height: calc(2.4vw * var(--scale-factor));
+        border-radius: 0 calc(var(--border-radius-components) * var(--scale-factor)) calc(var(--border-radius-components) * var(--scale-factor)) 0;
+        background-color: var(--bg-color-button);
+        color: var(--text-color);
+        font-family: 'Algol Font';
+        font-weight: 200;
+        font-size: calc(var(--font-size-btn)* var(--scale-factor));
+    }
+    
+    :host .container-file input[type="text"]{
+        border-radius: calc(var(--border-radius-components) * var(--scale-factor)) 0 0 calc(var(--border-radius-components) * var(--scale-factor));
+    }
+
+    :host .container-file .btn:hover:not(:disabled) {
+        filter: brightness(1.1); /* Clareia levemente */
+    }
+    :host .container-file .btn:active:not(:disabled) {
+        transform: translateY(calc(0.09vw * var(--scale-factor))); /* Efeito de clique */
+        filter: brightness(0.9);
+    }
+    :host([disabled]) .container-file .btn {
+        background-color: var(--bg-color-inputs-disabled);
+        color: var(--text-color-disabled);
+        cursor: not-allowed;
+        opacity: 0.7;
+    }
+
+`);
+
+// ----------------------------------------------------------------------------------------------------------------------------------
+customElements.define('algol-input', Input); // Registra o componente customizado
+customElements.define('algol-input-number', InputNumber); // Registra o componente customizado
+customElements.define('algol-input-date', InputDate);
+customElements.define('algol-input-time', InputTime);
+customElements.define('algol-input-color', InputColor); 
+customElements.define('algol-input-range', InputRange); 
+customElements.define('algol-input-file', InputFile);
