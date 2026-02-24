@@ -1,8 +1,17 @@
-# <algol-image>
+# para instalar
+bun add elysia @elysiajs/static
+bun add -d @types/bun
+bun add ioredis
 
-Componente Web para carregamento de imagens com fallback de erro, lazy loading e integração com formulários.
+# configurar o redis no SO
+sudo apt update
+sudo apt install redis-server
+sudo systemctl start redis-server
+sudo systemctl enable redis-server
+redis-cli ping <!-- A resposta deve ser: PONG -->
 
-## Uso
 
-```html
-<algol-image src="foto.png" alt="Exemplo" lazy expand></algol-image>
+# para rodar
+bun drizzle-kit push <!-- para recriar o banco -->
+bun run index.ts
+bun --watch index.ts <!-- para recarregar automaticamente -->

@@ -1,0 +1,13 @@
+find ./ \
+  -path "./node_modules" -prune -o \
+  -path "./node_modules/*" -prune -o \
+  -path "./public" -prune -o \
+  -path "./public/*" -prune -o \
+  -type f -name "*.ts" -print \
+| sort | while IFS= read -r file; do
+  echo "// ===================================="
+  echo "// 📁 $file"
+  echo "// ===================================="
+  cat "$file"
+  echo
+done > projeto_completo_BACK.txt

@@ -1,0 +1,26 @@
+[
+  {
+    "title": "Linguagem Java",
+    "featured_image_url": "/imagens/posts/_covers/2019/java-cover.webp"
+  },
+  {
+    "title": "Algoritmo: o que é?",
+    "featured_image_url": "/imagens/posts/_covers/2020/algoritmos_algorithm_cover.webp"
+  },
+  {
+    "title": "Declarações condicionais",
+    "featured_image_url": "/imagens/posts/_covers/2020/declaracoes_condicionais_conditional_statements_cover.webp"
+  },
+  {
+    "title": "Operador de atribuição",
+    "featured_image_url": "/imagens/posts/_covers/2020/oper_atribuicao_cover.webp"
+  },
+  {
+    "title": "Operadores aritméticos",
+    "featured_image_url": "/imagens/posts/_covers/2020/operadores_aritmeticos_arithmetic_operators_cover-b.webp"
+  },
+  {
+    "title": "Operadores compostos",
+    "featured_image_url": "/imagens/posts/_covers/2020/operadores_compostos_cover.webp"
+  }
+]
