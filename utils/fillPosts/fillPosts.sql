@@ -1,5 +1,5 @@
 INSERT INTO `posts` 
-(`date`, `title`, `excerpt`, `slug`, `category_id`, `idiom_id`, `featured_image_url`, `content`) 
+(`date`, `title`, `excerpt`, `slug`, `category_id`, `idioms_id`, `featured_image_url`, `content`) 
 VALUES
 (unixepoch('2023-10-19 15:51:36'), 'Linguagem Java', 'Entenda a linguagem Java, suas características e o que a torna uma das linguagens de programação mais utilizadas e famosas da história da computação!', 'linguagem-java', 1, 1, '/imagens/posts/_covers/2019/java-cover.webp', ''),
 (unixepoch('2023-10-20 15:54:13'), 'Algoritmo: o que é?', 'Você sabe o que é um algoritmo? Neste artigo você vai aprender de uma forma nunca vista antes em um conteúdo gratuito! E ainda tem exercício!', 'algoritmo-o-que-e', 1, 1, '/imagens/posts/_covers/2020/algoritmos_algorithm_cover.webp', ''),

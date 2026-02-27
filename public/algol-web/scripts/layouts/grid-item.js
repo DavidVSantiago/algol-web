@@ -35,6 +35,7 @@ class GridItem extends BaseLayout {
             'imgrepeat': '--grid-item-imgrepeat', // no-repeat, repeat, repeat-x, repeat-y, ...
             'imgpos': '--grid-item-imgpos', // top, bottom, center, left, right, ...
             'imgsize': '--grid-item-imgsize', // contain, cover, ...
+            'imgoverlay': '--grid-item-imgoverlay', // valor entre 0 e 1
         };
     }
     static get PROP_MAP() {
@@ -101,6 +102,7 @@ class GridItem extends BaseLayout {
             algol-grid-item[posh]{justify-self: var(--grid-item-posh);}
             algol-grid-item[posv]{align-self: var(--grid-item-posv);}
             algol-grid-item[img]{background-image: var(--grid-item-img);}
+            algol-grid-item[imgoverlay]{background:linear-gradient(rgba(0,0,0,var(--grid-item-imgoverlay)), rgba(0,0,0,var(--grid-item-imgoverlay))), var(--grid-item-img);}
             algol-grid-item[imgattach]{background-attachment: var(--grid-item-imgattach);}
             algol-grid-item[imgrepeat]{background-repeat: var(--grid-item-imgrepeat);}
             algol-grid-item[imgpos]{background-position: var(--grid-item-imgpos);}

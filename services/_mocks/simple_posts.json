@@ -1,0 +1,506 @@
+[
+  {
+    "id": 1,
+    "title": "Linguagem Java",
+    "excerpt": "Entenda a linguagem Java, suas características e o que a torna uma das linguagens de programação mais utilizadas e famosas da história da computação!",
+    "slug": "linguagem-java",
+    "featured_image_url": "/imagens/posts/_covers/2019/java-cover.webp"
+  },
+  {
+    "id": 2,
+    "title": "Algoritmo: o que é?",
+    "excerpt": "Você sabe o que é um algoritmo? Neste artigo você vai aprender de uma forma nunca vista antes em um conteúdo gratuito! E ainda tem exercício!",
+    "slug": "algoritmo-o-que-e",
+    "featured_image_url": "/imagens/posts/_covers/2020/algoritmos_algorithm_cover.webp"
+  },
+  {
+    "id": 3,
+    "title": "Declarações condicionais",
+    "excerpt": "As declarações condicionais te permitem criar algoritmos mais inteligentes, fazendo-os tomar decisões durante a sua execução.",
+    "slug": "declaracoes-condicionais",
+    "featured_image_url": "/imagens/posts/_covers/2020/declaracoes_condicionais_conditional_statements_cover.webp"
+  },
+  {
+    "id": 4,
+    "title": "Operador de atribuição",
+    "excerpt": "Aprenda sobre o operador de atribuição, o mais simples da programação. Veja como ele é usado para colocar informações dentro das variáveis.",
+    "slug": "operador-de-atribuicao",
+    "featured_image_url": "/imagens/posts/_covers/2020/oper_atribuicao_cover.webp"
+  },
+  {
+    "id": 5,
+    "title": "Operadores aritméticos",
+    "excerpt": "Aprenda sobre a 2ª categoria de operadores. Veja como os operadores aritméticos são usados para realizar cálculos matemáticos.",
+    "slug": "operadores-aritmeticos",
+    "featured_image_url": "/imagens/posts/_covers/2020/operadores_aritmeticos_arithmetic_operators_cover-b.webp"
+  },
+  {
+    "id": 6,
+    "title": "Operadores compostos",
+    "excerpt": "Aprenda sobre a 5ª categoria de operadores. Veja como os operadores compostos, tais como o de incremento e decremento, simplificam os cálculos.",
+    "slug": "operadores-compostos",
+    "featured_image_url": "/imagens/posts/_covers/2020/operadores_compostos_cover.webp"
+  },
+  {
+    "id": 7,
+    "title": "Operadores lógicos",
+    "excerpt": "Aprenda sobre a 4ª categoria de operadores. Veja como os operadores lógicos são usados para criar expressões condicionais complexas.",
+    "slug": "operadores-logicos",
+    "featured_image_url": "/imagens/posts/_covers/2020/operadores_logicos_logical_operators_cover_b.webp"
+  },
+  {
+    "id": 8,
+    "title": "Operadores relacionais",
+    "excerpt": "Aprenda sobre a 3ª categoria de operadores. Veja como os operadores relacionais são usados para criar expressões condicionais.",
+    "slug": "operadores-relacionais",
+    "featured_image_url": "/imagens/posts/_covers/2020/operadores_relacionais-b.webp"
+  },
+  {
+    "id": 9,
+    "title": "Variável: O que é?",
+    "excerpt": "Aprenda o significado de uma variável. Entenda como as linguagens de programação as utilizam para armazenar e processar as informações.",
+    "slug": "variavel-o-que-e",
+    "featured_image_url": "/imagens/posts/_covers/2020/variavel_variable_cover.webp"
+  },
+  {
+    "id": 10,
+    "title": "Logical operators",
+    "excerpt": "Learn about the 4th category of programming operators. See how logical operators are used to create more complex conditional expressions.",
+    "slug": "logical-operators",
+    "featured_image_url": "/imagens/posts/_covers/2020/operadores_logicos_logical_operators_cover_b.webp"
+  },
+  {
+    "id": 11,
+    "title": "Java language",
+    "excerpt": "Understand Java language, its features and what makes it one of the most widely used programming languages in computer history!",
+    "slug": "java-language",
+    "featured_image_url": "/imagens/posts/_covers/2019/java-cover.webp"
+  },
+  {
+    "id": 12,
+    "title": "Linguagens de programação: o que são?",
+    "excerpt": "Aprenda o significado das linguagens de programação. Entenda com o que elas se parecem e como são utilizadas para criar programas.",
+    "slug": "linguagens-programacao-o-que-sao",
+    "featured_image_url": "/imagens/posts/_covers/2019/programming-language-cover.webp"
+  },
+  {
+    "id": 13,
+    "title": "Programming languages: what are they?",
+    "excerpt": "Learn the meaning of programming languages. Understand what they look like and how they are used to create programs.",
+    "slug": "programming-languages-what-are-they",
+    "featured_image_url": "/imagens/posts/_covers/2019/programming-language-cover.webp"
+  },
+  {
+    "id": 14,
+    "title": "Variable: what is it?",
+    "excerpt": "Learn the meaning of a programing variable. Understand how programming languages use them to store and process information.",
+    "slug": "variable-what-is-it",
+    "featured_image_url": "/imagens/posts/_covers/2020/variavel_variable_cover.webp"
+  },
+  {
+    "id": 15,
+    "title": "Relational operators",
+    "excerpt": "Learn about the 3rd category of programming operators. See how relational operators are used to create conditional expressions.",
+    "slug": "relational-operators",
+    "featured_image_url": "/imagens/posts/_covers/2020/operadores_relacionais-b.webp"
+  },
+  {
+    "id": 16,
+    "title": "Compound assignment operators",
+    "excerpt": "Learn about the 5th category of programming operators. See how compound assignment operators, such as increment and decrement, simplify calculations.",
+    "slug": "compound-operators",
+    "featured_image_url": "/imagens/posts/_covers/2020/operadores_compostos_cover.webp"
+  },
+  {
+    "id": 17,
+    "title": "Arithmetic operators",
+    "excerpt": "Learn about the 2nd category of operators. See how arithmetic operators are used to perform mathematical calculations in programming.",
+    "slug": "arithmetic-operators",
+    "featured_image_url": "/imagens/posts/_covers/2020/operadores_aritmeticos_arithmetic_operators_cover-b.webp"
+  },
+  {
+    "id": 18,
+    "title": "Assignment operator",
+    "excerpt": "Learn about the assignment operator, the simplest operator in programming. See how it is used to put information into variables.",
+    "slug": "assignment-operator",
+    "featured_image_url": "/imagens/posts/_covers/2020/oper_atribuicao_cover.webp"
+  },
+  {
+    "id": 19,
+    "title": "Conditional statements",
+    "excerpt": "Conditional statements allow you to create much smarter algorithms, making them make important decisions during their execution.",
+    "slug": "conditional-statements",
+    "featured_image_url": "/imagens/posts/_covers/2021/Estruturas_condicionais_conditional_structures_cover.webp"
+  },
+  {
+    "id": 20,
+    "title": "Input and output commands: your beginning in programming",
+    "excerpt": "Take your first steps in programming. Learn about input and output commands, and how it allows you to communicate with your computer.",
+    "slug": "input-output-commands-beginning-programming",
+    "featured_image_url": "/imagens/posts/_covers/2020/comandos_entrada_saida_input_output_cover.webp"
+  },
+  {
+    "id": 21,
+    "title": "Algorithm: what is it?",
+    "excerpt": "Do you know what an algorithm is? In this article you will learn in a way never seen before in free content! And we also offer exercises!",
+    "slug": "algorithm-what-is-it",
+    "featured_image_url": "/imagens/posts/_covers/2020/algoritmos_algorithm_cover.webp"
+  },
+  {
+    "id": 22,
+    "title": "Tipos Abstratos de Dados - TAD",
+    "excerpt": "Aprenda o que é um Tipo Abstrato de Dados (TAD). Entenda como as linguagens de programação utilizam um TAD para representar conceitos.",
+    "slug": "tipos-abstratos-de-dados-tad",
+    "featured_image_url": "/imagens/posts/_covers/2021/TAD_ADT_cover.webp"
+  },
+  {
+    "id": 23,
+    "title": "Abstract Data Types - ADT",
+    "excerpt": "Learn what an Abstract Data Types (ADT) is. Understand how programming languages use an ADT to represent various real-world concepts.",
+    "slug": "abstract-data-types-adt",
+    "featured_image_url": "/imagens/posts/_covers/2021/TAD_ADT_cover.webp"
+  },
+  {
+    "id": 24,
+    "title": "Árvores: estrutura de dados",
+    "excerpt": "Conheça as principais características e propriedades das árvores, uma das mais importantes estruturas de dados não lineares da computação.",
+    "slug": "arvores-estrutura-de-dados",
+    "featured_image_url": "/imagens/posts/_covers/2019/arvores-estrutura-de-dados.webp"
+  },
+  {
+    "id": 25,
+    "title": "Trees: data structure",
+    "excerpt": "Learn about the main characteristics and properties of trees, one of the most important nonlinear data structures in computing.",
+    "slug": "trees-data-structure",
+    "featured_image_url": "/imagens/posts/_covers/2019/arvores-estrutura-de-dados.webp"
+  },
+  {
+    "id": 26,
+    "title": "Indução matemática: como se faz?",
+    "excerpt": "Entenda o significado da indução matemática, a sua origem e como aplicá-la corretamente para provar teoremas que envolvem números naturais.",
+    "slug": "inducao-matematica-como-se-faz",
+    "featured_image_url": "/imagens/posts/_covers/2019/inducao-matematica.webp"
+  },
+  {
+    "id": 27,
+    "title": "Mathematical induction: how do you do it?",
+    "excerpt": "Understand the meaning of mathematical induction, its origin and how to apply it correctly to prove theorems involving natural numbers.",
+    "slug": "mathematical-induction-how-do-you-do-it",
+    "featured_image_url": "/imagens/posts/_covers/2019/inducao-matematica.webp"
+  },
+  {
+    "id": 28,
+    "title": "Algoritmos recursivos",
+    "excerpt": "Conheça a aparência e a estrutura dos algoritmos recursivos, além do grande segredo que existe por de trás da sua execução.",
+    "slug": "algoritmos-recursivos",
+    "featured_image_url": "/imagens/posts/_covers/2019/algoritmos-recursivos.webp"
+  },
+  {
+    "id": 29,
+    "title": "Recursive algorithms",
+    "excerpt": "Know the look and feel and the structure of recursive algorithms and the big secret behind its execution.",
+    "slug": "recursive-algorithms",
+    "featured_image_url": "/imagens/posts/_covers/2019/algoritmos-recursivos.webp"
+  },
+  {
+    "id": 30,
+    "title": "Recursividade: o que é?",
+    "excerpt": "Entenda o significado do conceito matemático da recursividade e veja alguns exemplos de problemas reais onde ela é aplicada.",
+    "slug": "recursividade-o-que-e",
+    "featured_image_url": "/imagens/posts/_covers/2019/recursividade-o-que-e.webp"
+  },
+  {
+    "id": 31,
+    "title": "Recursion: what is it?",
+    "excerpt": "Understand the meaning of the mathematical concept of recursion and see some examples of real problems where it is applied.",
+    "slug": "recursion-what-is-it",
+    "featured_image_url": "/imagens/posts/_covers/2019/recursividade-o-que-e.webp"
+  },
+  {
+    "id": 32,
+    "title": "Comando while: estrutura de repetição",
+    "excerpt": "Aprenda em detalhes um dos conceitos mais fantásticos da programação de computadores: o comando while e as estruturas de repetição.",
+    "slug": "comando-while-estrutura-de-repeticao",
+    "featured_image_url": "/imagens/posts/_covers/2021/comando_while_command.webp"
+  },
+  {
+    "id": 33,
+    "title": "While statement: repetition structure",
+    "excerpt": "Learn all details of one of the most fantastic computer programming concepts: the while statement and the repetition structures.",
+    "slug": "while-statement-repetition-structure",
+    "featured_image_url": "/imagens/posts/_covers/2021/comando_while_command.webp"
+  },
+  {
+    "id": 34,
+    "title": "Comando switch case: estrutura de seleção",
+    "excerpt": "Aprenda todos os detalhes do comando switch case. O comando que te permite criar estruturas de seleção em programação de computadores.",
+    "slug": "comando-switch-case",
+    "featured_image_url": "/imagens/posts/_covers/2021/comando_switch_case_command-b.webp"
+  },
+  {
+    "id": 35,
+    "title": "Switch case command: selection structure",
+    "excerpt": "Learn all the details of the switch case command. The command that allows you to create selection structures in computer programming.",
+    "slug": "switch-case-command",
+    "featured_image_url": "/imagens/posts/_covers/2021/comando_switch_case_command-b.webp"
+  },
+  {
+    "id": 36,
+    "title": "Estruturas condicionais",
+    "excerpt": "O que acontece se você colocar uma estrutura if-else dentro da outra? Veja neste artigo o conceito de estruturas condicionais.",
+    "slug": "estruturas-condicionais",
+    "featured_image_url": "/imagens/posts/_covers/2021/Estruturas_condicionais_conditional_structures_cover.webp"
+  },
+  {
+    "id": 37,
+    "title": "Conditional structures",
+    "excerpt": "What happens if you put one if-else structure inside the other? See the concept of conditional structures in this article.",
+    "slug": "conditional-structures",
+    "featured_image_url": "/imagens/posts/_covers/2021/Estruturas_condicionais_conditional_structures_cover.webp"
+  },
+  {
+    "id": 38,
+    "title": "Comando for: estrutura de repetição",
+    "excerpt": "Avance seus conhecimentos em estruturas de repetição. Aprenda o funcionamento do \"comando for\", do comando \"continue\" e do comando \"break\".",
+    "slug": "comando-for-estrutura-de-repeticao",
+    "featured_image_url": "/imagens/posts/_covers/2021/comando_for_command.webp"
+  },
+  {
+    "id": 39,
+    "title": "For statement: repetition structure",
+    "excerpt": "Advance your knowledge in repetition structures. Learn how the \"for statement\", the \"continue\" statement and the \"break\" statement work.",
+    "slug": "for-statement-repetition-structure",
+    "featured_image_url": "/imagens/posts/_covers/2021/comando_for_command.webp"
+  },
+  {
+    "id": 40,
+    "title": "Arrays: arranjos de dados",
+    "excerpt": "Aprenda a manipular grandes conjuntos de dados. Com os arrays você pode manipular várias variáveis como se fossem uma única.",
+    "slug": "arrays-arranjos-de-dados",
+    "featured_image_url": "/imagens/posts/_covers/2021/arrays-cover.webp"
+  },
+  {
+    "id": 41,
+    "title": "Arrays",
+    "excerpt": "Learn now how to manipulate large data sets. With arrays, you have the ability to manipulate multiple variables as if they were a single one.",
+    "slug": "arrays",
+    "featured_image_url": "/imagens/posts/_covers/2021/arrays-cover.webp"
+  },
+  {
+    "id": 42,
+    "title": "Função: modularização de algoritmos",
+    "excerpt": "Aprenda a técnica de modularização de algoritmos. Uma função permite dividir o código fonte em módulos separados e comunicáveis entre si.",
+    "slug": "funcao-modularizacao",
+    "featured_image_url": "/imagens/posts/_covers/2021/funcao_function_cover-b.webp"
+  },
+  {
+    "id": 43,
+    "title": "Function: modularization",
+    "excerpt": "Learn the technique of modularizing algorithms. A function make it possible to divide the source code into separate modules.",
+    "slug": "function-modularization",
+    "featured_image_url": "/imagens/posts/_covers/2021/funcao_function_cover-b.webp"
+  },
+  {
+    "id": 44,
+    "title": "Análise de algoritmos: como se faz?",
+    "excerpt": "Aprenda como se faz a análise de algoritmos. Veja exemplos e demonstrações passo a passo de análises realizadas em algoritmos reais.",
+    "slug": "analise-algoritmos-como-se-faz",
+    "featured_image_url": "/imagens/posts/_covers/2022/algorithm_analisys-cover.webp"
+  },
+  {
+    "id": 45,
+    "title": "Algorithm analysis: how do you do it?",
+    "excerpt": "Learn how to do algorithm analysis. See examples and step-by-step demonstrations of analyzes performed on real algorithms.",
+    "slug": "algorithm-analysis-how-do-you-do-it",
+    "featured_image_url": "/imagens/posts/_covers/2022/algorithm_analisys-cover.webp"
+  },
+  {
+    "id": 46,
+    "title": "Melhor caso e pior caso",
+    "excerpt": "Entenda como algumas construções específicas podem definir diferentes funções de complexidade para um mesmo algoritmo, definido o conceito de melhor caso e pior caso.",
+    "slug": "melhor-caso-pior-caso",
+    "featured_image_url": "/imagens/posts/_covers/2022/best-case-wrost-case-cover.webp"
+  },
+  {
+    "id": 47,
+    "title": "Best case and worst case",
+    "excerpt": "Learn in this article how some specific constructions can define different complexity functions for the same algorithm. Defining the concepts of best case and worst case.",
+    "slug": "best-case-and-worst-case",
+    "featured_image_url": "/imagens/posts/_covers/2022/best-case-wrost-case-cover.webp"
+  },
+  {
+    "id": 48,
+    "title": "Comportamento assintótico",
+    "excerpt": "Compreenda a importância do comportamento assintótico das funções geradas pelo processo de análise de algoritmos.",
+    "slug": "comportamento-assintotico",
+    "featured_image_url": "/imagens/posts/_covers/2022/asymptotic-behavior-cover.webp"
+  },
+  {
+    "id": 49,
+    "title": "Asymptotic behavior",
+    "excerpt": "Deepen your knowledge in algorithm analysis. Know the importance of asymptotic behavior of the functions generated by the analysis process.",
+    "slug": "asymptotic-behavior",
+    "featured_image_url": "/imagens/posts/_covers/2022/asymptotic-behavior-cover.webp"
+  },
+  {
+    "id": 50,
+    "title": "Classes assintóticas",
+    "excerpt": "Conheça as principais classes assintóticas e o significado de desempenho que elas representam para os algoritmos.",
+    "slug": "classes-assintoticas",
+    "featured_image_url": "/imagens/posts/_covers/2022/asymptotic-classes-cover.webp"
+  },
+  {
+    "id": 51,
+    "title": "Asymptotic classes",
+    "excerpt": "Continue to deepen your knowledge of algorithm analysis. Learn about asymptotic classes and the differences in performance between them.",
+    "slug": "asymptotic-classes",
+    "featured_image_url": "/imagens/posts/_covers/2022/asymptotic-classes-cover.webp"
+  },
+  {
+    "id": 52,
+    "title": "Notação Big O",
+    "excerpt": "Conheça todos os detalhes da notação Big O: a primeira das 3 principais notações usadas em análise de algoritmos para representar desempenho.",
+    "slug": "notacao-big-o",
+    "featured_image_url": "/imagens/posts/_covers/2022/big-o-notation-cover.webp"
+  },
+  {
+    "id": 53,
+    "title": "Big O notation",
+    "excerpt": "Learn the full details of the Big O notation: the first of the top 3 notations used in algorithm analysis to represent performance.",
+    "slug": "big-o-notation",
+    "featured_image_url": "/imagens/posts/_covers/2022/big-o-notation-cover.webp"
+  },
+  {
+    "id": 54,
+    "title": "Notação Big Ômega",
+    "excerpt": "Conheça todos os detalhes da notação Big Ômega: a segunda das 3 principais notações usadas em análise de algoritmos.",
+    "slug": "notacao-big-omega",
+    "featured_image_url": "/imagens/posts/_covers/2022/big-omega-notation-cover.webp"
+  },
+  {
+    "id": 55,
+    "title": "Big Omega notation",
+    "excerpt": "Learn the full details of the Big Omega notation: the second of the top 3 notations used in algorithm analysis to represent performance.",
+    "slug": "big-omega-notation",
+    "featured_image_url": "/imagens/posts/_covers/2022/big-omega-notation-cover.webp"
+  },
+  {
+    "id": 56,
+    "title": "Notação Theta",
+    "excerpt": "Conheça todos os detalhes da notação Theta: a última das 3 principais notações usadas em análise de algoritmos para representar desempenho.",
+    "slug": "notacao-theta",
+    "featured_image_url": "/imagens/posts/_covers/2022/theta-notation-cover.webp"
+  },
+  {
+    "id": 57,
+    "title": "Theta notation",
+    "excerpt": "Learn all the details of Theta notation: the last of the top 3 notations used in algorithm analysis to represent performance.",
+    "slug": "algorithm-analysis-theta-notation",
+    "featured_image_url": "/imagens/posts/_covers/2022/theta-notation-cover.webp"
+  },
+  {
+    "id": 58,
+    "title": "Logaritmos: o que são?",
+    "excerpt": "Entenda origem e os elementos que compõem a simbologia dos logaritmos. Conheça as suas restrições e as principais convenções para a sua representação.",
+    "slug": "logaritmos-o-que-sao",
+    "featured_image_url": "/imagens/posts/_covers/2019/logaritmos-o-que-sao.webp"
+  },
+  {
+    "id": 59,
+    "title": "Logarithms: what are they?",
+    "excerpt": "Understand origin and the elements that make up the symbology of logarithms. Know your restrictions and the main conventions for your representation.",
+    "slug": "logarithms-what-are-they",
+    "featured_image_url": "/imagens/posts/_covers/2019/logaritmos-o-que-sao.webp"
+  },
+  {
+    "id": 60,
+    "title": "Propriedades dos logaritmos",
+    "excerpt": "Conheça as principais propriedades dos logaritmos e aprenda a utilizá-las para resolver vários tipos de operações algébricas.",
+    "slug": "propriedades-dos-logaritmos",
+    "featured_image_url": "/imagens/posts/_covers/2019/propriedades-dos-logaritmos.webp"
+  },
+  {
+    "id": 61,
+    "title": "Logarithm properties",
+    "excerpt": "Learn about the Logarithm properties and learn how to use them to solve various types of algebraic operations.",
+    "slug": "logarithm-properties",
+    "featured_image_url": "/imagens/posts/_covers/2019/propriedades-dos-logaritmos.webp"
+  },
+  {
+    "id": 62,
+    "title": "Somatórios: o que são?",
+    "excerpt": "Entenda o significado dos somatórios, conheça os elementos que compõem o corpo da sua simbologia e veja alguns exemplos práticos e ilustrados.",
+    "slug": "somatorios-o-que-sao",
+    "featured_image_url": "/imagens/posts/_covers/2019/somatorios-o-que-sao.webp"
+  },
+  {
+    "id": 63,
+    "title": "Summations: what are they?",
+    "excerpt": "Understand the meaning of the summations, get to know the elements that make up the body of its symbology and see some practical and illustrated examples.",
+    "slug": "summations-what-are-they",
+    "featured_image_url": "/imagens/posts/_covers/2019/somatorios-o-que-sao.webp"
+  },
+  {
+    "id": 64,
+    "title": "Propriedades dos somatórios",
+    "excerpt": "Conheça as principais propriedades dos somatórios e aprenda a utilizá-las para resolver vários tipos de operações algébricas.",
+    "slug": "propriedades-dos-somatorios",
+    "featured_image_url": "/imagens/posts/_covers/2019/propriedades-dos-somatorios.webp"
+  },
+  {
+    "id": 65,
+    "title": "Summation properties",
+    "excerpt": "Learn about the main Summation properties and learn how to use it to solve various types of algebraic operations.",
+    "slug": "summation-properties",
+    "featured_image_url": "/imagens/posts/_covers/2019/propriedades-dos-somatorios.webp"
+  },
+  {
+    "id": 66,
+    "title": "Sistema binário: bits versus informações",
+    "excerpt": "Entenda como os computadores conseguem, por meio do sistema binário, armazenar as complexas representações humanas em amontoados de zeros e uns.",
+    "slug": "sistema-binario-bits-versus-informacoes",
+    "featured_image_url": "/imagens/posts/_covers/2023/binary-system-cover.webp"
+  },
+  {
+    "id": 67,
+    "title": "Binary system: bits versus information",
+    "excerpt": "Understand how computers can store complex human representations in clusters of zeros and ones, through the binary system.",
+    "slug": "binary-system-bits-versus-information",
+    "featured_image_url": "/imagens/posts/_covers/2023/binary-system-cover.webp"
+  },
+  {
+    "id": 68,
+    "title": "Código binário: o que é?",
+    "excerpt": "Aprenda o significado do código binário e como ele desempenha um papel muito importante para a execução dos programas de comutadores.",
+    "slug": "codigo-binario-o-que-e",
+    "featured_image_url": "/imagens/posts/_covers/2023/binary-code-cover.webp"
+  },
+  {
+    "id": 69,
+    "title": "Binary code: what is it?",
+    "excerpt": "Learn the meaning of binary code, its appearance and how it plays a very important role in the execution of all computer programs.",
+    "slug": "binary-code-what-is-it",
+    "featured_image_url": "/imagens/posts/_covers/2023/binary-code-cover.webp"
+  },
+  {
+    "id": 70,
+    "title": "Código fonte: o que é?",
+    "excerpt": "Entenda o que é o código fonte, a sua relação com o código binário e como ele é muito importante para a manutenção dos sistemas computacionais.",
+    "slug": "codigo-fonte-o-que-e",
+    "featured_image_url": "/imagens/posts/_covers/2023/source-code-cover.webp"
+  },
+  {
+    "id": 71,
+    "title": "Source code: what is it?",
+    "excerpt": "Understand what is source code is, your appearance, its relationship to binary code and its great importance for maintaining computer systems.",
+    "slug": "source-code-what-is-it",
+    "featured_image_url": "/imagens/posts/_covers/2023/source-code-cover.webp"
+  },
+  {
+    "id": 72,
+    "title": "Comandos de entrada e saída: o seu início na programação",
+    "excerpt": "Dê seus primeiros passos na programação. Aprenda sobre os comandos de entrada e saída, e como ele te permite se comunicar com o computador.",
+    "slug": "comandos-entrada-saida-inicio-programacao",
+    "featured_image_url": "/imagens/posts/_covers/2020/comandos_entrada_saida_input_output_cover.webp"
+  }
+]

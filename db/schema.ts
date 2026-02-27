@@ -29,7 +29,7 @@ export const posts = sqliteTable('posts', {
             onDelete: 'cascade',
             onUpdate: 'cascade',
     }),
-    idiom_id: integer('idioms_id')
+    idioms_id: integer('idioms_id')
         .notNull()
         .references(() => idioms.id, {
             onDelete: 'cascade',
@@ -43,8 +43,6 @@ export const posts = sqliteTable('posts', {
 // Para gerar os tipos automaticamente
 export type Posts = typeof posts.$inferSelect;
 export type NewPosts = typeof posts.$inferInsert;
-export type RecentPost = {
-    id: number;
-    title: string;
-    featured_image_url: string | null;
-};
+
+/** Tipo para especificar o retorno de posts resumidos*/
+export type SimplePosts = Pick<Posts,"id" | "title" | "slug" | "featured_image_url">;

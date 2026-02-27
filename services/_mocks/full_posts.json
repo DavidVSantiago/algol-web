@@ -8,7 +8,7 @@
     "category_id": 1,
     "idioms_id": 1,
     "featured_image_url": "/imagens/posts/_covers/2019/java-cover.webp",
-    "content": null
+    "content": "<h2>Introdução</h2>\n        <div class=\"_grid _2_cols_grid_B\">\n            <div>\n                <img src=\"[[[filebucket]]]/imagens/posts/2019/linguagem-java/java-01.webp\" alt=\"java\" width=\"288\" height=\"171\">\n            </div>\n            <div>\n                <p>Lançada originalmente em 1995, pela <a href=\"https://pt.wikipedia.org/wiki/Sun_Microsystems\" target=\"_blank\" rel=\"noopener noreferrer\" aria-label=\"Leia mais a respeito.\">Sun Microsystems</a>, a linguagem Java é uma das linguagens de programação mais famosas e mais utilizadas pelos desenvolvedores iniciantes. No mercado de desenvolvimento de softwares, o Java é amplamente utilizado devido ao seu grande poder de realização, maior facilidade de uso e menor curva de aprendizado.</p>\n            </div>\n        </div>\n        <p>Atualmente a linguagem pertence à empresa <a href=\"https://www.oracle.com/br/index.html\" target=\"_blank\" rel=\"noopener noreferrer\" aria-label=\"Leia mais a respeito.\">Oracle</a> e se mantém muito forte. Ainda desponta como primeira colocada no Ranking das linguagens de programação mais utilizadas em todo o mundo (segundo o <a href=\"https://www.tiobe.com/tiobe-index/\" target=\"_blank\" rel=\"noopener noreferrer\" aria-label=\"Leia mais a respeito.\">índice TIOBE</a>).</p>\n        <p>Mas, por que será que ela é tão famosa? Por que deu tão certo no mercado? O que a torna tão utilizada pelos mais variados tipos de desenvolvedores de aplicações?</p>\n        <p>Bem! Para responder a esses questionamentos precisamos conhecer as características dessa linguagem de programação.</p>\n        <p><a href=\"[[[domain]]]/linguagens-programacao-o-que-sao/\" target=\"_blank\" aria-label=\"Leia mais a respeito.\">Se você ainda não está familiarizado com o conceito de linguagem de programação, clique neste link e veja o artigo em que te explicamos com bastante detalhes sobre o assunto.</a></p>\n        \n        <hr>\n\n        <h2>O Java funciona em qualquer lugar!</h2>\n        <p>\n            O Java é uma linguagem de programação multiplataforma. Isso significa que o programador escreve um único código fonte do seu programa e consegue executá-lo em vários sistemas operacionais diferentes, sem quase realizar nenhum tipo de ajuste ou adaptação. Este é o conceito que chamamos de portabilidade: a capacidade de ser portável e adaptar-se a outros ambientes de maneira natural. Em resumo: o programador escreve o código apenas uma vez e o executa em qualquer lugar.\n        </p>\n        <div class=\"_grid _2_cols_grid_A\">\n            <div>\n                <div><img class=\"full-size-img-mobile\" src=\"[[[filebucket]]]/imagens/posts/2019/linguagem-java/java-02a.webp\" alt=\"java\" width=\"350\" height=\"252\"></div>\n                <p class=\"description\">O Java funciona no Windows</p>\n            </div>\n            <div>\n                <div><img class=\"full-size-img-mobile\" src=\"[[[filebucket]]]/imagens/posts/2019/linguagem-java/java-02b.webp\" alt=\"java\" width=\"350\" height=\"252\"></div>\n                <p class=\"description\">Funciona no sistema Linux</p>\n            </div>\n            <div>\n                <div><img class=\"full-size-img-mobile\" src=\"[[[filebucket]]]/imagens/posts/2019/linguagem-java/java-02c.webp\" alt=\"java\" width=\"350\" height=\"252\"></div>\n                <p class=\"description\">Funciona no seu Celular Android</p>\n            </div>\n            <div>\n                <div><img class=\"full-size-img-mobile\" src=\"[[[filebucket]]]/imagens/posts/2019/linguagem-java/java-02d.webp\" alt=\"java\" width=\"350\" height=\"252\"></div>\n                <p class=\"description\">Funciona até no Mac OS</p>\n            </div>\n        </div>\n        <p>Mas isso não acontece por mágica. O grande responsável por dar à linguagem essa capacidade de adaptação a vários ambientes diferentes é a sua Máquina Virtual.</p>\n        <p>Um programa escrito em Java não é executado diretamente pelo sistema operacional, como são executados os programas tradicionais. Existe uma aplicação denominada Máquina Virtual Java (JVM) que faz com que um programa escrito na linguagem seja adaptável aos mais diversos tipos de sistemas.</p>\n        <p>A imagem abaixo ilustra a função da JVM. Ela funciona como uma espécie de intermediador entre a execução do código Java e o sistema operacional. O código do programa que você escreveu é naturalmente interpretado pela Máquina Virtual e executado nos diversos sistemas operacionais. Todo trabalho de adaptação para as particularidades do sistema é feito pela JVM.</p>\n        <img class=\"full-size-img-mobile\" src=\"[[[filebucket]]]/imagens/posts/2019/linguagem-java/java-03.webp\" alt=\"java\" width=\"510\" height=\"253\">\n        <div class=\"separator-1\"></div>\n        <p>A JVM não precisa ser configurada pelo programador. Ela pode ser obtida gratuitamente no site da Oracle e já vem pronta para ser usada e interpretar os programas escritos na linguagem.</p>\n\n        <hr>\n\n        <h2>Os programas escritos em Java são rápidos?</h2>\n        <p>Apesar da portabilidade e adaptação aos diversos sistemas operacionais, as aplicações Java são um pouco mais lentas que as aplicações tradicionais...</p>"
   },
   {
     "id": 2,
@@ -19,7 +19,7 @@
     "category_id": 1,
     "idioms_id": 1,
     "featured_image_url": "/imagens/posts/_covers/2020/algoritmos_algorithm_cover.webp",
-    "content": null
+    "content": ""
   },
   {
     "id": 3,
@@ -30,7 +30,7 @@
     "category_id": 1,
     "idioms_id": 1,
     "featured_image_url": "/imagens/posts/_covers/2020/declaracoes_condicionais_conditional_statements_cover.webp",
-    "content": null
+    "content": ""
   },
   {
     "id": 4,
@@ -41,7 +41,7 @@
     "category_id": 1,
     "idioms_id": 1,
     "featured_image_url": "/imagens/posts/_covers/2020/oper_atribuicao_cover.webp",
-    "content": null
+    "content": ""
   },
   {
     "id": 5,
@@ -52,7 +52,7 @@
     "category_id": 1,
     "idioms_id": 1,
     "featured_image_url": "/imagens/posts/_covers/2020/operadores_aritmeticos_arithmetic_operators_cover-b.webp",
-    "content": null
+    "content": ""
   },
   {
     "id": 6,
@@ -63,7 +63,7 @@
     "category_id": 1,
     "idioms_id": 1,
     "featured_image_url": "/imagens/posts/_covers/2020/operadores_compostos_cover.webp",
-    "content": null
+    "content": ""
   },
   {
     "id": 7,
@@ -74,7 +74,7 @@
     "category_id": 1,
     "idioms_id": 1,
     "featured_image_url": "/imagens/posts/_covers/2020/operadores_logicos_logical_operators_cover_b.webp",
-    "content": null
+    "content": ""
   },
   {
     "id": 8,
@@ -85,7 +85,7 @@
     "category_id": 1,
     "idioms_id": 1,
     "featured_image_url": "/imagens/posts/_covers/2020/operadores_relacionais-b.webp",
-    "content": null
+    "content": ""
   },
   {
     "id": 9,
@@ -96,7 +96,7 @@
     "category_id": 1,
     "idioms_id": 1,
     "featured_image_url": "/imagens/posts/_covers/2020/variavel_variable_cover.webp",
-    "content": null
+    "content": ""
   },
   {
     "id": 10,
@@ -107,7 +107,7 @@
     "category_id": 1,
     "idioms_id": 2,
     "featured_image_url": "/imagens/posts/_covers/2020/operadores_logicos_logical_operators_cover_b.webp",
-    "content": null
+    "content": ""
   },
   {
     "id": 11,
@@ -118,7 +118,7 @@
     "category_id": 1,
     "idioms_id": 2,
     "featured_image_url": "/imagens/posts/_covers/2019/java-cover.webp",
-    "content": null
+    "content": ""
   },
   {
     "id": 12,
@@ -129,7 +129,7 @@
     "category_id": 1,
     "idioms_id": 1,
     "featured_image_url": "/imagens/posts/_covers/2019/programming-language-cover.webp",
-    "content": null
+    "content": ""
   },
   {
     "id": 13,
@@ -140,7 +140,7 @@
     "category_id": 1,
     "idioms_id": 2,
     "featured_image_url": "/imagens/posts/_covers/2019/programming-language-cover.webp",
-    "content": null
+    "content": ""
   },
   {
     "id": 14,
@@ -151,7 +151,7 @@
     "category_id": 1,
     "idioms_id": 2,
     "featured_image_url": "/imagens/posts/_covers/2020/variavel_variable_cover.webp",
-    "content": null
+    "content": ""
   },
   {
     "id": 15,
@@ -162,7 +162,7 @@
     "category_id": 1,
     "idioms_id": 2,
     "featured_image_url": "/imagens/posts/_covers/2020/operadores_relacionais-b.webp",
-    "content": null
+    "content": ""
   },
   {
     "id": 16,
@@ -173,7 +173,7 @@
     "category_id": 1,
     "idioms_id": 2,
     "featured_image_url": "/imagens/posts/_covers/2020/operadores_compostos_cover.webp",
-    "content": null
+    "content": ""
   },
   {
     "id": 17,
@@ -184,7 +184,7 @@
     "category_id": 1,
     "idioms_id": 2,
     "featured_image_url": "/imagens/posts/_covers/2020/operadores_aritmeticos_arithmetic_operators_cover-b.webp",
-    "content": null
+    "content": ""
   },
   {
     "id": 18,
@@ -195,7 +195,7 @@
     "category_id": 1,
     "idioms_id": 2,
     "featured_image_url": "/imagens/posts/_covers/2020/oper_atribuicao_cover.webp",
-    "content": null
+    "content": ""
   },
   {
     "id": 19,
@@ -206,7 +206,7 @@
     "category_id": 1,
     "idioms_id": 2,
     "featured_image_url": "/imagens/posts/_covers/2021/Estruturas_condicionais_conditional_structures_cover.webp",
-    "content": null
+    "content": ""
   },
   {
     "id": 20,
@@ -217,7 +217,7 @@
     "category_id": 1,
     "idioms_id": 2,
     "featured_image_url": "/imagens/posts/_covers/2020/comandos_entrada_saida_input_output_cover.webp",
-    "content": null
+    "content": ""
   },
   {
     "id": 21,
@@ -228,7 +228,7 @@
     "category_id": 1,
     "idioms_id": 2,
     "featured_image_url": "/imagens/posts/_covers/2020/algoritmos_algorithm_cover.webp",
-    "content": null
+    "content": ""
   },
   {
     "id": 22,
@@ -239,7 +239,7 @@
     "category_id": 1,
     "idioms_id": 1,
     "featured_image_url": "/imagens/posts/_covers/2021/TAD_ADT_cover.webp",
-    "content": null
+    "content": ""
   },
   {
     "id": 23,
@@ -250,7 +250,7 @@
     "category_id": 1,
     "idioms_id": 2,
     "featured_image_url": "/imagens/posts/_covers/2021/TAD_ADT_cover.webp",
-    "content": null
+    "content": ""
   },
   {
     "id": 24,
@@ -261,7 +261,7 @@
     "category_id": 1,
     "idioms_id": 1,
     "featured_image_url": "/imagens/posts/_covers/2019/arvores-estrutura-de-dados.webp",
-    "content": null
+    "content": ""
   },
   {
     "id": 25,
@@ -272,7 +272,7 @@
     "category_id": 1,
     "idioms_id": 2,
     "featured_image_url": "/imagens/posts/_covers/2019/arvores-estrutura-de-dados.webp",
-    "content": null
+    "content": ""
   },
   {
     "id": 26,
@@ -283,7 +283,7 @@
     "category_id": 1,
     "idioms_id": 1,
     "featured_image_url": "/imagens/posts/_covers/2019/inducao-matematica.webp",
-    "content": null
+    "content": ""
   },
   {
     "id": 27,
@@ -294,7 +294,7 @@
     "category_id": 1,
     "idioms_id": 2,
     "featured_image_url": "/imagens/posts/_covers/2019/inducao-matematica.webp",
-    "content": null
+    "content": ""
   },
   {
     "id": 28,
@@ -305,7 +305,7 @@
     "category_id": 1,
     "idioms_id": 1,
     "featured_image_url": "/imagens/posts/_covers/2019/algoritmos-recursivos.webp",
-    "content": null
+    "content": ""
   },
   {
     "id": 29,
@@ -316,7 +316,7 @@
     "category_id": 1,
     "idioms_id": 2,
     "featured_image_url": "/imagens/posts/_covers/2019/algoritmos-recursivos.webp",
-    "content": null
+    "content": ""
   },
   {
     "id": 30,
@@ -327,7 +327,7 @@
     "category_id": 1,
     "idioms_id": 1,
     "featured_image_url": "/imagens/posts/_covers/2019/recursividade-o-que-e.webp",
-    "content": null
+    "content": ""
   },
   {
     "id": 31,
@@ -338,7 +338,7 @@
     "category_id": 1,
     "idioms_id": 2,
     "featured_image_url": "/imagens/posts/_covers/2019/recursividade-o-que-e.webp",
-    "content": null
+    "content": ""
   },
   {
     "id": 32,
@@ -349,7 +349,7 @@
     "category_id": 1,
     "idioms_id": 1,
     "featured_image_url": "/imagens/posts/_covers/2021/comando_while_command.webp",
-    "content": null
+    "content": ""
   },
   {
     "id": 33,
@@ -360,7 +360,7 @@
     "category_id": 1,
     "idioms_id": 2,
     "featured_image_url": "/imagens/posts/_covers/2021/comando_while_command.webp",
-    "content": null
+    "content": ""
   },
   {
     "id": 34,
@@ -371,7 +371,7 @@
     "category_id": 1,
     "idioms_id": 1,
     "featured_image_url": "/imagens/posts/_covers/2021/comando_switch_case_command-b.webp",
-    "content": null
+    "content": ""
   },
   {
     "id": 35,
@@ -382,7 +382,7 @@
     "category_id": 1,
     "idioms_id": 2,
     "featured_image_url": "/imagens/posts/_covers/2021/comando_switch_case_command-b.webp",
-    "content": null
+    "content": ""
   },
   {
     "id": 36,
@@ -393,7 +393,7 @@
     "category_id": 1,
     "idioms_id": 1,
     "featured_image_url": "/imagens/posts/_covers/2021/Estruturas_condicionais_conditional_structures_cover.webp",
-    "content": null
+    "content": ""
   },
   {
     "id": 37,
@@ -404,7 +404,7 @@
     "category_id": 1,
     "idioms_id": 2,
     "featured_image_url": "/imagens/posts/_covers/2021/Estruturas_condicionais_conditional_structures_cover.webp",
-    "content": null
+    "content": ""
   },
   {
     "id": 38,
@@ -415,7 +415,7 @@
     "category_id": 1,
     "idioms_id": 1,
     "featured_image_url": "/imagens/posts/_covers/2021/comando_for_command.webp",
-    "content": null
+    "content": ""
   },
   {
     "id": 39,
@@ -426,7 +426,7 @@
     "category_id": 1,
     "idioms_id": 2,
     "featured_image_url": "/imagens/posts/_covers/2021/comando_for_command.webp",
-    "content": null
+    "content": ""
   },
   {
     "id": 40,
@@ -437,7 +437,7 @@
     "category_id": 1,
     "idioms_id": 1,
     "featured_image_url": "/imagens/posts/_covers/2021/arrays-cover.webp",
-    "content": null
+    "content": ""
   },
   {
     "id": 41,
@@ -448,7 +448,7 @@
     "category_id": 1,
     "idioms_id": 2,
     "featured_image_url": "/imagens/posts/_covers/2021/arrays-cover.webp",
-    "content": null
+    "content": ""
   },
   {
     "id": 42,
@@ -459,7 +459,7 @@
     "category_id": 1,
     "idioms_id": 1,
     "featured_image_url": "/imagens/posts/_covers/2021/funcao_function_cover-b.webp",
-    "content": null
+    "content": ""
   },
   {
     "id": 43,
@@ -470,7 +470,7 @@
     "category_id": 1,
     "idioms_id": 2,
     "featured_image_url": "/imagens/posts/_covers/2021/funcao_function_cover-b.webp",
-    "content": null
+    "content": ""
   },
   {
     "id": 44,
@@ -481,7 +481,7 @@
     "category_id": 1,
     "idioms_id": 1,
     "featured_image_url": "/imagens/posts/_covers/2022/algorithm_analisys-cover.webp",
-    "content": null
+    "content": ""
   },
   {
     "id": 45,
@@ -492,7 +492,7 @@
     "category_id": 1,
     "idioms_id": 2,
     "featured_image_url": "/imagens/posts/_covers/2022/algorithm_analisys-cover.webp",
-    "content": null
+    "content": ""
   },
   {
     "id": 46,
@@ -503,7 +503,7 @@
     "category_id": 1,
     "idioms_id": 1,
     "featured_image_url": "/imagens/posts/_covers/2022/best-case-wrost-case-cover.webp",
-    "content": null
+    "content": ""
   },
   {
     "id": 47,
@@ -514,7 +514,7 @@
     "category_id": 1,
     "idioms_id": 2,
     "featured_image_url": "/imagens/posts/_covers/2022/best-case-wrost-case-cover.webp",
-    "content": null
+    "content": ""
   },
   {
     "id": 48,
@@ -525,7 +525,7 @@
     "category_id": 1,
     "idioms_id": 1,
     "featured_image_url": "/imagens/posts/_covers/2022/asymptotic-behavior-cover.webp",
-    "content": null
+    "content": ""
   },
   {
     "id": 49,
@@ -536,7 +536,7 @@
     "category_id": 1,
     "idioms_id": 2,
     "featured_image_url": "/imagens/posts/_covers/2022/asymptotic-behavior-cover.webp",
-    "content": null
+    "content": ""
   },
   {
     "id": 50,
@@ -547,7 +547,7 @@
     "category_id": 1,
     "idioms_id": 1,
     "featured_image_url": "/imagens/posts/_covers/2022/asymptotic-classes-cover.webp",
-    "content": null
+    "content": ""
   },
   {
     "id": 51,
@@ -558,7 +558,7 @@
     "category_id": 1,
     "idioms_id": 2,
     "featured_image_url": "/imagens/posts/_covers/2022/asymptotic-classes-cover.webp",
-    "content": null
+    "content": ""
   },
   {
     "id": 52,
@@ -569,7 +569,7 @@
     "category_id": 1,
     "idioms_id": 1,
     "featured_image_url": "/imagens/posts/_covers/2022/big-o-notation-cover.webp",
-    "content": null
+    "content": ""
   },
   {
     "id": 53,
@@ -580,7 +580,7 @@
     "category_id": 1,
     "idioms_id": 2,
     "featured_image_url": "/imagens/posts/_covers/2022/big-o-notation-cover.webp",
-    "content": null
+    "content": ""
   },
   {
     "id": 54,
@@ -591,7 +591,7 @@
     "category_id": 1,
     "idioms_id": 1,
     "featured_image_url": "/imagens/posts/_covers/2022/big-omega-notation-cover.webp",
-    "content": null
+    "content": ""
   },
   {
     "id": 55,
@@ -602,7 +602,7 @@
     "category_id": 1,
     "idioms_id": 2,
     "featured_image_url": "/imagens/posts/_covers/2022/big-omega-notation-cover.webp",
-    "content": null
+    "content": ""
   },
   {
     "id": 56,
@@ -613,7 +613,7 @@
     "category_id": 1,
     "idioms_id": 1,
     "featured_image_url": "/imagens/posts/_covers/2022/theta-notation-cover.webp",
-    "content": null
+    "content": ""
   },
   {
     "id": 57,
@@ -624,7 +624,7 @@
     "category_id": 1,
     "idioms_id": 2,
     "featured_image_url": "/imagens/posts/_covers/2022/theta-notation-cover.webp",
-    "content": null
+    "content": ""
   },
   {
     "id": 58,
@@ -635,7 +635,7 @@
     "category_id": 1,
     "idioms_id": 1,
     "featured_image_url": "/imagens/posts/_covers/2019/logaritmos-o-que-sao.webp",
-    "content": null
+    "content": ""
   },
   {
     "id": 59,
@@ -646,7 +646,7 @@
     "category_id": 1,
     "idioms_id": 2,
     "featured_image_url": "/imagens/posts/_covers/2019/logaritmos-o-que-sao.webp",
-    "content": null
+    "content": ""
   },
   {
     "id": 60,
@@ -657,7 +657,7 @@
     "category_id": 1,
     "idioms_id": 1,
     "featured_image_url": "/imagens/posts/_covers/2019/propriedades-dos-logaritmos.webp",
-    "content": null
+    "content": ""
   },
   {
     "id": 61,
@@ -668,7 +668,7 @@
     "category_id": 1,
     "idioms_id": 2,
     "featured_image_url": "/imagens/posts/_covers/2019/propriedades-dos-logaritmos.webp",
-    "content": null
+    "content": ""
   },
   {
     "id": 62,
@@ -679,7 +679,7 @@
     "category_id": 1,
     "idioms_id": 1,
     "featured_image_url": "/imagens/posts/_covers/2019/somatorios-o-que-sao.webp",
-    "content": null
+    "content": ""
   },
   {
     "id": 63,
@@ -690,7 +690,7 @@
     "category_id": 1,
     "idioms_id": 2,
     "featured_image_url": "/imagens/posts/_covers/2019/somatorios-o-que-sao.webp",
-    "content": null
+    "content": ""
   },
   {
     "id": 64,
@@ -701,7 +701,7 @@
     "category_id": 1,
     "idioms_id": 1,
     "featured_image_url": "/imagens/posts/_covers/2019/propriedades-dos-somatorios.webp",
-    "content": null
+    "content": ""
   },
   {
     "id": 65,
@@ -712,7 +712,7 @@
     "category_id": 1,
     "idioms_id": 2,
     "featured_image_url": "/imagens/posts/_covers/2019/propriedades-dos-somatorios.webp",
-    "content": null
+    "content": ""
   },
   {
     "id": 66,
@@ -723,7 +723,7 @@
     "category_id": 1,
     "idioms_id": 1,
     "featured_image_url": "/imagens/posts/_covers/2023/binary-system-cover.webp",
-    "content": null
+    "content": ""
   },
   {
     "id": 67,
@@ -734,7 +734,7 @@
     "category_id": 1,
     "idioms_id": 2,
     "featured_image_url": "/imagens/posts/_covers/2023/binary-system-cover.webp",
-    "content": null
+    "content": ""
   },
   {
     "id": 68,
@@ -745,7 +745,7 @@
     "category_id": 1,
     "idioms_id": 1,
     "featured_image_url": "/imagens/posts/_covers/2023/binary-code-cover.webp",
-    "content": null
+    "content": ""
   },
   {
     "id": 69,
@@ -756,7 +756,7 @@
     "category_id": 1,
     "idioms_id": 2,
     "featured_image_url": "/imagens/posts/_covers/2023/binary-code-cover.webp",
-    "content": null
+    "content": ""
   },
   {
     "id": 70,
@@ -767,7 +767,7 @@
     "category_id": 1,
     "idioms_id": 1,
     "featured_image_url": "/imagens/posts/_covers/2023/source-code-cover.webp",
-    "content": null
+    "content": ""
   },
   {
     "id": 71,
@@ -778,7 +778,7 @@
     "category_id": 1,
     "idioms_id": 2,
     "featured_image_url": "/imagens/posts/_covers/2023/source-code-cover.webp",
-    "content": null
+    "content": ""
   },
   {
     "id": 72,
@@ -789,6 +789,6 @@
     "category_id": 1,
     "idioms_id": 1,
     "featured_image_url": "/imagens/posts/_covers/2020/comandos_entrada_saida_input_output_cover.webp",
-    "content": null
+    "content": ""
   }
 ]

@@ -1,0 +1,457 @@
+// ====================================
+// 📁 ./db\dao\posts_dao.ts
+// ====================================
+import { eq } from "drizzle-orm";
+import { Database } from "../database";
+import { posts } from "../schema";
+import type { Posts, NewPosts, RecentPost } from "../schema";
+import postsData from "../../utils/fillPosts/fillPosts.json";
+
+/** DAO da tabela LINK */
+export class PostsDAO{
+    // atributos
+    private db = Database.getInstance().connection;
+
+    // Crud
+    public async create(data: NewPosts): Promise<Posts|undefined>{
+        // insere a informação no banco de dados e retorna o resultado
+        const result = await this.db.insert(posts).values(data).returning();
+        return result[0];
+    }
+    // cRud
+    public async getRecentPosts(): Promise<RecentPost[]> {
+        // Busca apenas os 6 primeiros registros
+        const artigos = await this.db
+        .select({
+            id: posts.id,
+            title: posts.title,
+            featured_image_url: posts.featured_image_url,
+        })
+        .from(posts)
+        .limit(6);
+
+        return artigos;
+    }
+    
+    public async fillTable(): Promise<void> {
+        // 1. Transformamos o JSON bruto no formato do Schema
+        const formattedData = postsData.map((item) => ({
+            date: Math.floor(new Date(item.post_date).getTime() / 1000),
+            title: item.post_title,
+            excerpt: item.post_excerpt,
+            slug: item.post_name,
+            category_id: 1,
+            idiom_id: 1,
+            featured_image_url: item.thumb_url,
+            content: "" // Campo obrigatório não nulo
+        }));
+
+        try {
+            console.log(`⏳ Iniciando inserção de ${formattedData.length} registros...`);
+            
+            // 2. O "Pulo do Gato": Bulk Insert
+            await this.db
+                .insert(posts)
+                .values(formattedData)
+                // Se o slug já existir, ele pula o registro em vez de dar erro
+                .onConflictDoNothing({ target: posts.slug });
+
+            console.log("✅ Bulk Insert finalizado com sucesso!");
+        } catch (error) {
+            console.error("❌ Erro crítico no Bulk Insert:", error);
+            throw error;
+        }
+    }
+}
+
+// ====================================
+// 📁 ./db\database.ts
+// ====================================
+import type { LibSQLDatabase } from "drizzle-orm/libsql";
+import { createClient } from "@libsql/client";
+import { drizzle } from "drizzle-orm/libsql";
+import * as schema from './schema';
+
+/** Singleton do banco de dados */
+export class Database{
+    private static instance: Database; // singleton
+    // atributos
+    public readonly connection: LibSQLDatabase<typeof schema>;
+
+    private constructor() {
+        this.connection  = drizzle(createClient({url:"file:algol.db"}), {schema});
+    }
+
+    static getInstance(): Database {
+        if (!Database.instance) Database.instance = new Database();
+        return Database.instance;
+    }
+}
+
+// ====================================
+// 📁 ./db\redis.ts
+// ====================================
+import Redis from 'ioredis';
+
+export const redis = new Redis({
+    host: '127.0.0.1', // ou a URL do seu Redis
+    port: 6379,
+});
+
+// ====================================
+// 📁 ./db\schema.ts
+// ====================================
+/** Arquivo que possui a estrutura do banco de dados */
+
+import { sqliteTable, text, integer } from "drizzle-orm/sqlite-core";
+import { sql } from "drizzle-orm";
+
+/** Tabela categorias */
+export const categories = sqliteTable('categories', {
+    id: integer('id').primaryKey({ autoIncrement: true }),
+    name: text('name').notNull(),
+});
+
+/** Tabela idioma */
+export const idioms = sqliteTable('idioms', {
+    id: integer('id').primaryKey({ autoIncrement: true }),
+    name: text('name').notNull(),
+});
+
+/** Tabela atigos */
+export const posts = sqliteTable('posts', {
+    id: integer('id').primaryKey({ autoIncrement: true }),
+    date: integer('date').notNull(),
+    title: text('title').notNull(),
+    // Removido .notNull() para permitir campos vazios
+    excerpt: text('excerpt', { length: 400 }), 
+    slug: text('slug').notNull().unique(),
+    category_id: integer('category_id')
+        .notNull()
+        .references(() => categories.id, {
+            onDelete: 'cascade',
+            onUpdate: 'cascade',
+    }),
+    idiom_id: integer('idiom_id')
+        .notNull()
+        .references(() => idioms.id, {
+            onDelete: 'cascade',
+            onUpdate: 'cascade',
+    }),
+    featured_image_url: text('featured_image_url'),
+    // Removido .notNull() para permitir campos vazios
+    content: text('content') 
+});
+
+// Para gerar os tipos automaticamente
+export type Posts = typeof posts.$inferSelect;
+export type NewPosts = typeof posts.$inferInsert;
+/** Tipo para especificar o retorno de posts recentes da página Home*/
+export type RecentPosts = {
+    id: number;
+    title: string;
+    slug: string;
+    featured_image_url: string;
+};
+/** Tipo para especificar o retorno de posts resumidos da página Posts*/
+export type SimplePosts = {
+    id: number;
+    title: string;
+    slug: string;
+    featured_image_url: string;
+};
+/** Tipo para especificar o retorno de um único post para usar na página Single*/
+export type Post = {
+    id: number;
+    date: number;
+    title: string;
+    excerpt: string;
+    slug: string;
+    category_id: string;
+    idioms_id: string;
+    featured_image_url: string;
+    content: string;
+};
+
+// ====================================
+// 📁 ./drizzle.config.ts
+// ====================================
+// drizzle.config.ts
+import { defineConfig } from "drizzle-kit";
+
+export default defineConfig({
+  schema: "./db/schema.ts",
+  out: "./drizzle",
+  dialect: "sqlite",
+  dbCredentials: {
+    url: "file:algol.db", // Nome do novo banco
+  },
+});
+
+// ====================================
+// 📁 ./index.ts
+// ====================================
+import { Elysia } from 'elysia';
+import { siteRoutes } from './routes/acesso_site'; //    
+import { apiRoutes } from './routes/rest_api';
+
+// const IMAGE_BUCKET = 'https://algol-bucket.b-cdn.net';
+// const IMAGE_BUCKET = 'http://localhost:8080';
+
+export const app = new Elysia()
+    // .decorate('IMAGE_BUCKET', IMAGE_BUCKET) // torna a variável global
+    .use(apiRoutes)
+    .use(siteRoutes)
+    .listen(8080);
+
+console.log(`🦊 Servidor modular rodando em ${app.server?.hostname}:${app.server?.port}`);
+
+// ====================================
+// 📁 ./routes\acesso_site.ts
+// ====================================
+/** Possui as rotas de acesso público do site */
+import { Elysia, t } from 'elysia';
+
+export const siteRoutes = new Elysia()
+    .get('/', () => Bun.file('public/index.html'))
+    .get('/posts', () => Bun.file('public/index.html'))
+    .get('/publications', () => Bun.file('public/index.html'))
+    .get('/courses', () => Bun.file('public/index.html'))
+    .get('/*', async ({ path }) => {
+        // Tenta mapear a URL para um arquivo físico na pasta public
+        const file = Bun.file(`public${path}`);
+        // Se o arquivo físico existir (ex: /css/style.css, /js/app.js, imagens)
+        // O Bun automaticamente lida com os MIME Types corretos
+        if (await file.exists()) {
+            return file;
+        }
+        // Se o arquivo não existir, é uma rota do frontend (ex: /algoritmo-o-que-e)
+        // Então fazemos o fallback para o index.html
+        return Bun.file('public/index.html');
+    })
+;
+
+// ====================================
+// 📁 ./routes\rest_api.ts
+// ====================================
+import { Elysia } from 'elysia';
+import { PostsService } from '../services/posts_service';
+import {globals} from '../utils/globals';
+
+// Inicializa o banco de dados
+const postsService = new PostsService();
+
+export const apiRoutes = new Elysia({ prefix: '/api'})
+    .use(globals) // para acessar as variáveis globais
+    .get('/recent-posts', async () => await postsService.getRecentPosts())
+    .get('/simple-posts', async () => await postsService.getSimplePosts())
+    .get('/single', async () => await postsService.getSingle())
+;
+
+// ====================================
+// 📁 ./services\posts_service.ts
+// ====================================
+import { PostsDAO } from '../db/dao/posts_dao';
+import { redis } from '../db/redis';
+import { readFile } from 'node:fs/promises';
+import type { RecentPosts, SimplePosts, Post} from '../db/schema';
+import recentPosts from "./_mocks/recent_posts.json"
+import simplePosts from "./_mocks/simple_posts.json"
+import post from "./_mocks/post.json"
+
+export class PostsService {
+    private dao = new PostsDAO();
+    private CACHE_KEY = 'posts:recentes';
+    private CACHE_TTL = 3600; // Tempo de vida do cache em segundos (1 hora)
+
+    // public async getHomePosts(): Promise<HomePosts[]> {
+    //     // 1. Tenta buscar do Cache
+    //     const cachedPosts = await redis.get(this.CACHE_KEY); //
+        
+    //     if (cachedPosts) { // Cache Hit
+    //         console.log("Retornando posts do Redis Cache");
+    //         return JSON.parse(cachedPosts);
+    //     }
+
+    //     // 2. Se não achou (Cache Miss), busca do banco através do DAO
+    //     console.log("Cache Miss. Buscando do Banco...");
+    //     const artigos = await this.dao.getRecentPosts();
+
+    //     // 3. Salva no Redis para as próximas consultas
+    //     if (artigos && artigos.length > 0) {
+    //         await redis.set(
+    //             this.CACHE_KEY, 
+    //             JSON.stringify(artigos), 
+    //             'EX', 
+    //             this.CACHE_TTL
+    //         );
+    //     }
+
+    //     return artigos;
+    // }
+
+    /** Retorna dados mockados */
+    public async getRecentPosts(): Promise<RecentPosts[]> {
+        return recentPosts as unknown as RecentPosts[];
+    }
+    public async getSimplePosts(): Promise<SimplePosts[]> {
+        return simplePosts as unknown as SimplePosts[];
+    }
+    public async getSingle(): Promise<Post[]> {
+        return post as unknown as Post[];
+    }
+}
+
+// ====================================
+// 📁 ./utils\GEN_BACK.ts
+// ====================================
+import { readdirSync, readFileSync, writeFileSync } from "fs";
+import { join, relative } from "path";
+
+const ROOT = "./";
+const OUTPUT = "projeto_completo_BACK.txt";
+
+let files: string[] = [];
+let output = "";
+
+/** Percorre diretórios recursivamente */
+function walk(dir: string) {
+
+    const entries = readdirSync(dir, { withFileTypes: true });
+
+    for (const entry of entries) {
+
+        const fullPath = join(dir, entry.name);
+
+        // Ignora diretórios proibidos
+        if (entry.isDirectory()) {
+
+            if (
+                entry.name === "node_modules" ||
+                entry.name === "public"
+            ) {
+                continue;
+            }
+
+            walk(fullPath);
+            continue;
+        }
+
+        // Apenas arquivos .ts
+        if (!entry.name.endsWith(".ts")) {
+            continue;
+        }
+
+        files.push(fullPath);
+    }
+}
+
+// Percorre
+walk(ROOT);
+
+// Ordena igual ao "sort"
+files.sort();
+
+// Gera saída igual ao find + cat
+for (const file of files) {
+
+    const relPath = "./" + relative(".", file);
+
+    output += "// ====================================\n";
+    output += `// 📁 ${relPath}\n`;
+    output += "// ====================================\n";
+
+    output += readFileSync(file, "utf8");
+    output += "\n\n";
+}
+
+writeFileSync(OUTPUT, output);
+
+console.log("Arquivo gerado:", OUTPUT);
+
+// ====================================
+// 📁 ./utils\GEN_FRONT.ts
+// ====================================
+import { readdirSync, readFileSync, writeFileSync } from "fs";
+import { join, relative } from "path";
+
+const ROOT = "./public";
+const OUTPUT = "projeto_completo_FRONT.txt";
+
+let output = "";
+
+/** Percorre diretórios recursivamente */
+function walk(dir: string) {
+
+    const entries = readdirSync(dir, { withFileTypes: true });
+
+    for (const entry of entries) {
+
+        const fullPath = join(dir, entry.name);
+
+        // Ignora pastas proibidas
+        if (entry.isDirectory()) {
+
+            if (
+                entry.name === "_mocks" ||
+                entry.name === "algol-web"
+            ) {
+                continue;
+            }
+
+            walk(fullPath);
+            continue;
+        }
+
+        // Apenas .html e .js
+        if (
+            !entry.name.endsWith(".html") &&
+            !entry.name.endsWith(".js")
+        ) {
+            continue;
+        }
+
+        // Ignora min.js
+        if (entry.name === "min.js") {
+            continue;
+        }
+
+        const relPath = "./" + relative(".", fullPath);
+
+        output += "// ====================================\n";
+        output += `// 📁 ${relPath}\n`;
+        output += "// ====================================\n";
+
+        output += readFileSync(fullPath, "utf8");
+        output += "\n\n";
+    }
+}
+
+walk(ROOT);
+
+writeFileSync(OUTPUT, output);
+
+console.log("Arquivo gerado:", OUTPUT);
+
+// ====================================
+// 📁 ./utils\fillPosts\fillPosts.ts
+// ====================================
+// seed.ts
+import { PostsDAO } from "../../db/dao/posts_dao"
+
+const dao = new PostsDAO();
+console.log("🚀 Populando banco de dados...");
+await dao.fillTable();
+process.exit(0);
+
+// ====================================
+// 📁 ./utils\globals.ts
+// ====================================
+import { Elysia } from 'elysia';
+
+const IMAGE_BUCKET = 'https://algol-bucket.b-cdn.net';
+
+// Criamos um plugin de configuração que guarda os decorators
+export const globals = new Elysia({ name: 'globals' })
+    .decorate('IMAGE_BUCKET', IMAGE_BUCKET);
+

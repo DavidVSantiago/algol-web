@@ -31,8 +31,8 @@ class Button extends BaseComponent {
     }
     static get ATTR_MAP() {
         return {
-            'bgcolor': '--accent-A', // cor do fundo botão
-            'color': '--text-A', // cor do texto do botão
+            'color': '--button-color', // cor do fundo do botão
+            'textcolor': '--button-textcolor', // cor do texto do botão
         };
     }
     static get observedAttributes() {return [...Object.keys(Button.PROP_MAP), ...Object.keys(Button.ATTR_MAP)];}
@@ -158,6 +158,8 @@ algol_button_sheet.replaceSync(`
         text-shadow: 0 calc(0.1vw * var(--scale-factor)) calc(0.1vw * var(--scale-factor)) var(--bg-A);
 
     }
+    :host([color]) button{background-color: var(--button-color);}
+    :host([textcolor]) button{color: var(--button-textcolor);}
 
     /* --- Hover e Active --------------------------------------------------------------- */
     button:hover:not(:disabled) {

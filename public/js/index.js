@@ -17,9 +17,6 @@ function createMenu(){
             <li><a href="/posts" onclick="route(event)">ARTIGOS</a></li>
             <li><a href="/publications" onclick="route(event)">PUBLICAÇÕES</a></li>
             <li><a href="/courses" onclick="route(event)">CURSOS</a></li>
-            <li>
-                <algol-button type="submit">Botão simples</algol-button>
-            </li>
         </algol-power-menu>
     `);
 }

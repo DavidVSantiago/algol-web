@@ -7,8 +7,6 @@ const postsService = new PostsService();
 
 export const apiRoutes = new Elysia({ prefix: '/api'})
     .use(globals) // para acessar as variáveis globais
-    .get('/posts', async () => { 
-
-        const artigos = await postsService.getRecentPosts();
-        return artigos
-    },);
+    .get('/simple-posts/:max', async ({ params }) => await postsService.getSimplePosts(params.max))
+    .get('/post/:slug', async ({ params }) => await postsService.getPost(params.slug))
+;

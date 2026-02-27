@@ -1,0 +1,3 @@
+- Colocar todos os conteúdos dos artigos no "full_posts.json" e atualizar o banco com esses dados
+- Implementar a mecânica de seleção select de acordo com o idioma da página, obtido dinamicamente do html (perguntar ao IA se isso é padrão ouro)
+- Levar a paginação para o lado do banco de dados.
