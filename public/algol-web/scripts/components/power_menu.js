@@ -133,6 +133,11 @@ class PowerMenu extends BaseComponent {
         ul.style.gridTemplateColumns = `repeat(${childCount}, auto)`;
     }
 
+    hide(){
+        this.elems.menuBtns.classList.remove('show');
+        this.elems.menuOverlay.classList.remove('show');
+    }
+
     // ****************************************************************************
     // Injeção de estilo CSS
     // ****************************************************************************

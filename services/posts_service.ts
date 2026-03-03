@@ -38,10 +38,13 @@ export class PostsService {
     // }
 
     /** Retorna dados mockados */
-    public async getSimplePosts(max: string): Promise<SimplePosts[]> {
-        return await this.dao.getSimplePosts(max);
-    }
     public async getPost(slug: string): Promise<Posts | undefined> {
         return await this.dao.getPost(slug);
+    }
+    public async getSimplePosts(limit: number, lang: string): Promise<SimplePosts[]> {
+        return await this.dao.getSimplePosts(limit,lang);
+    }
+    public async getPaginatedPosts(page: number, limit: number, lang: string){
+        return await this.dao.getPaginatedPosts(page,limit,lang);
     }
 }

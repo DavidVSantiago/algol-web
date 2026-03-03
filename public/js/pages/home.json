@@ -1,0 +1,20 @@
+{
+    "pt-br": {
+        "loading": "Carregando conteúdo...",
+        "hero_title": "Computação e Tecnologia",
+        "hero_subtitle": "Conteúdos didáticos com máxima riqueza de recursos visuais",
+        "book_title": "Fundamentos de algoritmos para jogos digitais.",
+        "book_desc": "Conheça nosso livro sobre o desenvolvimento de jogos digitais.",
+        "articles_title": "Conheça nossos conteúdos na página de artigos.",
+        "error_load": "Erro ao carregar conteúdos."
+    },
+    "en-us": {
+        "loading": "Loading content...",
+        "hero_title": "Computing and Technology",
+        "hero_subtitle": "Educational content with maximum visual richness",
+        "book_title": "Algorithm fundamentals for digital games.",
+        "book_desc": "Discover our book on digital game development.",
+        "articles_title": "Check out our content on the posts page.",
+        "error_load": "Error loading content."
+    }
+}

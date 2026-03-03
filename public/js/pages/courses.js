@@ -23,53 +23,59 @@ class PageCourses extends PageBase{
 
                 <algol-grid-item>
                     <algol-spacer value="7" valuebreak="5"></algol-spacer>
-                    <algol-grid-layout class="card-bg" posh="stretch" cols="0.3fr 0.7fr" colsbreak="1fr" gap="1vw">
-                        <algol-grid-item>
+                    <a href="/courses/basic-programming-part-01" onclick="route(event)" style="text-decoration: none; color: inherit;">
+                        <algol-grid-layout class="card-bg" posh="stretch" cols="0.3fr 0.7fr" colsbreak="1fr" gap="1vw">
+                            <algol-grid-item>
                                 <algol-image
                                 size="100%"
                                 radius="1vw"
                                 expand src="${IMAGE_BUCKET}/imagens/cursos/programacao-basica/programacao-basica-basic-programming-01-cover.webp" alt="landscape" width="400" height="200"></algol-image>
-                        </algol-grid-item>
-                        <algol-grid-item padding="0 2vw" paddingbreak="5vw 3vw" posh="start">
+                            </algol-grid-item>
+                            <algol-grid-item padding="0 2vw" paddingbreak="5vw 3vw" posh="start">
                                 <h2>Programação básica - parte 01</h2>
                                 <algol-spacer value="1.5"></algol-spacer>
                                 <p>Comece com os conceitos básicos de programação de computadores.</p>
-                        </algol-grid-item>
-                    </algol-grid-layout>
+                            </algol-grid-item>
+                        </algol-grid-layout>
+                    </a>
                 </algol-grid-item>
 
                 <algol-grid-item>
                     <algol-spacer value="7" valuebreak="5"></algol-spacer>
-                    <algol-grid-layout class="card-bg" posh="stretch" cols="0.3fr 0.7fr" colsbreak="1fr" gap="1vw">
-                        <algol-grid-item>
-                                <algol-image
-                                size="100%"
-                                radius="1vw"
-                                expand src="${IMAGE_BUCKET}/imagens/cursos/programacao-basica/programacao-basica-basic-programming-02-cover.webp" alt="landscape" width="400" height="200"></algol-image>
-                        </algol-grid-item>
-                        <algol-grid-item padding="0 2vw" paddingbreak="5vw 3vw" posh="start">
-                                <h2>Programação básica - parte 02</h2>
-                                <algol-spacer value="1.5"></algol-spacer>
-                                <p>Agora que você sabe o básico da programação de computadores, vamos para os assuntos mais desafiadores</p>
-                        </algol-grid-item>
-                    </algol-grid-layout>
+                    <a href="/courses/basic-programming-part-02" onclick="route(event)" style="text-decoration: none; color: inherit;">
+                        <algol-grid-layout class="card-bg" posh="stretch" cols="0.3fr 0.7fr" colsbreak="1fr" gap="1vw">
+                            <algol-grid-item>
+                                    <algol-image
+                                    size="100%"
+                                    radius="1vw"
+                                    expand src="${IMAGE_BUCKET}/imagens/cursos/programacao-basica/programacao-basica-basic-programming-02-cover.webp" alt="landscape" width="400" height="200"></algol-image>
+                            </algol-grid-item>
+                            <algol-grid-item padding="0 2vw" paddingbreak="5vw 3vw" posh="start">
+                                    <h2>Programação básica - parte 02</h2>
+                                    <algol-spacer value="1.5"></algol-spacer>
+                                    <p>Agora que você sabe o básico da programação de computadores, vamos para os assuntos mais desafiadores</p>
+                            </algol-grid-item>
+                        </algol-grid-layout>
+                    </a>
                 </algol-grid-item>
 
                 <algol-grid-item>
                     <algol-spacer value="7" valuebreak="5"></algol-spacer>
-                    <algol-grid-layout class="card-bg" posh="stretch" cols="0.3fr 0.7fr" colsbreak="1fr" gap="1vw">
-                        <algol-grid-item>
-                                <algol-image
-                                size="100%"
-                                radius="1vw"
-                                expand src="${IMAGE_BUCKET}/imagens/cursos/analise-de-algoritmos/algorithm-analysis-course.webp" alt="landscape" width="400" height="200"></algol-image>
-                        </algol-grid-item>
-                        <algol-grid-item padding="0 2vw" paddingbreak="5vw 3vw" posh="start">
-                                <h2>Análise de algoritmos - parte 01</h2>
-                                <algol-spacer value="1.5"></algol-spacer>
-                                <p>Aprenda, de forma detalhada, a medir desempenho de algoritmos.</p>
-                        </algol-grid-item>
-                    </algol-grid-layout>
+                    <a href="/courses/algorithm-analysis-part-01" onclick="route(event)" style="text-decoration: none; color: inherit;">
+                        <algol-grid-layout class="card-bg" posh="stretch" cols="0.3fr 0.7fr" colsbreak="1fr" gap="1vw">
+                            <algol-grid-item>
+                                    <algol-image
+                                    size="100%"
+                                    radius="1vw"
+                                    expand src="${IMAGE_BUCKET}/imagens/cursos/analise-de-algoritmos/algorithm-analysis-course.webp" alt="landscape" width="400" height="200"></algol-image>
+                            </algol-grid-item>
+                            <algol-grid-item padding="0 2vw" paddingbreak="5vw 3vw" posh="start">
+                                    <h2>Análise de algoritmos - parte 01</h2>
+                                    <algol-spacer value="1.5"></algol-spacer>
+                                    <p>Aprenda, de forma detalhada, a medir desempenho de algoritmos.</p>
+                            </algol-grid-item>
+                        </algol-grid-layout>
+                    </a>
                     <algol-spacer value="7" valuebreak="5"></algol-spacer>
                 </algol-grid-item>
 

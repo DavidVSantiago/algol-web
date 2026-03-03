@@ -11,7 +11,7 @@ class PagePosts extends PageBase{
     }
 
     /** @override */
-    render() {
+    async render() {
         let cachedPostsHtml = null; // sessionStorage.getItem(this.dataCacheKey);
 
         const postsContent = cachedPostsHtml
@@ -63,57 +63,41 @@ class PagePosts extends PageBase{
         });
 
         if (!cachedPostsHtml)
-            this.loadData(1);
+            await this.loadData(1);
         else
             this.loadData(1, true); // Se a página 1 veio do cache, renderiza apenas os botões 
     }
-
-
-    /** Muda a página e faz o scroll suave para o topo do conteúdo */
-    async goToPage(page) {
-        this.currentPage = page;
-        
-        const wrapper = document.getElementById('posts-wrapper');
-        if (wrapper) {
-            wrapper.innerHTML = /* html */`<div style="display: flex; justify-content: center; width: 100%; padding: 5vw 0;"><h2>Carregando página ${page}...</h2></div>`;
-            wrapper.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-        
-        await this.loadData(page);
-}
 
     /** @override */
     async loadData(page = 1, isRebuildingPaginationOnly = false) {
         if (this.isLoading) return;
         this.isLoading = true;
-
+        const limit = this.postsPerPage;
+        const lang = document.documentElement.lang; // obtem o idioma atual da página
         try {
-            const response = await fetch('/api/simple-posts/-1');
-            const todosArtigos = await response.json();
+            const response = await fetch(`/api/paginated-posts?page=${page}&limit=${limit}&lang=${lang}`);
+            const resultado = await response.json();
             
-            // Define o total de páginas
-            const totalItems = todosArtigos.length;
-            this.totalPages = Math.ceil(totalItems / this.postsPerPage);
+            this.totalPages = Math.ceil(resultado.totalCount / limit);
+            const artigos = resultado.data;
 
             if (!isRebuildingPaginationOnly) {
-                // Lógica de paginação simulada (Offset e Limit)
-                const offset = (page - 1) * this.postsPerPage;
-                const artigosDaPagina = todosArtigos.slice(offset, offset + this.postsPerPage);
-
                 let stringHtml = `<algol-grid-layout class="card-bg" posh="stretch" cols="1fr 1fr 1fr" colsbreak="1fr" gap="1vw" gapbreak="10vw" style="align-items: start;">`;
                 
-                stringHtml += artigosDaPagina.map(artigo => /* html */`
+                stringHtml += artigos.map(artigo => /* html */`
                     <algol-grid-item padding="1vw">
-                        <algol-image radius="0.1vw" size="100%" src="${IMAGE_BUCKET}${artigo.featured_image_url}" alt="landscape" width="400" height="200"></algol-image>
-                        <algol-grid-layout cols="1fr" color="white">
-                            <algol-grid-item padding="1vw" paddingbreak="4vw">
-                                <algol-spacer value="1"></algol-spacer>
-                                <h3 style="text-align:left;">${artigo.title}</h3>
-                                <algol-spacer value="1"></algol-spacer>
-                                <p style="text-align:left;">${artigo.excerpt}</p>
-                                <algol-spacer value="1"></algol-spacer>
-                            </algol-grid-item>
-                        </algol-grid-layout>
+                        <a href="/${artigo.slug}" onclick="route(event)" style="text-decoration: none; color: inherit;">
+                            <algol-image radius="0.1vw" size="100%" src="${IMAGE_BUCKET}${artigo.featured_image_url}" alt="landscape" width="400" height="200"></algol-image>
+                            <algol-grid-layout cols="1fr" color="white">
+                                <algol-grid-item padding="1vw" paddingbreak="4vw">
+                                    <algol-spacer value="1"></algol-spacer>
+                                    <h3 style="text-align:left;">${artigo.title}</h3>
+                                    <algol-spacer value="1"></algol-spacer>
+                                    <p style="text-align:left;">${artigo.excerpt}</p>
+                                    <algol-spacer value="1"></algol-spacer>
+                                </algol-grid-item>
+                            </algol-grid-layout>
+                        </a>
                     </algol-grid-item>
                 `).join('');
                 
@@ -135,6 +119,19 @@ class PagePosts extends PageBase{
         } finally {
             this.isLoading = false;
         }
+    }
+
+     /** Muda a página e faz o scroll suave para o topo do conteúdo */
+    async goToPage(page) {
+        this.currentPage = page;
+        
+        const wrapper = document.getElementById('posts-wrapper');
+        if (wrapper) {
+            wrapper.innerHTML = /* html */`<div style="display: flex; justify-content: center; width: 100%; padding: 5vw 0;"><h2>Carregando página ${page}...</h2></div>`;
+            wrapper.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+        
+        await this.loadData(page);
     }
 
     /** Renderiza os botões numéricos com suporte a elipses */

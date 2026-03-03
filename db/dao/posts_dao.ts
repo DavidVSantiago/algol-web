@@ -1,6 +1,6 @@
-import { eq } from "drizzle-orm";
+import { count, eq } from "drizzle-orm";
 import { Database } from "../database";
-import { posts } from "../schema";
+import { posts, idioms } from "../schema";
 import type { SimplePosts, Posts, NewPosts } from "../schema";
 import postsData from "../../services/_mocks/full_posts.json";
 
@@ -22,17 +22,52 @@ export class PostsDAO{
         .limit(1); // otimização para retornar apenas o primeiro resultado encontrado
         return result[0];
     }
-    public async getSimplePosts(max: string): Promise<SimplePosts[]> {
+    public async getSimplePosts(limit: number, lang: string): Promise<SimplePosts[]> {
         const result = await this.db.select({
             id: posts.id,
             title: posts.title,
             featured_image_url: posts.featured_image_url,
-            slug: posts.slug
+            slug: posts.slug,
+            excerpt: posts.excerpt,
+            idioms_id: posts.idioms_id
         })
         .from(posts)
-        .limit(Number(max)); // otimização para retornar apenas o primeiro resultado encontrado
+        .innerJoin(idioms, eq(posts.idioms_id, idioms.id))
+        .where(eq(idioms.name, lang.toLowerCase()))
+        .limit(limit); // otimização para retornar a quantidade solicitada (-1 == todos)
         return result;
     }
+    public async getPaginatedPosts(page: number, limit: number, lang: string){
+        const offset = (page - 1) * limit; // calcula o offset, de onde devemos começar a buscar
+
+        // usa uma Promisse.all para obter o máximo de desempenho em consultas simultâneas
+        const [countPosts, data] = await Promise.all([ // passa um array de promisses, no caso, duas consultas
+            // consulta de contagem do total de artigos no banco
+            this.db.select({total: count()})
+            .from(posts)
+            .innerJoin(idioms, eq(posts.idioms_id,idioms.id))
+            .where(eq(idioms.name,lang.toLowerCase())), // para restringir ao idioma da página
+
+            this.db.select({
+                id: posts.id,
+                title: posts.title,
+                featured_image_url: posts.featured_image_url,
+                slug: posts.slug,
+                excerpt: posts.excerpt,
+                idioms_id: posts.idioms_id
+            })
+            .from(posts).innerJoin(idioms,eq(posts.idioms_id,idioms.id))
+            .where(eq(idioms.name,lang.toLowerCase()))
+            .limit(limit) // para obter até uma certa quantidade (paginação)
+            .offset(offset) // para pular (paginação)
+        ]);
+
+        const totalCount = countPosts[0].total; // obtém o resultado da primeira consulta
+        
+        // retorna um objeto estruturado, com os dados dos artigos e o total de artigos
+        return{data,totalCount};
+    }
+
     // cRud
     // public async getRecentPosts(): Promise<RecentPost[]> {
     //     // Busca apenas os 6 primeiros registros
@@ -61,15 +96,14 @@ export class PostsDAO{
             title: item.title,
             excerpt: item.excerpt,
             slug: item.slug,
-            category_id: 1,
-            idioms_id: 1,
+            category_id: item.category_id,
+            idioms_id: item.idioms_id,
             featured_image_url: item.featured_image_url,
             content: item.content,
         }));
 
         try {
             console.log(`⏳ Iniciando inserção de ${formattedData.length} registros...`);
-            
             // 2. O "Pulo do Gato": Bulk Insert
             await this.db
                 .insert(posts)

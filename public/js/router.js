@@ -4,6 +4,9 @@ const urlRoutes = {
     "/posts": PagePosts,
     "/publications": PagePublications,
     "/courses": PageCourses,
+    "/courses/basic-programming-part-01": PageBasicProg01,
+    "/courses/basic-programming-part-02": PageBasicProg02,
+    "/courses/algorithm-analysis-part-01": PageAlgoAnalysis01,
     404: Page404,
 };
 
@@ -17,6 +20,7 @@ const route = (event) =>{
 /** função que gerencia a mudança dinâmica de conteúdo */
 const spa_container = document.getElementById('spa-container');
 const handleLocation = async () => {
+    await hideContent(); // apaga o conteúdo da página
     const path = window.location.pathname; // captura o caminho da url
     let pageClass = urlRoutes[path]; // seleciona a classe(página), com base na rota
     let slug = null;
@@ -42,9 +46,10 @@ const handleLocation = async () => {
     }
 
     const page = new pageClass(spa_container, params) // instancia a classe da página da rota atual
-    page.render(); // invoca a funçao de renderização da página
+    await page.start(); // invoca a funçao de construção da página
+    showContent();
 }
 
 window.onpopstate = handleLocation; // para quando o usuário usar os botões de avançar e voltar
 window.route = route; // Expõe a função route no escopo global para que os onclick="route(event)" funcionem
-handleLocation(); // Garante que a rota inicial seja processada no carregamento
+window.handleLocation = handleLocation; // Exponha o handleLocation globalmente

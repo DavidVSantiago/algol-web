@@ -36,6 +36,8 @@ class GridItem extends BaseLayout {
             'imgpos': '--grid-item-imgpos', // top, bottom, center, left, right, ...
             'imgsize': '--grid-item-imgsize', // contain, cover, ...
             'imgoverlay': '--grid-item-imgoverlay', // valor entre 0 e 1
+            'color': '--grid-item-color',
+            'colorbreak': '--grid-item-colorbreak'
         };
     }
     static get PROP_MAP() {
@@ -108,6 +110,8 @@ class GridItem extends BaseLayout {
             algol-grid-item[imgpos]{background-position: var(--grid-item-imgpos);}
             algol-grid-item[imgsize]{background-size: var(--grid-item-imgsize);}
             algol-grid-item[padding]{padding: var(--grid-item-padding);}
+            algol-grid-item[color]{background-color: var(--grid-item-color);}
+            
 
             @media (max-width: ${MOBILE_BREAKPOINT}) {
                 algol-grid-item[colspanbreak] {grid-column-end: var(--grid-item-colspan-break) !important;}
@@ -115,6 +119,7 @@ class GridItem extends BaseLayout {
                 algol-grid-item[poshbreak] {justify-self: var(--grid-item-poshbreak) !important;}
                 algol-grid-item[posvbreak] {align-self: var(--grid-item-posvbreak) !important;}
                 algol-grid-item[paddingbreak]{padding: var(--grid-item-paddingbreak);}
+                algol-grid-item[colorbreak] {background-color: var(--grid-item-colorbreak) !important;}
             }
         `;
 

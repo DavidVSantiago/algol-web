@@ -1,3 +1,4 @@
-- Colocar todos os conteúdos dos artigos no "full_posts.json" e atualizar o banco com esses dados
-- Implementar a mecânica de seleção select de acordo com o idioma da página, obtido dinamicamente do html (perguntar ao IA se isso é padrão ouro)
-- Levar a paginação para o lado do banco de dados.
+- Criar os dicionarios de idioma das páginas 'post' e 'publication'
+- Propor uma reestruturação da hierarquia de páginas, para generalizar o sistema de dicionario de idiomas.
+   * a ideia é que a a classe base realize todos os procedimentos de carregamento da página de idiomas.
+- Propor o sistema para o primeiro nível de cache das páginas, que deve levar em consiuderação o idioma.

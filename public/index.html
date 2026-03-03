@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,33 +7,36 @@
     
 
     <!-- INICIO - Importação da lib ALGOL WEB -------------------------------->
-    <link id="theme-link" rel="stylesheet" href="css/algol-light.css">
-    <script src="algol-web/scripts/variaveis.js" ></script>
-    <script src="algol-web/scripts/bases/base_component.js" ></script>
-    <script src="algol-web/scripts/bases/base_layout.js" ></script>
-    <script src="algol-web/scripts/components/inputs.js" ></script>
-    <script src="algol-web/scripts/components/buttons.js" ></script>
-    <script src="algol-web/scripts/components/textarea.js" ></script>
-    <script src="algol-web/scripts/components/select.js" ></script>
-    <script src="algol-web/scripts/components/image.js" ></script>
-    <script src="algol-web/scripts/components/spacer.js" ></script>
-    <script src="algol-web/scripts/components/power_menu.js" ></script>
-    <script src="algol-web/scripts/components/checkables.js" ></script>
-    <script src="algol-web/scripts/layouts/grid-layout.js" ></script>
-    <script src="algol-web/scripts/layouts/grid-item.js" ></script>
-    <script src="algol-web/scripts/layouts/flex-item.js" ></script>
+    <link id="theme-link" rel="stylesheet" href="/algol-web/algol-light.css">
+    <script src="/algol-web/scripts/variaveis.js" ></script>
+    <script src="/algol-web/scripts/bases/base_component.js" ></script>
+    <script src="/algol-web/scripts/bases/base_layout.js" ></script>
+    <script src="/algol-web/scripts/components/inputs.js" ></script>
+    <script src="/algol-web/scripts/components/buttons.js" ></script>
+    <script src="/algol-web/scripts/components/textarea.js" ></script>
+    <script src="/algol-web/scripts/components/select.js" ></script>
+    <script src="/algol-web/scripts/components/image.js" ></script>
+    <script src="/algol-web/scripts/components/spacer.js" ></script>
+    <script src="/algol-web/scripts/components/power_menu.js" ></script>
+    <script src="/algol-web/scripts/components/checkables.js" ></script>
+    <script src="/algol-web/scripts/layouts/grid-layout.js" ></script>
+    <script src="/algol-web/scripts/layouts/grid-item.js" ></script>
+    <script src="/algol-web/scripts/layouts/flex-item.js" ></script>
     <!-- FIM - Importação da lib ALGOL WEB ------------------------------------>
     
-    <script src="js/index.js" defer></script>
+    <script src="/js/index.js" defer></script>
     <script src="/js/pages/_base.js" defer></script>
     <script src="/js/pages/home.js" defer></script>
     <script src="/js/pages/posts.js" defer></script>
     <script src="/js/pages/publications.js" defer></script>
     <script src="/js/pages/courses.js" defer></script>
     <script src="/js/pages/404.js" defer></script>  
-    <script src="/js/pages/single.js" defer></script>  
+    <script src="/js/pages/single.js" defer></script>
+    <script src="/js/pages/courses/basic_prog_01.js" defer></script>
+    <script src="/js/pages/courses/basic_prog_02.js" defer></script>
+    <script src="/js/pages/courses/algo_analysis_01.js" defer></script>
     <script src="/js/router.js" defer></script>
-    <link rel="stylesheet" href="css/fonts.css">
+    <link rel="stylesheet" href="/css/fonts.css">
     <style>
         #menu{
             font-family: 'Roboto Condensed Regular' !important;
@@ -65,18 +68,14 @@
     <algol-grid-layout id="layout-screen" posh="stretch" cols="0.1fr 0.8fr 0.1fr" colsbreak="1fr">
         <algol-grid-item></algol-grid-item>
         
-        <!-- INICIO - PAGE CONTENT ---------------------------------------->
-        <algol-grid-item id="page-content">        
-            <algol-spacer value="1" valuebreak="3"></algol-spacer>
+        <algol-grid-item id="app">        
+            <!-- MENU inserido dinamicamente aqui --------------------------->
 
-            <div id="spa-container">
-                <!-- Contreíd-->
-            </div>
+            <algol-spacer value="1" valuebreak="3"></algol-spacer>
+            <main id="spa-container"></main>
 
             <!-- RODAPÉ inserido dinamicamente aqui --------------------------->
-            
         </algol-grid-item>
-        <!-- INICIO - PAGE CONTENT ---------------------------------------->
 
         <algol-grid-item></algol-grid-item>
     </algol-grid-layout>

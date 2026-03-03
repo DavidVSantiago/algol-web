@@ -6,8 +6,12 @@ class PageBase {
         this.params = params;
     }
 
+    async start(){
+        await this.render();
+    }
+
     /** @abstract */
-    render() {
+    async render() {
         throw "render() não implementado";
     }
     

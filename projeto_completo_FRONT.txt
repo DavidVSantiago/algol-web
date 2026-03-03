@@ -2,7 +2,7 @@
 // 📁 ./public\index.html
 // ====================================
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,33 +10,36 @@
     
 
     <!-- INICIO - Importação da lib ALGOL WEB -------------------------------->
-    <link id="theme-link" rel="stylesheet" href="css/algol-light.css">
-    <script src="algol-web/scripts/variaveis.js" ></script>
-    <script src="algol-web/scripts/bases/base_component.js" ></script>
-    <script src="algol-web/scripts/bases/base_layout.js" ></script>
-    <script src="algol-web/scripts/components/inputs.js" ></script>
-    <script src="algol-web/scripts/components/buttons.js" ></script>
-    <script src="algol-web/scripts/components/textarea.js" ></script>
-    <script src="algol-web/scripts/components/select.js" ></script>
-    <script src="algol-web/scripts/components/image.js" ></script>
-    <script src="algol-web/scripts/components/spacer.js" ></script>
-    <script src="algol-web/scripts/components/power_menu.js" ></script>
-    <script src="algol-web/scripts/components/checkables.js" ></script>
-    <script src="algol-web/scripts/layouts/grid-layout.js" ></script>
-    <script src="algol-web/scripts/layouts/grid-item.js" ></script>
-    <script src="algol-web/scripts/layouts/flex-item.js" ></script>
+    <link id="theme-link" rel="stylesheet" href="/algol-web/algol-light.css">
+    <script src="/algol-web/scripts/variaveis.js" ></script>
+    <script src="/algol-web/scripts/bases/base_component.js" ></script>
+    <script src="/algol-web/scripts/bases/base_layout.js" ></script>
+    <script src="/algol-web/scripts/components/inputs.js" ></script>
+    <script src="/algol-web/scripts/components/buttons.js" ></script>
+    <script src="/algol-web/scripts/components/textarea.js" ></script>
+    <script src="/algol-web/scripts/components/select.js" ></script>
+    <script src="/algol-web/scripts/components/image.js" ></script>
+    <script src="/algol-web/scripts/components/spacer.js" ></script>
+    <script src="/algol-web/scripts/components/power_menu.js" ></script>
+    <script src="/algol-web/scripts/components/checkables.js" ></script>
+    <script src="/algol-web/scripts/layouts/grid-layout.js" ></script>
+    <script src="/algol-web/scripts/layouts/grid-item.js" ></script>
+    <script src="/algol-web/scripts/layouts/flex-item.js" ></script>
     <!-- FIM - Importação da lib ALGOL WEB ------------------------------------>
     
-    <script src="js/index.js" defer></script>
+    <script src="/js/index.js" defer></script>
     <script src="/js/pages/_base.js" defer></script>
     <script src="/js/pages/home.js" defer></script>
     <script src="/js/pages/posts.js" defer></script>
     <script src="/js/pages/publications.js" defer></script>
     <script src="/js/pages/courses.js" defer></script>
     <script src="/js/pages/404.js" defer></script>  
-    <script src="/js/pages/single.js" defer></script>  
+    <script src="/js/pages/single.js" defer></script>
+    <script src="/js/pages/courses/basic_prog_01.js" defer></script>
+    <script src="/js/pages/courses/basic_prog_02.js" defer></script>
+    <script src="/js/pages/courses/algo_analysis_01.js" defer></script>
     <script src="/js/router.js" defer></script>
-    <link rel="stylesheet" href="css/fonts.css">
+    <link rel="stylesheet" href="/css/fonts.css">
     <style>
         #menu{
             font-family: 'Roboto Condensed Regular' !important;
@@ -69,7 +72,7 @@
         <algol-grid-item></algol-grid-item>
         
         <!-- INICIO - PAGE CONTENT ---------------------------------------->
-        <algol-grid-item id="page-content">        
+        <algol-grid-item id="app">        
             <algol-spacer value="1" valuebreak="3"></algol-spacer>
 
             <div id="spa-container">
@@ -91,9 +94,74 @@
 // ====================================
 const IMAGE_BUCKET = 'http://localhost:8080'; // fazer com que este valor seja enviado pleo servidor no request da rota '/'
 
+// lê no localstorage o idioma atual
+const currentLang = localStorage.getItem('app_lang') || 'pt-br';
+
+// Dicionário de traduções globais (Menu e Footer)
+const i18n = {
+    "pt-br": {
+        menu: {
+            home: "HOME",
+            articles: "ARTIGOS",
+            publications: "PUBLICAÇÕES",
+            courses: "CURSOS"
+        },
+        footer: {
+            subscribe: "Inscreva-se",
+            terms: "Termos de uso",
+            privacy: "Política de privacidade",
+            rights: "Todos os direitos reservados."
+        }
+    },
+    "en-us": {
+        menu: {
+            home: "HOME",
+            articles: "ARTICLES",
+            publications: "PUBLICATIONS",
+            courses: "COURSES"
+        },
+        footer: {
+            subscribe: "Subscribe",
+            terms: "Terms of use",
+            privacy: "Privacy policy",
+            rights: "All rights reserved."
+        }
+    }
+};
+
+document.documentElement.lang = currentLang; // atualiza o idioma da página
+
+let t = null;
+
+/** Função que carrega e monta a página */
+async function initLayout() {
+    try {
+        hideApp();
+        // Busca o dicionário global do site
+        const response = await fetch('/js/index.json');
+        const i18n = await response.json();
+        
+        // Atribui o nó correto do JSON (com fallback para pt-br caso algo falhe)
+        t = i18n[currentLang] || i18n['pt-br'];
+
+        // Só desenha a interface depois que 't' estiver preenchido
+        createMenu();
+        createFooter();
+        await window.handleLocation();
+        
+    } catch (error) {
+        console.error("Erro ao carregar o arquivo index.json:", error);
+    }
+}
+
 // insere dinamicamente o menu da página.
 function createMenu(){
-    const page_content = document.getElementById('page-content');
+    const page_content = document.getElementById('app');
+
+    // Configura qual <option> de idioma do menu deve aparecer selecionado por padrão
+    const selectPt = currentLang === 'pt-br' ? 'selected' : '';
+    const selectEn = currentLang === 'en-us' ? 'selected' : '';
+
     page_content.insertAdjacentHTML('afterbegin',`
         <algol-power-menu id="menu"
             logo="${IMAGE_BUCKET}/imagens/structural-site/logo_h.svg"
@@ -104,15 +172,28 @@ function createMenu(){
             logosize = "12vw"
             logosizebreak = "30vw"
             >
-            <li><a href="/" onclick="route(event)">HOME</a></li>
-            <li><a href="/posts" onclick="route(event)">ARTIGOS</a></li>
-            <li><a href="/publications" onclick="route(event)">PUBLICAÇÕES</a></li>
-            <li><a href="/courses" onclick="route(event)">CURSOS</a></li>
+            <li><a href="/" onclick="route(event)">${t.menu.home}</a></li>
+            <li><a href="/posts" onclick="route(event)">${t.menu.articles}</a></li>
+            <li><a href="/publications" onclick="route(event)">${t.menu.publications}</a></li>
+            <li>
+                <algol-select name="select" id="select-lang">
+                    <option value="pt-br" ${selectPt}>Português &#x1F1E7;&#x1F1F7;</option>  
+                    <option value="en-us" ${selectEn}>English &#x1F1FA;&#x1F1F8;</option>
+                </algol-select>
+            </li>
         </algol-power-menu>
     `);
+    document.getElementById("select-lang").addEventListener('algol-change', function (e) {
+        const selectedLang = e.detail.value;
+        if (selectedLang !== currentLang) { // se a selecionada é diferente da atual
+            changeLanguage(selectedLang);
+        }
+    });
+
 }
 function createFooter(){
-    const page_content = document.getElementById('page-content');
+    const page_content = document.getElementById('app');
+    const currentYear = new Date().getFullYear(); // TODO Buscar do servidor
     page_content.insertAdjacentHTML('beforeend',`
         <algol-grid-layout cols="1fr" id="footer">
             <algol-grid-item>
@@ -124,7 +205,7 @@ function createFooter(){
             <algol-flex-item posh="stretch">
                 <algol-spacer value="1.2"></algol-spacer>
                     <a href="https://www.youtube.com/channel/UCVJGac_RO3I-yIM77xLYrdw" target="_blank">
-                        <p>Inscreva-se&nbsp;</p>
+                        <p>${t.footer.subscribe}&nbsp;</p>
                     </a>
                     <a href="https://www.youtube.com/channel/UCVJGac_RO3I-yIM77xLYrdw" target="_blank">
                         <algol-image size="1.6vw" sizebreak="5vw"
@@ -133,19 +214,44 @@ function createFooter(){
             </algol-flex-item>
             <algol-flex-item>
                 <algol-spacer value="1.2"></algol-spacer>   
-                <p><a href="#">Termos de uso</a></p>
+                <p><a href="#">${t.footer.terms}</a></p>
                 <p>&nbsp;&nbsp;&nbsp;&nbsp;</p>
-                <p><a href="#">Política de privarcidade</a></p>
+                <p><a href="#">${t.footer.privacy}</a></p>
                 <algol-spacer value="1.2"></algol-spacer>
             </algol-flex-item>
             <algol-grid-item id="ano" padding="1.5vw 0" posh="stretch">
-                <p>©20xx Algol.dev. Todos os direitos reservados.</p>
+                <p>©${currentYear} Algol.dev. ${t.footer.rights}.</p>
             </algol-grid-item>
         </algol-grid-layout>
     `);
 }
-createMenu();
-createFooter();
+
+function changeLanguage(newLang) {
+    // 1. Salva a nova preferência no localstorage
+    localStorage.setItem('app_lang', newLang);
+
+    // 2. Limpa o sessionStorage. 
+    // Como suas classes PageHome e PagePosts usam sessionStorage para evitar recarregar dados do Elysia,
+    // nós precisamos limpar esse cache. Caso contrário, o layout muda para inglês, mas os posts continuam em português.
+    sessionStorage.clear();
+
+    // 3. Recarrega a página. 
+    // Em uma SPA, o reload reinicia o JS, pega o novo 'app_lang' logo no início do script, 
+    // refaz o menu/footer traduzidos e o router carrega a página atual com o idioma novo.
+    window.location.reload();
+}
+
+function hideApp(){
+    const app = document.getElementById("app")
+    app.style.opacity = "0";
+}
+function showApp(){
+    const app = document.getElementById("app")
+    app.style.opacity = "1";
+    app.style.transition = "opacity 0.4s ease-in-out";
+}
+
+initLayout();
 
 // ====================================
 // 📁 ./public\js\pages\404 copy.js
@@ -162,14 +268,358 @@ const render404 = (container) => {
 
 class Page404 extends PageBase{
 
-    constructor(container) {
-        super(container);
+    constructor(container, params) {
+        super(container, params);
     }
 
     /** @override */
     render() {
         this.container.innerHTML = /* html */ `
             <h1>404 - Página não encontrada</h1>
+        `;
+    }
+
+    /** @override */
+    async loadData() {
+        // nada para carregar
+    }
+}
+
+// ====================================
+// 📁 ./public\js\pages\courses\algo_analysis_01.js
+// ====================================
+
+class PageAlgoAnalysis01 extends PageBase{
+
+    constructor(container, params) {
+        super(container, params);
+    }
+
+    /** @override */
+    render() {
+        this.container.innerHTML = /* html */ `
+            <algol-grid-layout posh="stretch" cols="1fr">
+                <algol-grid-item
+                img="${IMAGE_BUCKET}/imagens/cursos/analise-de-algoritmos/algorithm-analysis-course.webp"
+                padding="15vw 5vw"
+                paddingbreak="30vw 5vw"
+                imgrepeat="no-repeat"
+                imgsize="cover"
+                imgpos="right"
+                imgoverlay="0.6"
+                posh="stretch">
+                    <h2 style="text-align: center; color: white; text-shadow: 0 calc(0.1vw * var(--scale-factor)) calc(0.1vw * var(--scale-factor)) black;">Algorithm analysis - part 01</h2>
+                </algol-grid-item>
+            </algol-grid-layout>
+        `;
+    }
+
+    /** @override */
+    async loadData() {
+        // nada para carregar
+    }
+}
+
+// ====================================
+// 📁 ./public\js\pages\courses\basic_prog_01.js
+// ====================================
+class PageBasicProg01 extends PageBase{
+
+    constructor(container, params) {
+        super(container, params);
+        this.courseData = [
+            {
+                "imgurl":"/imagens/posts/_covers/2020/algoritmos_algorithm_cover.webp",
+                "title":"01 - Algoritmo: o que é?",
+                "description":"Você sabe o que é um algoritmo? Neste artigo você vai aprender de uma forma nunca vista antes em um conteúdo gratuito! E ainda tem exercício!",
+                "link":"/algoritmo-o-que-e",
+                "lang":"pt-br"
+            },
+            {
+                "imgurl":"/imagens/posts/_covers/2020/comandos_entrada_saida_input_output_cover.webp",
+                "title":"02 - Comandos de entrada e saída: o seu início na programação",
+                "description":"Dê seus primeiros passos na programação. Aprenda sobre os comandos de entrada e saída, e como ele te permite se comunicar com o computador.",
+                "link":"/comandos-entrada-saida-inicio-programacao",
+                "lang":"pt-br"
+            },
+            {
+                "imgurl":"/imagens/posts/_covers/2020/variavel_variable_cover.webp",
+                "title":"03 - Variável: O que é?",
+                "description":"Aprenda o significado de uma variável. Entenda como as linguagens de programação as utilizam para armazenar e processar as informações.",
+                "link":"/variavel-o-que-e",
+                "lang":"pt-br"
+            },
+            {
+                "imgurl":"/imagens/posts/_covers/2020/oper_atribuicao_cover.webp",
+                "title":"04 - Operador de atribuição",
+                "description":"Aprenda sobre o operador de atribuição, o mais simples da programação. Veja como ele é usado para colocar informações dentro das variáveis.",
+                "link":"/operador-de-atribuicao",
+                "lang":"pt-br"
+            },
+            {
+                "imgurl":"/imagens/posts/_covers/2020/operadores_aritmeticos_arithmetic_operators_cover-b.webp",
+                "title":"05 - Operadores aritméticos",
+                "description":"Aprenda sobre a 2ª categoria de operadores. Veja como os operadores aritméticos são usados para realizar cálculos matemáticos.",
+                "link":"/operadores-aritmeticos",
+                "lang":"pt-br"
+            },
+            {
+                "imgurl":"/imagens/posts/_covers/2020/declaracoes_condicionais_conditional_statements_cover.webp",
+                "title":"06 - Declarações condicionais",
+                "description":"As declarações condicionais te permitem criar algoritmos mais inteligentes, fazendo-os tomar decisões durante a sua execução.",
+                "link":"/declaracoes-condicionais",
+                "lang":"pt-br"
+            },
+            {
+                "imgurl":"/imagens/posts/_covers/2020/operadores_relacionais-b.webp",
+                "title":"07 - Operadores relacionais",
+                "description":"Aprenda sobre a 3ª categoria de operadores. Veja como os operadores relacionais são usados para criar expressões condicionais.",
+                "link":"/operadores-relacionais",
+                "lang":"pt-br"
+            },
+            {
+                "imgurl":"/imagens/posts/_covers/2020/operadores_logicos_logical_operators_cover_b.webp",
+                "title":"08 - Operadores lógicos",
+                "description":"Aprenda sobre a 4ª categoria de operadores. Veja como os operadores lógicos são usados para criar expressões condicionais complexas.",
+                "link":"/operadores-logicos",
+                "lang":"pt-br"
+            },
+            {
+                "imgurl":"/imagens/posts/_covers/2020/operadores_compostos_cover.webp",
+                "title":"09 - Operadores compostos",
+                "description":"Aprenda sobre a 5ª categoria de operadores. Veja como os operadores compostos, tais como o de incremento e decremento, simplificam os cálculos.",
+                "link":"/operadores-compostos",
+                "lang":"pt-br"
+            }
+        ]
+    }
+
+    /** @override */
+    render() {
+        const coursesHTML = this.courseData.map(course => `
+            <algol-grid-layout posh="stretch" cols="1fr">
+                <algol-grid-item color="#fff">
+                    <a href="${course.link}" onclick="route(event)" style="text-decoration: none; color: inherit;">
+                        <algol-grid-layout class="card-bg" posh="stretch" cols="0.3fr 0.7fr" colsbreak="1fr" gap="1vw">
+
+                            <algol-grid-item padding="1vw">
+                                <algol-image 
+                                    radius="0.1vw" 
+                                    size="100%" 
+                                    src="${IMAGE_BUCKET}${course.imgurl}" 
+                                    alt="landscape" 
+                                    width="400" 
+                                    height="200">
+                                </algol-image>
+                            </algol-grid-item>
+
+                            <algol-grid-item padding="0 2vw" paddingbreak="5vw 3vw" posh="start">
+                                <h2>${course.title}</h2>
+                                <algol-spacer value="1.5"></algol-spacer>
+                                <p>${course.description}</p>
+                            </algol-grid-item>
+
+                        </algol-grid-layout>
+                    </a>
+                </algol-grid-item>
+            </algol-grid-layout>
+            <algol-spacer value="3" valuebreak="5"></algol-spacer>
+        `).join('');
+        
+        this.container.innerHTML = `
+            <algol-grid-layout posh="stretch" cols="1fr">
+                <algol-grid-item
+                    img="${IMAGE_BUCKET}/imagens/cursos/programacao-basica/programacao-basica-basic-programming-01-cover.webp"
+                    padding="15vw 5vw"
+                    paddingbreak="30vw 5vw"
+                    imgrepeat="no-repeat"
+                    imgsize="cover"
+                    imgpos="right"
+                    imgoverlay="0.6"
+                    posh="stretch">
+                    <h2 style="text-align: center; color: white; text-shadow: 0 calc(0.1vw * var(--scale-factor)) calc(0.1vw * var(--scale-factor)) black;">
+                        Basic programming - part 01
+                    </h2>
+                </algol-grid-item>
+            </algol-grid-layout>
+
+            <algol-spacer value="7" valuebreak="5"></algol-spacer>
+
+            ${coursesHTML}
+
+            <algol-spacer value="7" valuebreak="5"></algol-spacer>
+        `;
+    }
+
+    /** @override */
+    async loadData() {
+        // nada para carregar
+    }
+}
+
+// ====================================
+// 📁 ./public\js\pages\courses\basic_prog_02 copy.js
+// ====================================
+
+class PageBasicProg02 extends PageBase{
+
+    constructor(container, params) {
+        super(container, params);
+    }
+
+    /** @override */
+    render() {
+        this.container.innerHTML = /* html */ `
+            <algol-grid-layout posh="stretch" cols="1fr">
+                <algol-grid-item
+                img="${IMAGE_BUCKET}/imagens/cursos/programacao-basica/programacao-basica-basic-programming-02-cover.webp"
+                padding="15vw 5vw"
+                paddingbreak="30vw 5vw"
+                imgrepeat="no-repeat"
+                imgsize="cover"
+                imgpos="right"
+                imgoverlay="0.6"
+                posh="stretch">
+                    <h2 style="text-align: center; color: white; text-shadow: 0 calc(0.1vw * var(--scale-factor)) calc(0.1vw * var(--scale-factor)) black;">Basic programming - part 02</h2>
+                </algol-grid-item>
+            </algol-grid-layout>
+        `;
+    }
+
+    /** @override */
+    async loadData() {
+        // nada para carregar
+    }
+}
+
+// ====================================
+// 📁 ./public\js\pages\courses\basic_prog_02.js
+// ====================================
+class PageBasicProg02 extends PageBase{
+
+    constructor(container, params) {
+        super(container, params);
+        this.courseData = [
+            {
+                "imgurl":"/imagens/posts/_covers/2020/algoritmos_algorithm_cover.webp",
+                "title":"01 - Algoritmo: o que é?",
+                "description":"Você sabe o que é um algoritmo? Neste artigo você vai aprender de uma forma nunca vista antes em um conteúdo gratuito! E ainda tem exercício!",
+                "link":"/algoritmo-o-que-e",
+                "lang":"pt-br"
+            },
+            {
+                "imgurl":"/imagens/posts/_covers/2020/comandos_entrada_saida_input_output_cover.webp",
+                "title":"02 - Comandos de entrada e saída: o seu início na programação",
+                "description":"Dê seus primeiros passos na programação. Aprenda sobre os comandos de entrada e saída, e como ele te permite se comunicar com o computador.",
+                "link":"/comandos-entrada-saida-inicio-programacao",
+                "lang":"pt-br"
+            },
+            {
+                "imgurl":"/imagens/posts/_covers/2020/variavel_variable_cover.webp",
+                "title":"03 - Variável: O que é?",
+                "description":"Aprenda o significado de uma variável. Entenda como as linguagens de programação as utilizam para armazenar e processar as informações.",
+                "link":"/variavel-o-que-e",
+                "lang":"pt-br"
+            },
+            {
+                "imgurl":"/imagens/posts/_covers/2020/oper_atribuicao_cover.webp",
+                "title":"04 - Operador de atribuição",
+                "description":"Aprenda sobre o operador de atribuição, o mais simples da programação. Veja como ele é usado para colocar informações dentro das variáveis.",
+                "link":"/operador-de-atribuicao",
+                "lang":"pt-br"
+            },
+            {
+                "imgurl":"/imagens/posts/_covers/2020/operadores_aritmeticos_arithmetic_operators_cover-b.webp",
+                "title":"05 - Operadores aritméticos",
+                "description":"Aprenda sobre a 2ª categoria de operadores. Veja como os operadores aritméticos são usados para realizar cálculos matemáticos.",
+                "link":"/operadores-aritmeticos",
+                "lang":"pt-br"
+            },
+            {
+                "imgurl":"/imagens/posts/_covers/2020/declaracoes_condicionais_conditional_statements_cover.webp",
+                "title":"06 - Declarações condicionais",
+                "description":"As declarações condicionais te permitem criar algoritmos mais inteligentes, fazendo-os tomar decisões durante a sua execução.",
+                "link":"/declaracoes-condicionais",
+                "lang":"pt-br"
+            },
+            {
+                "imgurl":"/imagens/posts/_covers/2020/operadores_relacionais-b.webp",
+                "title":"07 - Operadores relacionais",
+                "description":"Aprenda sobre a 3ª categoria de operadores. Veja como os operadores relacionais são usados para criar expressões condicionais.",
+                "link":"/operadores-relacionais",
+                "lang":"pt-br"
+            },
+            {
+                "imgurl":"/imagens/posts/_covers/2020/operadores_logicos_logical_operators_cover_b.webp",
+                "title":"08 - Operadores lógicos",
+                "description":"Aprenda sobre a 4ª categoria de operadores. Veja como os operadores lógicos são usados para criar expressões condicionais complexas.",
+                "link":"/operadores-logicos",
+                "lang":"pt-br"
+            },
+            {
+                "imgurl":"/imagens/posts/_covers/2020/operadores_compostos_cover.webp",
+                "title":"09 - Operadores compostos",
+                "description":"Aprenda sobre a 5ª categoria de operadores. Veja como os operadores compostos, tais como o de incremento e decremento, simplificam os cálculos.",
+                "link":"/operadores-compostos",
+                "lang":"pt-br"
+            }
+        ]
+    }
+
+    /** @override */
+    render() {
+        const coursesHTML = this.courseData.map(course => `
+            <algol-grid-layout posh="stretch" cols="1fr">
+                <algol-grid-item color="#fff">
+                    <a href="${course.link}" onclick="route(event)" style="text-decoration: none; color: inherit;">
+                        <algol-grid-layout class="card-bg" posh="stretch" cols="0.3fr 0.7fr" colsbreak="1fr" gap="1vw">
+
+                            <algol-grid-item padding="1vw">
+                                <algol-image 
+                                    radius="0.1vw" 
+                                    size="100%" 
+                                    src="${IMAGE_BUCKET}${course.imgurl}" 
+                                    alt="landscape" 
+                                    width="400" 
+                                    height="200">
+                                </algol-image>
+                            </algol-grid-item>
+
+                            <algol-grid-item padding="0 2vw" paddingbreak="5vw 3vw" posh="start">
+                                <h2>${course.title}</h2>
+                                <algol-spacer value="1.5"></algol-spacer>
+                                <p>${course.description}</p>
+                            </algol-grid-item>
+
+                        </algol-grid-layout>
+                    </a>
+                </algol-grid-item>
+            </algol-grid-layout>
+            <algol-spacer value="3" valuebreak="5"></algol-spacer>
+        `).join('');
+        
+        this.container.innerHTML = `
+            <algol-grid-layout posh="stretch" cols="1fr">
+                <algol-grid-item
+                    img="${IMAGE_BUCKET}/imagens/cursos/programacao-basica/programacao-basica-basic-programming-02-cover.webp"
+                    padding="15vw 5vw"
+                    paddingbreak="30vw 5vw"
+                    imgrepeat="no-repeat"
+                    imgsize="cover"
+                    imgpos="right"
+                    imgoverlay="0.6"
+                    posh="stretch">
+                    <h2 style="text-align: center; color: white; text-shadow: 0 calc(0.1vw * var(--scale-factor)) calc(0.1vw * var(--scale-factor)) black;">
+                        Basic programming - part 02
+                    </h2>
+                </algol-grid-item>
+            </algol-grid-layout>
+
+            <algol-spacer value="7" valuebreak="5"></algol-spacer>
+
+            ${coursesHTML}
+
+            <algol-spacer value="7" valuebreak="5"></algol-spacer>
         `;
     }
 
@@ -207,53 +657,59 @@ class PageCourses extends PageBase{
 
                 <algol-grid-item>
                     <algol-spacer value="7" valuebreak="5"></algol-spacer>
-                    <algol-grid-layout class="card-bg" posh="stretch" cols="0.3fr 0.7fr" colsbreak="1fr" gap="1vw">
-                        <algol-grid-item>
+                    <a href="/courses/basic-programming-part-01" onclick="route(event)" style="text-decoration: none; color: inherit;">
+                        <algol-grid-layout class="card-bg" posh="stretch" cols="0.3fr 0.7fr" colsbreak="1fr" gap="1vw">
+                            <algol-grid-item>
                                 <algol-image
                                 size="100%"
                                 radius="1vw"
                                 expand src="${IMAGE_BUCKET}/imagens/cursos/programacao-basica/programacao-basica-basic-programming-01-cover.webp" alt="landscape" width="400" height="200"></algol-image>
-                        </algol-grid-item>
-                        <algol-grid-item padding="0 2vw" paddingbreak="5vw 3vw" posh="start">
+                            </algol-grid-item>
+                            <algol-grid-item padding="0 2vw" paddingbreak="5vw 3vw" posh="start">
                                 <h2>Programação básica - parte 01</h2>
                                 <algol-spacer value="1.5"></algol-spacer>
                                 <p>Comece com os conceitos básicos de programação de computadores.</p>
-                        </algol-grid-item>
-                    </algol-grid-layout>
+                            </algol-grid-item>
+                        </algol-grid-layout>
+                    </a>
                 </algol-grid-item>
 
                 <algol-grid-item>
                     <algol-spacer value="7" valuebreak="5"></algol-spacer>
-                    <algol-grid-layout class="card-bg" posh="stretch" cols="0.3fr 0.7fr" colsbreak="1fr" gap="1vw">
-                        <algol-grid-item>
-                                <algol-image
-                                size="100%"
-                                radius="1vw"
-                                expand src="${IMAGE_BUCKET}/imagens/cursos/programacao-basica/programacao-basica-basic-programming-02-cover.webp" alt="landscape" width="400" height="200"></algol-image>
-                        </algol-grid-item>
-                        <algol-grid-item padding="0 2vw" paddingbreak="5vw 3vw" posh="start">
-                                <h2>Programação básica - parte 02</h2>
-                                <algol-spacer value="1.5"></algol-spacer>
-                                <p>Agora que você sabe o básico da programação de computadores, vamos para os assuntos mais desafiadores</p>
-                        </algol-grid-item>
-                    </algol-grid-layout>
+                    <a href="/courses/basic-programming-part-02" onclick="route(event)" style="text-decoration: none; color: inherit;">
+                        <algol-grid-layout class="card-bg" posh="stretch" cols="0.3fr 0.7fr" colsbreak="1fr" gap="1vw">
+                            <algol-grid-item>
+                                    <algol-image
+                                    size="100%"
+                                    radius="1vw"
+                                    expand src="${IMAGE_BUCKET}/imagens/cursos/programacao-basica/programacao-basica-basic-programming-02-cover.webp" alt="landscape" width="400" height="200"></algol-image>
+                            </algol-grid-item>
+                            <algol-grid-item padding="0 2vw" paddingbreak="5vw 3vw" posh="start">
+                                    <h2>Programação básica - parte 02</h2>
+                                    <algol-spacer value="1.5"></algol-spacer>
+                                    <p>Agora que você sabe o básico da programação de computadores, vamos para os assuntos mais desafiadores</p>
+                            </algol-grid-item>
+                        </algol-grid-layout>
+                    </a>
                 </algol-grid-item>
 
                 <algol-grid-item>
                     <algol-spacer value="7" valuebreak="5"></algol-spacer>
-                    <algol-grid-layout class="card-bg" posh="stretch" cols="0.3fr 0.7fr" colsbreak="1fr" gap="1vw">
-                        <algol-grid-item>
-                                <algol-image
-                                size="100%"
-                                radius="1vw"
-                                expand src="${IMAGE_BUCKET}/imagens/cursos/analise-de-algoritmos/algorithm-analysis-course.webp" alt="landscape" width="400" height="200"></algol-image>
-                        </algol-grid-item>
-                        <algol-grid-item padding="0 2vw" paddingbreak="5vw 3vw" posh="start">
-                                <h2>Análise de algoritmos - parte 01</h2>
-                                <algol-spacer value="1.5"></algol-spacer>
-                                <p>Aprenda, de forma detalhada, a medir desempenho de algoritmos.</p>
-                        </algol-grid-item>
-                    </algol-grid-layout>
+                    <a href="/courses/algorithm-analysis-part-01" onclick="route(event)" style="text-decoration: none; color: inherit;">
+                        <algol-grid-layout class="card-bg" posh="stretch" cols="0.3fr 0.7fr" colsbreak="1fr" gap="1vw">
+                            <algol-grid-item>
+                                    <algol-image
+                                    size="100%"
+                                    radius="1vw"
+                                    expand src="${IMAGE_BUCKET}/imagens/cursos/analise-de-algoritmos/algorithm-analysis-course.webp" alt="landscape" width="400" height="200"></algol-image>
+                            </algol-grid-item>
+                            <algol-grid-item padding="0 2vw" paddingbreak="5vw 3vw" posh="start">
+                                    <h2>Análise de algoritmos - parte 01</h2>
+                                    <algol-spacer value="1.5"></algol-spacer>
+                                    <p>Aprenda, de forma detalhada, a medir desempenho de algoritmos.</p>
+                            </algol-grid-item>
+                        </algol-grid-layout>
+                    </a>
                     <algol-spacer value="7" valuebreak="5"></algol-spacer>
                 </algol-grid-item>
 
@@ -273,13 +729,48 @@ class PageCourses extends PageBase{
 
 class PageHome extends PageBase{
 
-    constructor(container) {
-        super(container);
+    constructor(container, params) {
+        super(container, params);
         this.dataCacheKey = 'dataCacheHome'; // cache de dados json, se houver
+        this.i18nCacheKey = 'i18nHome'; // cache das traduções
+        this.t = null; // guardará o dicionário atual
+    }
+
+    async loadTranslations(lang){
+        if(this.t) return; // se ja carregou, encerra
+
+        // tenta buscar o dicionário no cache (para evitar fetch)
+        const cachedI18n = sessionStorage.getItem(this.i18nCacheKey);
+        if(cachedI18n){ // se conseguiu recuperar o dicionario do cache
+            const allTranslations = JSON.parse(cachedI18n); // desistringfica
+            this.t = allTranslations[lang] || allTranslations['pt-br']; // obtém o objeto do idioma
+            return;
+        }
+
+        // se não há cache, mostra msg de loading pra fazer fetch
+        this.container.innerHTML = `<h2 style="text-align: center; margin-top: 5vw;">Loading...</h2>`;
+        try {
+            // busca as traduções da página
+            const response = await fetch('/js/pages/home.json');
+            const allTranslations = await response.json();
+            // Salva o JSON completo no cache
+            sessionStorage.setItem(this.i18nCacheKey, JSON.stringify(allTranslations));
+            // obtém o objeto do idioma
+            this.t = allTranslations[lang] || allTranslations['pt-br'];
+        } catch (error) {
+            console.error("Erro ao carregar home.json:", error);
+            // Fallback de emergência caso o arquivo falhe
+            this.t = { loading: "Carregando...", hero_title: "Computação", error_load: "Erro." }; 
+        }
     }
 
     /** @override */
-    render() {
+    async render() {
+        const lang = document.documentElement.lang || 'pt-br';
+
+        // 1. Aguarda as traduções estarem prontas
+        await this.loadTranslations(lang);
+
         let cachedPostsHtml = null;// sessionStorage.getItem(this.dataCacheKey);
 
         const postsContent = cachedPostsHtml
@@ -287,7 +778,7 @@ class PageHome extends PageBase{
             : /* html */`
                 <div id="posts-container">
                     <h2 style="text-align: center;">
-                        Carregando conteúdo...
+                        ${this.t.loading}
                     </h2>
                </div>`;
                
@@ -301,31 +792,37 @@ class PageHome extends PageBase{
                 imgsize="cover"
                 imgpos="center"
                 posh="stretch">
-                    <h2 style="text-align: center; color: white; text-shadow: 0 calc(0.1vw * var(--scale-factor)) calc(0.1vw * var(--scale-factor)) black;">Computação e Tecnologia</h2>
+                    <h2 style="text-align: center; color: white; text-shadow: 0 calc(0.1vw * var(--scale-factor)) calc(0.1vw * var(--scale-factor)) black;">
+                        ${this.t.hero_title}
+                    </h2>
                     <algol-spacer value="1.5"></algol-spacer>
-                    <h3 style="text-align: center; color: white; text-shadow: 0 calc(0.1vw * var(--scale-factor)) calc(0.1vw * var(--scale-factor)) black;">Conteúdos didáticos com máxima riqueza de recursos visuais</h3>
+                    <h3 style="text-align: center; color: white; text-shadow: 0 calc(0.1vw * var(--scale-factor)) calc(0.1vw * var(--scale-factor)) black;">
+                        ${this.t.hero_subtitle}
+                    </h3>
                 </algol-grid-item>
 
                 <algol-grid-item>
                     <algol-spacer value="7" valuebreak="5"></algol-spacer>
-                    <algol-grid-layout class="card-bg" posh="stretch" cols="0.3fr 0.7fr" colsbreak="1fr" gap="1vw">
-                        <algol-grid-item>
-                                <algol-image
-                                size="100%"
-                                radius="1vw"
-                                expand src="${IMAGE_BUCKET}/imagens/cursos/programacao-basica/programacao-basica-basic-programming-01-cover.webp" alt="landscape" width="400" height="200"></algol-image>
-                        </algol-grid-item>
-                        <algol-grid-item padding="0 2vw" paddingbreak="5vw 3vw" posh="start">
-                                <h2>Programação Básica</h2>
-                                <algol-spacer value="1.5"></algol-spacer>
-                                <p>Inicie agora o seu aprendizado no maravilhoso mundo da programação de computadores.</p>
-                        </algol-grid-item>
-                    </algol-grid-layout>
+                    <a href="/publications" onclick="route(event)" style="text-decoration: none; color: inherit;">
+                        <algol-grid-layout class="card-bg" posh="stretch" cols="0.3fr 0.7fr" colsbreak="1fr" gap="1vw">
+                            <algol-grid-item padding="1vw">
+                                    <algol-image
+                                    size="100%"
+                                    radius="1vw"
+                                    expand src="${IMAGE_BUCKET}/imagens/publications/gds1/book-gds1-java.webp" alt="landscape" width="400" height="200"></algol-image>
+                            </algol-grid-item>
+                            <algol-grid-item padding="0 2vw" paddingbreak="5vw 3vw" posh="start">
+                                    <h2>${this.t.book_title}</h2>
+                                    <algol-spacer value="1.5"></algol-spacer>
+                                    <p>${this.t.book_desc}</p>
+                            </algol-grid-item>
+                        </algol-grid-layout>
+                    </a>
                 </algol-grid-item>
 
                 <algol-grid-item>
                     <algol-spacer value="7" valuebreak="8"></algol-spacer>
-                    <h3 style="text-align: center;">Conheça nossos conteúdos na página de artigos.</h3>
+                    <h3 style="text-align: center;">${this.t.articles_title}</h3>
                     <algol-spacer value="3"></algol-spacer>
                     
                     ${postsContent}
@@ -336,22 +833,22 @@ class PageHome extends PageBase{
         `;
 
         if (!cachedPostsHtml)
-            this.loadData();
+           await this.loadData();
     }
 
     /** @override */
     async loadData() {
         const div = document.getElementById('posts-container');
         if (!div) return;
-
         try {
-            const response = await fetch('/api/recent-posts');
+            const lang = document.documentElement.lang; // obtem o idioma atual da página
+            const response = await fetch(`/api/simple-posts?limit=${6}&lang=${lang}`);
             const artigos = await response.json();
             
             let stringHtml = `<algol-grid-layout  class="card-bg" posh="stretch" cols="1fr 1fr 1fr" colsbreak="1fr 1fr" gap="1vw">`
             stringHtml += artigos.map(artigo => /* html */`
                 <algol-grid-item padding="1vw">
-                    <a href="${artigo.slug}" onclick="route(event)">
+                    <a href="/${artigo.slug}" onclick="route(event)">
                         <algol-image radius="0.4vw" size="100%" src="${IMAGE_BUCKET}${artigo.featured_image_url}" alt="landscape" width="400" height="200"></algol-image>
                         <p style="text-align:center;">${artigo.title}</p>
                     </a>
@@ -366,98 +863,6 @@ class PageHome extends PageBase{
             div.innerHTML = "<p>Erro ao carregar conteúdos.</p>";
         }
     }
-
-}
-
-// ====================================
-// 📁 ./public\js\pages\posts copy.js
-// ====================================
-class PagePosts extends PageBase{
-
-    constructor(container) {
-        super(container);
-        this.dataCacheKey = 'dataCachePosts'; // cache de dados json, se houver
-    }
-
-    /** @override */
-    render() {
-        let cachedPostsHtml = null; // sessionStorage.getItem(this.dataCacheKey);
-
-        const postsContent = cachedPostsHtml
-            ? cachedPostsHtml
-            : /* html */`
-                <div id="posts-container">
-                    <h2 style="text-align: center;">
-                        Carregando conteúdo...
-                    </h2>
-               </div>`;
-               
-        this.container.innerHTML = /* html */ `
-            <algol-grid-layout posh="stretch" cols="1fr">
-                <algol-grid-item
-                img="${IMAGE_BUCKET}/imagens/structural-site/articles-page-cover.webp"
-                padding="15vw 5vw"
-                paddingbreak="30vw 5vw"
-                imgrepeat="no-repeat"
-                imgsize="cover"
-                imgpos="right"
-                imgoverlay="0.6"
-                posh="stretch">
-                    <h2 style="text-align: center; color: white; text-shadow: 0 calc(0.1vw * var(--scale-factor)) calc(0.1vw * var(--scale-factor)) black;">Os mais variados assuntos sobre computação e tecnologia</h2>
-                </algol-grid-item>
-                
-                <algol-grid-item>
-                    <algol-spacer value="7" valuebreak="8"></algol-spacer>
-                    
-                    ${postsContent}
-                    
-                    <algol-spacer value="7" valuebreak="5"></algol-spacer>
-                </algol-grid-item>
-
-            </algol-grid-layout>
-        `;
-
-        if (!cachedPostsHtml)
-            this.loadData();
-    }
-
-    /** @override */
-    async loadData() {
-        const div = document.getElementById('posts-container');
-        if (!div) return;
-
-        try {
-            // Simula a demora
-            await new Promise(resolve => setTimeout(resolve, 500));
-
-            const response = await (await fetch('/_mocks/posts.json'));
-            const artigos = await response.json();
-            
-            let stringHtml = `<algol-grid-layout  class="card-bg" posh="stretch" cols="1fr 1fr 1fr" colsbreak="1fr" gap="1vw" gapbreak="10vw">`
-            stringHtml += artigos.map(artigo => /* html */`
-                <algol-grid-item padding="1vw">
-                    <algol-image radius="0.1vw" size="100%" src="${IMAGE_BUCKET}${artigo.featured_image_url}" alt="landscape" width="400" height="200"></algol-image>
-                    <algol-grid-layout cols="1fr" color="white">
-                        <algol-grid-item padding="1vw" paddingbreak="4vw">
-                            <algol-spacer value="1"></algol-spacer>
-                            <h3 style="text-align:left;">${artigo.title}</h3>
-                            <algol-spacer value="1"></algol-spacer>
-                            <p style="text-align:left;">${artigo.excerpt}</p>
-                            <algol-spacer value="1"></algol-spacer>
-                        </algol-grid-item>
-                    </algol-grid-layout>
-                </algol-grid-item>
-            `).join('');
-            stringHtml += `</algol-grid-layout>`
-            div.outerHTML = stringHtml; // substitui a div pelo <algol-grid-layout>
-            sessionStorage.setItem(this.dataCacheKey, stringHtml); // salva no cache do sessionStorage para evitar recarregar do servidor
-
-        } catch (error) {
-            console.error("Erro ao carregar artigos:", error);
-            div.innerHTML = "<p>Erro ao carregar conteúdos.</p>";
-        }
-    }
-
 }
 
 // ====================================
@@ -465,8 +870,8 @@ class PagePosts extends PageBase{
 // ====================================
 class PagePosts extends PageBase{
 
-    constructor(container) {
-        super(container);
+    constructor(container, params) {
+        super(container, params);
         this.dataCacheKey = 'dataCachePosts'; // cache de dados json, se houver
         // para paginação
         this.currentPage = 1;
@@ -476,7 +881,7 @@ class PagePosts extends PageBase{
     }
 
     /** @override */
-    render() {
+    async render() {
         let cachedPostsHtml = null; // sessionStorage.getItem(this.dataCacheKey);
 
         const postsContent = cachedPostsHtml
@@ -528,57 +933,41 @@ class PagePosts extends PageBase{
         });
 
         if (!cachedPostsHtml)
-            this.loadData(1);
+            await this.loadData(1);
         else
             this.loadData(1, true); // Se a página 1 veio do cache, renderiza apenas os botões 
     }
-
-
-    /** Muda a página e faz o scroll suave para o topo do conteúdo */
-    async goToPage(page) {
-        this.currentPage = page;
-        
-        const wrapper = document.getElementById('posts-wrapper');
-        if (wrapper) {
-            wrapper.innerHTML = /* html */`<div style="display: flex; justify-content: center; width: 100%; padding: 5vw 0;"><h2>Carregando página ${page}...</h2></div>`;
-            wrapper.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-        
-        await this.loadData(page);
-}
 
     /** @override */
     async loadData(page = 1, isRebuildingPaginationOnly = false) {
         if (this.isLoading) return;
         this.isLoading = true;
-
+        const limit = this.postsPerPage;
+        const lang = document.documentElement.lang; // obtem o idioma atual da página
         try {
-            const response = await fetch('/api/simple-posts');
-            const todosArtigos = await response.json();
+            const response = await fetch(`/api/paginated-posts?page=${page}&limit=${limit}&lang=${lang}`);
+            const resultado = await response.json();
             
-            // Define o total de páginas
-            const totalItems = todosArtigos.length;
-            this.totalPages = Math.ceil(totalItems / this.postsPerPage);
+            this.totalPages = Math.ceil(resultado.totalCount / limit);
+            const artigos = resultado.data;
 
             if (!isRebuildingPaginationOnly) {
-                // Lógica de paginação simulada (Offset e Limit)
-                const offset = (page - 1) * this.postsPerPage;
-                const artigosDaPagina = todosArtigos.slice(offset, offset + this.postsPerPage);
-
                 let stringHtml = `<algol-grid-layout class="card-bg" posh="stretch" cols="1fr 1fr 1fr" colsbreak="1fr" gap="1vw" gapbreak="10vw" style="align-items: start;">`;
                 
-                stringHtml += artigosDaPagina.map(artigo => /* html */`
+                stringHtml += artigos.map(artigo => /* html */`
                     <algol-grid-item padding="1vw">
-                        <algol-image radius="0.1vw" size="100%" src="${IMAGE_BUCKET}${artigo.featured_image_url}" alt="landscape" width="400" height="200"></algol-image>
-                        <algol-grid-layout cols="1fr" color="white">
-                            <algol-grid-item padding="1vw" paddingbreak="4vw">
-                                <algol-spacer value="1"></algol-spacer>
-                                <h3 style="text-align:left;">${artigo.title}</h3>
-                                <algol-spacer value="1"></algol-spacer>
-                                <p style="text-align:left;">${artigo.excerpt}</p>
-                                <algol-spacer value="1"></algol-spacer>
-                            </algol-grid-item>
-                        </algol-grid-layout>
+                        <a href="/${artigo.slug}" onclick="route(event)" style="text-decoration: none; color: inherit;">
+                            <algol-image radius="0.1vw" size="100%" src="${IMAGE_BUCKET}${artigo.featured_image_url}" alt="landscape" width="400" height="200"></algol-image>
+                            <algol-grid-layout cols="1fr" color="white">
+                                <algol-grid-item padding="1vw" paddingbreak="4vw">
+                                    <algol-spacer value="1"></algol-spacer>
+                                    <h3 style="text-align:left;">${artigo.title}</h3>
+                                    <algol-spacer value="1"></algol-spacer>
+                                    <p style="text-align:left;">${artigo.excerpt}</p>
+                                    <algol-spacer value="1"></algol-spacer>
+                                </algol-grid-item>
+                            </algol-grid-layout>
+                        </a>
                     </algol-grid-item>
                 `).join('');
                 
@@ -600,6 +989,19 @@ class PagePosts extends PageBase{
         } finally {
             this.isLoading = false;
         }
+    }
+
+     /** Muda a página e faz o scroll suave para o topo do conteúdo */
+    async goToPage(page) {
+        this.currentPage = page;
+        
+        const wrapper = document.getElementById('posts-wrapper');
+        if (wrapper) {
+            wrapper.innerHTML = /* html */`<div style="display: flex; justify-content: center; width: 100%; padding: 5vw 0;"><h2>Carregando página ${page}...</h2></div>`;
+            wrapper.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+        
+        await this.loadData(page);
     }
 
     /** Renderiza os botões numéricos com suporte a elipses */
@@ -641,39 +1043,13 @@ class PagePosts extends PageBase{
 }
 
 // ====================================
-// 📁 ./public\js\pages\publications copy.js
-// ====================================
-const renderPublications = (container) => {
-    container.innerHTML = `
-        <algol-grid-layout posh="stretch" id="layout" cols="1fr 1fr 1fr" colsbreak="1fr" gap="1vw" class="algol-bubble-01">
-            <algol-grid-item posh="start">   
-                <algol-input-date name="input-date" id="input-date" label="input-date" placeholder="Digite aqui..." ></algol-input-date>
-                <algol-input-date disabled required label="input-date" placeholder="Digite aqui..." ></algol-input-date>
-            </algol-grid-item>
-            <algol-grid-item posh="stretch">   
-                <algol-input-time name="input-time" id="input-time" label="input-time" placeholder="Digite aqui..." ></algol-input-time>
-                <algol-input-time disabled required label="input-time" placeholder="Digite aqui..." ></algol-input-time>
-            </algol-grid-item>
-            <algol-grid-item posh="end">
-                <algol-input-range name="input-range" id="input-range" label="input-range" min=0.5 max="3" step="0.1"></algol-input-range>
-                <algol-input-range disabled required label="input-range" ></algol-input-range>
-            </algol-grid-item>
-            <algol-flex-item distrib="between"> 
-                <algol-input-color name="input-color" id="input-color" label="input-color" ></algol-input-color>
-                <algol-input-color disabled required label="input-color" ></algol-input-color>
-            </algol-flex-item>
-        </algol-grid-layout>
-    `;
-};
-
-// ====================================
 // 📁 ./public\js\pages\publications.js
 // ====================================
 
     class PagePublications extends PageBase{
 
-        constructor(container) {
-            super(container);
+        constructor(container, params) {
+            super(container, params);
         }
 
         /** @override */
@@ -764,308 +1140,17 @@ const renderPublications = (container) => {
     }
 
 // ====================================
-// 📁 ./public\js\pages\single copy.js
-// ====================================
-
-class PageSingle extends PageBase{
-
-    constructor(container) {
-        super(container);
-    }
-
-    /** @override */
-    render() {
-        let cachedPostsHtml = null;// sessionStorage.getItem(this.dataCacheKey);
-
-        const postsContent = cachedPostsHtml
-            ? cachedPostsHtml
-            : /* html */`
-                <div id="single-container">
-                    <h2 style="text-align: center;">
-                        Carregando conteúdo...
-                    </h2>
-               </div>`;
-               
-        this.container.innerHTML = `
-            ${postsContent}
-        `;
-
-        this.injectStyle(/* css */`
-             #single-container{
-                background-color: white;
-             }
-            #single-container a:link{
-                text-decoration: underline;
-                color: var(--site_global_color)
-            }
-            #single-container a:hover {
-                color: rgb(88, 38, 155);
-            }
-            
-            #single-container a:visited {
-                text-decoration: none;
-                color: rgb(128, 128, 128);
-            }
-
-            #single-container h2{
-               
-            }
-            #single-container h3{
-            
-            }
-            #single-container p, #single-container ul, #single-container ol, #single-container table{
-            
-            }
-            #single-container ul, #single-container ol{
-                padding-left: 4vw;
-            }
-            #single-container ul{
-                list-style-type: disc;
-            }
-            #single-container li{
-                margin-bottom: 1vw;
-            }
-            #single-container hr{
-                margin-bottom: 7vw;
-                margin-top: 7vw;
-                border: 0.2vw solid #ccc;
-            }
-            #single-container img{
-
-            }
-
-            /* classes para estilização de tabelas */
-            #single-container table{
-                text-align: center;
-                margin: auto;
-            }
-            #single-container table tr:nth-child(odd){background-color: #ddd;}
-            #single-container table tr:nth-child(even){background-color: #eee;}
-            #single-container table th, #single-container table td{padding: 1vw 2vw;}
-            #single-container table th{
-                background-color: #aaa;
-                padding-bottom: 1vw;
-                padding-top: 1vw;
-            }
-            #single-container table .blueHeader{
-                background-color: rgb(80, 102, 148);
-                color: white;
-            }
-
-            /* classes para estilização de abas */
-            #single-container .container-abas .abas {
-                list-style: none; /* Remove os marcadores padrão */
-                margin: 0;
-                padding: 0;
-                background-color: #f6f6f6;
-                display: flex;
-                flex-direction: row;
-                flex-wrap: wrap;
-            }
-            #single-container .container-abas .abas .aba {
-                text-decoration: none;
-                text-align: center;
-                color: #505050;
-                background-color: #eee;
-                border: 0.2vw #ddd solid;
-                padding: 1vw;
-                min-width: 6vw;
-            }
-            #single-container .container-abas .abas .aba.aba-ativa{
-                color: #fff;
-                background-color: var(--site_global_color);
-                border-color:var(--site_global_color);
-            }
-
-            #single-container .container-abas .abas .aba:hover {
-                background-color: #8a8a8a; /* Cor de fundo ao passar o mouse */
-                color: #fff;
-                border-color:#8a8a8a;
-            }
-            #single-container .container-abas .abas .aba.aba-ativa:hover {
-                background-color: var(--site_global_color);
-                border-color:var(--site_global_color);
-            }
-
-            #single-container .container-abas .conteudos {
-                margin-top: 1vw; /* Espaçamento entre as abas e o conteúdo */
-                background-color: #f6f6f6;
-            }
-            #single-container .container-abas .conteudo {
-                display: none; /* Oculta todas as abas por padrão */
-            }
-            #single-container .container-abas .conteudo.conteudo-ativo {
-                display: block; /* mostra apenas a aba com a classe .ativo */
-            }
-
-            /* classes para textos descritivos */
-            #single-container .description{
-                font-style: italic;
-                color: rgb(85, 85, 85);
-                text-align: center;
-            }
-
-            /* classes para textos estilizados */
-            #single-container p.stylized_01{
-                font-weight: bold;
-                font-size: 2vw;
-            }
-
-            /* classes para divs separadoras */
-            #single-container .separator-1{
-                height: 2vw;
-            }
-            #single-container .separator-2{
-                height: 4vw;
-            }
-            #single-container .separator-3{
-                height: 6vw;
-            }
-            #single-container .separator-4{
-                height: 8vw;
-            }
-            #single-container .separator-5{
-                height: 10vw;
-            }
-
-            /* classes para tamanhos de imagens */
-            #single-container .full-size-img-mobile, #single-container .less-size-img-mobile, #single-container .half-size-img-mobile, #single-container .quarter-size-img-mobile, #single-container .eighth-size-img-mobile{
-                width: unset;
-            }
-            #single-container .full-size-img{
-                width: 100% !important;
-            }
-            #single-container .less-size-img{
-                width: 75% !important;
-            }
-            #single-container .half-size-img{
-                width: 50% !important;
-            }
-            #single-container .quarter-size-img{
-                width: 25% !important;
-            }
-            #single-container .eighth-size-img{
-                width: 12.5% !important;
-            }
-
-            /* classes para animações de lotties */
-            #single-container .lottie-anim{
-                margin: auto;
-            }
-            #single-container .lottie-size-80-desktop, #single-container .lottie-size-80{
-                width: 80%;
-            }
-            #single-container .lottie-size-70-desktop, #single-container .lottie-size-70{
-                width: 70%;
-            }
-            #single-container .lottie-size-60-desktop, #single-container .lottie-size-60{
-                width: 60%;
-            }
-            #single-container .lottie-size-50-desktop, #single-container .lottie-size-50{
-                width: 50%;
-            }
-            #single-container .lottie-size-40-desktop, #single-container .lottie-size-40{
-                width: 40%;
-            }
-            #single-container .lottie-size-30-desktop, #single-container .lottie-size-30{
-                width: 30%;
-            }
-            #single-container .lottie-size-20-desktop, #single-container .lottie-size-20{
-                width: 20%;
-            }
-
-            /* classes utils */
-            #single-container .hide-desktop{
-                display: none;
-            }
-
-            #single-container .youtube-player {
-                width: 100%;
-                /* Or set a specific width */
-                height: auto;
-                aspect-ratio: 16 / 9;
-                margin-bottom: 6vw;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                background-color: black;
-            }
-        `);
-
-        if (!cachedPostsHtml)
-            this.loadData();
-    }
-
-    /** @override */
-    async loadData() {
-        const div = document.getElementById('single-container');
-        if (!div) return;
-
-        try {
-            // Simula a demora
-            await new Promise(resolve => setTimeout(resolve, 500));
-
-            const response = await (await fetch('/_mocks/single.json'));
-            const artigo = await response.json();
-            const content = this.processSingleContent(artigo.content); // faz substituições de tags marcadas no artigo
-
-            let stringHtml = `
-                <algol-grid-layout posh="stretch" cols="1fr">
-                    <algol-grid-item
-                    img="${IMAGE_BUCKET}${artigo.featured_image_url}"
-                    padding="15vw 5vw"
-                    paddingbreak="30vw 5vw"
-                    imgrepeat="no-repeat"
-                    imgsize="cover"
-                    imgpos="right"
-                    imgoverlay="0.6"
-                    posh="stretch">
-                        <h2 style="text-align: center; color: white; text-shadow: 0 calc(0.1vw * var(--scale-factor)) calc(0.1vw * var(--scale-factor)) black;">${artigo.title}</h2>
-                        <algol-spacer value="1.5"></algol-spacer>
-                        <p style="text-align: center; color: white;">${artigo.excerpt}</p>
-                        <algol-spacer value="1.5"></algol-spacer>
-                        <p style="text-align: center; color: white;">${artigo.date}</p>
-                    </algol-grid-item>
-
-                    <algol-grid-item id="single-container">
-                        ${content}
-                    </algol-grid-item>
-                </algol-grid-layout>
-            `;
-
-            div.outerHTML = stringHtml; // substitui a div pelo <algol-grid-layout>
-
-        } catch (error) {
-            console.error("Erro ao carregar artigos:", error);
-            div.innerHTML = "<p>Erro ao carregar conteúdos.</p>";
-        }
-    }
-
-    processSingleContent(rawContent) {
-        if (!rawContent) return '';
-
-        // Substitui todas as ocorrências de [[[filebucket]]] pelo domínio das imagens
-        let processedContent = rawContent.replaceAll('[[[filebucket]]]', IMAGE_BUCKET);
-        // Substituição do Domain
-        processedContent = processedContent.replaceAll('[[[domain]]]', window.location.origin);
-
-        return processedContent;
-    }
-
-}
-
-// ====================================
 // 📁 ./public\js\pages\single.js
 // ====================================
 
 class PageSingle extends PageBase{
 
-    constructor(container) {
-        super(container);
+    constructor(container, params) {
+        super(container, params);
     }
 
     /** @override */
-    render() {
+    async render() {
         let cachedPostsHtml = null;// sessionStorage.getItem(this.dataCacheKey);
 
         const postsContent = cachedPostsHtml
@@ -1084,6 +1169,7 @@ class PageSingle extends PageBase{
         this.injectStyle(/* css */`
             #single-container{
                 background-color: white;
+                padding: 1vw
             }
             #single-container a:link{
                 text-decoration: underline;
@@ -1121,10 +1207,33 @@ class PageSingle extends PageBase{
                 margin-top: 7vw;
                 border: 0.2vw solid #ccc;
             }
+           
             #single-container img{
                 max-width: 100%;
                 height: auto;
                 margin: auto;
+            }
+            #single-container .youtube-player{
+                width: 100%;
+                height: auto;
+                aspect-ratio: 16 / 9;
+                margin-bottom: 60px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                background-color: #000;
+            }
+            #single-container .youtube-player .play{
+                z-index: 1;
+                position: absolute;
+                cursor: pointer;
+                width: 15vw;
+            }
+            #single-container .youtube-player #video-thumb{
+                width: 100% !important;
+                height: auto;
+                opacity: .5;
+                z-index: 0;
             }
 
             /* classes para estilização de tabelas */
@@ -1433,7 +1542,7 @@ class PageSingle extends PageBase{
         `);
 
         if (!cachedPostsHtml)
-            this.loadData();
+            await this.loadData();
     }
 
     /** @override */
@@ -1443,7 +1552,7 @@ class PageSingle extends PageBase{
 
         try {
 
-            const response = await fetch(`/api/single${window.location.pathname}`);
+            const response = await fetch(`/api/post/${this.params.slug}`);
             const artigo = await response.json();
 
 
@@ -1466,6 +1575,10 @@ class PageSingle extends PageBase{
                         <algol-spacer value="1.5"></algol-spacer>
                         <p style="text-align: center; color: white;">${artigo.date}</p>
                     </algol-grid-item>
+                    
+                    <algol-grid-item>
+                        <algol-spacer value="1.5"></algol-spacer>
+                    </algol-grid-item>
 
                     <algol-grid-item id="single-container">
                         ${content}
@@ -1474,6 +1587,7 @@ class PageSingle extends PageBase{
             `;
 
             div.outerHTML = stringHtml; // substitui a div pelo <algol-grid-layout>
+            this.attachVideoEvents();
 
         } catch (error) {
             console.error("Erro ao carregar artigos:", error);
@@ -1489,7 +1603,57 @@ class PageSingle extends PageBase{
         // Substituição do Domain
         processedContent = processedContent.replaceAll('[[[domain]]]', window.location.origin);
 
+        // === parse das tags do YOUTUBE ===
+        // Regex captura o <img...> (grupo 1) e o ID do vídeo (grupo 2), ignorando possíveis quebras de linha ou tags <p> do editor
+        const regexYT = /(<img[^>]*id="video-thumb"[^>]*>)\s*(?:<\/?p>|<br>)*\s*\[youtubeVideo\](.*?)\[\/youtubeVideo\]\s*(?:<\/?p>|<br>)*/gi;
+        
+        processedContent = processedContent.replace(regexYT, (match, imgTag, videoId) => {
+            const playBtnBase64 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAHMAAABRBAMAAAATCYToAAAAAXNSR0IB2cksfwAAAAlwSFlzAAALEwAACxMBAJqcGAAAAB5QTFRF/wAA////AAAA/wAA/wAA/wAA/wAA/5SU/zs7/8vL9SIQUQAAAAp0Uk5T//8AmsoVWv///yxtBrEAAAGnSURBVHicxdi9bsJADABgSwT2myhbRHudEQTmSIQdpT3mKGlubreOHfsIfdxeiCoSge3EVoWzZODLofv1GZb9sM77anOOJAvRvu68r13e/2UMHVMlWQpEROFDvs771J4SEvVi7zrUvg1259brCx0ngy3/6MtICTDJW2rT0RQOLR3f6LnZhhYCCmVDrUTCtKGPIjpp6FFEozzQQkShDHQlo+sYJKPaxCFQmYSpij4L6UxOJzHIZoSKRjE8SekRXoUUUPrN0iI8N+PjXU7Nl5wuGLvCqZlzFFlzgTKWpOZHTkmb0tQQQ8RRwqbhISk+RCzFLU/NnGiXoeZBTtEhGkDNp5wiQzSILuT09j8eQpF+GkDlPYzOCZZi8j/n8AJddSyl1iu91IkdhqHyvYncTVX7cIFS5uQgKHfmEMcVd0riFNkZuhRJTPlTXZ5LKNKQQBV5kyJbu0N6ObtXKq3I/RU3Ds09Rzidct2dTnGTlPXTWntrVtzVFRWCpS3G0u2lGjKyp7bdGkw1vAYT7et+5ce6U5VkHMv2u9pdFY3acO7kvd9ch7+qOMW/pI+FJpVAMyIAAAAASUVORK5CYII=";
+            
+            return `
+            <div class="youtube-player" data-id="${videoId}">
+                <img decoding="async" class="play" width="115" height="81" src="${playBtnBase64}" alt="algol-youtube-play">
+                ${imgTag}
+            </div>
+            `;
+        });
+        
         return processedContent;
+    }
+
+    /** Busca todos os botões de play renderizados e atrela o evento de clique */
+    attachVideoEvents() {
+        // Busca todos os botões com a classe 'play' dentro de 'youtube-player'
+        const playButtons = this.container.querySelectorAll('.youtube-player .play');
+        
+        playButtons.forEach(btn => {
+            btn.addEventListener('click', (event) => this.playYoutubeVideo(event));
+        });
+    }
+
+    /** Lógica de substituição da div pelo iframe */
+    playYoutubeVideo(event) {
+        // event.currentTarget pega exatamente o elemento que sofreu o clique (a imagem)
+        const playBtn = event.currentTarget;
+        const playerContainer = playBtn.closest('.youtube-player');
+        
+        if (!playerContainer) return;
+
+        const videoId = playerContainer.getAttribute('data-id');
+        const separador = videoId.includes('?') ? '&' : '?';
+        const iframeSrc = `https://www.youtube.com/embed/${videoId}${separador}autoplay=1`;
+
+        const iframeHTML = /* html */`
+            <iframe 
+                src="${iframeSrc}" 
+                allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" 
+                frameborder="0" 
+                allowfullscreen="1"
+                style="width: 100%; height: 100%; aspect-ratio: 16/9;">
+            </iframe>
+        `;
+
+        playerContainer.innerHTML = iframeHTML;
     }
 
 }
@@ -1500,12 +1664,17 @@ class PageSingle extends PageBase{
 /** Classe base de uma página SPA */
 class PageBase {
 
-    constructor(container) {
+    constructor(container, params = {}) {
         this.container = container; // container alvo da renderização
+        this.params = params;
+    }
+
+    async start(){
+        await this.render();
     }
 
     /** @abstract */
-    render() {
+    async render() {
         throw "render() não implementado";
     }
     
@@ -1532,6 +1701,9 @@ const urlRoutes = {
     "/posts": PagePosts,
     "/publications": PagePublications,
     "/courses": PageCourses,
+    "/courses/basic-programming-part-01": PageBasicProg01,
+    "/courses/basic-programming-part-02": PageBasicProg02,
+    "/courses/algorithm-analysis-part-01": PageAlgoAnalysis01,
     404: Page404,
 };
 
@@ -1545,9 +1717,11 @@ const route = (event) =>{
 /** função que gerencia a mudança dinâmica de conteúdo */
 const spa_container = document.getElementById('spa-container');
 const handleLocation = async () => {
+    hideApp();
     const path = window.location.pathname; // captura o caminho da url
     let pageClass = urlRoutes[path]; // seleciona a classe(página), com base na rota
     let slug = null;
+    let params = {}; // Objeto de parâmetros para passar para as páginas
 
     // Se a rota não existir no dicionário, assumimos que é uma página Single (rota dinâmica na raiz)
     if (!pageClass) {
@@ -1556,6 +1730,7 @@ const handleLocation = async () => {
         // Evita erro caso o path seja apenas uma barra solta ou algo bizarro não mapeado
         if (slug.length > 0) {
             pageClass = PageSingle; // Direciona para a página do post
+            params = { slug } // passa o slug do artigo a ser carregado para a página single
         } else {
             pageClass = urlRoutes[404];
         }
@@ -1567,11 +1742,13 @@ const handleLocation = async () => {
         oldStyle.remove();
     }
 
-    const page = new pageClass(spa_container) // instancia a classe da página da rota atual
-    page.render(); // invoca a funçao de renderização da página
+    const page = new pageClass(spa_container, params) // instancia a classe da página da rota atual
+    await page.start(); // invoca a funçao de construção da página
+    showApp();
 }
 
 window.onpopstate = handleLocation; // para quando o usuário usar os botões de avançar e voltar
 window.route = route; // Expõe a função route no escopo global para que os onclick="route(event)" funcionem
-handleLocation(); // Garante que a rota inicial seja processada no carregamento
+window.handleLocation = handleLocation; // Exponha o handleLocation globalmente
+
 

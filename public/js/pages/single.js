@@ -6,7 +6,7 @@ class PageSingle extends PageBase{
     }
 
     /** @override */
-    render() {
+    async render() {
         let cachedPostsHtml = null;// sessionStorage.getItem(this.dataCacheKey);
 
         const postsContent = cachedPostsHtml
@@ -25,6 +25,7 @@ class PageSingle extends PageBase{
         this.injectStyle(/* css */`
             #single-container{
                 background-color: white;
+                padding: 1vw
             }
             #single-container a:link{
                 text-decoration: underline;
@@ -62,10 +63,33 @@ class PageSingle extends PageBase{
                 margin-top: 7vw;
                 border: 0.2vw solid #ccc;
             }
+           
             #single-container img{
                 max-width: 100%;
                 height: auto;
                 margin: auto;
+            }
+            #single-container .youtube-player{
+                width: 100%;
+                height: auto;
+                aspect-ratio: 16 / 9;
+                margin-bottom: 60px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                background-color: #000;
+            }
+            #single-container .youtube-player .play{
+                z-index: 1;
+                position: absolute;
+                cursor: pointer;
+                width: 15vw;
+            }
+            #single-container .youtube-player #video-thumb{
+                width: 100% !important;
+                height: auto;
+                opacity: .5;
+                z-index: 0;
             }
 
             /* classes para estilização de tabelas */
@@ -374,7 +398,7 @@ class PageSingle extends PageBase{
         `);
 
         if (!cachedPostsHtml)
-            this.loadData();
+            await this.loadData();
     }
 
     /** @override */
@@ -407,6 +431,10 @@ class PageSingle extends PageBase{
                         <algol-spacer value="1.5"></algol-spacer>
                         <p style="text-align: center; color: white;">${artigo.date}</p>
                     </algol-grid-item>
+                    
+                    <algol-grid-item>
+                        <algol-spacer value="1.5"></algol-spacer>
+                    </algol-grid-item>
 
                     <algol-grid-item id="single-container">
                         ${content}
@@ -415,6 +443,7 @@ class PageSingle extends PageBase{
             `;
 
             div.outerHTML = stringHtml; // substitui a div pelo <algol-grid-layout>
+            this.attachVideoEvents();
 
         } catch (error) {
             console.error("Erro ao carregar artigos:", error);
@@ -430,7 +459,57 @@ class PageSingle extends PageBase{
         // Substituição do Domain
         processedContent = processedContent.replaceAll('[[[domain]]]', window.location.origin);
 
+        // === parse das tags do YOUTUBE ===
+        // Regex captura o <img...> (grupo 1) e o ID do vídeo (grupo 2), ignorando possíveis quebras de linha ou tags <p> do editor
+        const regexYT = /(<img[^>]*id="video-thumb"[^>]*>)\s*(?:<\/?p>|<br>)*\s*\[youtubeVideo\](.*?)\[\/youtubeVideo\]\s*(?:<\/?p>|<br>)*/gi;
+        
+        processedContent = processedContent.replace(regexYT, (match, imgTag, videoId) => {
+            const playBtnBase64 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAHMAAABRBAMAAAATCYToAAAAAXNSR0IB2cksfwAAAAlwSFlzAAALEwAACxMBAJqcGAAAAB5QTFRF/wAA////AAAA/wAA/wAA/wAA/wAA/5SU/zs7/8vL9SIQUQAAAAp0Uk5T//8AmsoVWv///yxtBrEAAAGnSURBVHicxdi9bsJADABgSwT2myhbRHudEQTmSIQdpT3mKGlubreOHfsIfdxeiCoSge3EVoWzZODLofv1GZb9sM77anOOJAvRvu68r13e/2UMHVMlWQpEROFDvs771J4SEvVi7zrUvg1259brCx0ngy3/6MtICTDJW2rT0RQOLR3f6LnZhhYCCmVDrUTCtKGPIjpp6FFEozzQQkShDHQlo+sYJKPaxCFQmYSpij4L6UxOJzHIZoSKRjE8SekRXoUUUPrN0iI8N+PjXU7Nl5wuGLvCqZlzFFlzgTKWpOZHTkmb0tQQQ8RRwqbhISk+RCzFLU/NnGiXoeZBTtEhGkDNp5wiQzSILuT09j8eQpF+GkDlPYzOCZZi8j/n8AJddSyl1iu91IkdhqHyvYncTVX7cIFS5uQgKHfmEMcVd0riFNkZuhRJTPlTXZ5LKNKQQBV5kyJbu0N6ObtXKq3I/RU3Ds09Rzidct2dTnGTlPXTWntrVtzVFRWCpS3G0u2lGjKyp7bdGkw1vAYT7et+5ce6U5VkHMv2u9pdFY3acO7kvd9ch7+qOMW/pI+FJpVAMyIAAAAASUVORK5CYII=";
+            
+            return `
+            <div class="youtube-player" data-id="${videoId}">
+                <img decoding="async" class="play" width="115" height="81" src="${playBtnBase64}" alt="algol-youtube-play">
+                ${imgTag}
+            </div>
+            `;
+        });
+        
         return processedContent;
+    }
+
+    /** Busca todos os botões de play renderizados e atrela o evento de clique */
+    attachVideoEvents() {
+        // Busca todos os botões com a classe 'play' dentro de 'youtube-player'
+        const playButtons = this.container.querySelectorAll('.youtube-player .play');
+        
+        playButtons.forEach(btn => {
+            btn.addEventListener('click', (event) => this.playYoutubeVideo(event));
+        });
+    }
+
+    /** Lógica de substituição da div pelo iframe */
+    playYoutubeVideo(event) {
+        // event.currentTarget pega exatamente o elemento que sofreu o clique (a imagem)
+        const playBtn = event.currentTarget;
+        const playerContainer = playBtn.closest('.youtube-player');
+        
+        if (!playerContainer) return;
+
+        const videoId = playerContainer.getAttribute('data-id');
+        const separador = videoId.includes('?') ? '&' : '?';
+        const iframeSrc = `https://www.youtube.com/embed/${videoId}${separador}autoplay=1`;
+
+        const iframeHTML = /* html */`
+            <iframe 
+                src="${iframeSrc}" 
+                allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" 
+                frameborder="0" 
+                allowfullscreen="1"
+                style="width: 100%; height: 100%; aspect-ratio: 16/9;">
+            </iframe>
+        `;
+
+        playerContainer.innerHTML = iframeHTML;
     }
 
 }

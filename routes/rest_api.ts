@@ -7,6 +7,16 @@ const postsService = new PostsService();
 
 export const apiRoutes = new Elysia({ prefix: '/api'})
     .use(globals) // para acessar as variáveis globais
-    .get('/simple-posts/:max', async ({ params }) => await postsService.getSimplePosts(params.max))
+    .get('/simple-posts/', async ({query }) => {
+        const limit = Number(query.limit) || 6;
+        const lang = query.lang || 'pt-br';
+        return await postsService.getSimplePosts(limit, lang);
+    })
+    .get('/paginated-posts/', async ({ query }) => {
+        const page = Number(query.page) || 1;
+        const limit = Number(query.limit) || 6;
+        const lang = query.lang || 'pt-br';
+        return await postsService.getPaginatedPosts(page,limit,lang);
+    })
     .get('/post/:slug', async ({ params }) => await postsService.getPost(params.slug))
 ;
