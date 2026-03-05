@@ -1,4 +1,4 @@
-import { count, eq } from "drizzle-orm";
+import { count, eq, getTableColumns} from "drizzle-orm";
 import { Database } from "../database";
 import { posts, idioms } from "../schema";
 import type { SimplePosts, Posts, NewPosts } from "../schema";
@@ -15,13 +15,20 @@ export class PostsDAO{
         const result = await this.db.insert(posts).values(data).returning();
         return result[0];
     }
-    public async getPost(slug: string): Promise<Posts|undefined>{
-        const result = await this.db.select() // equivale a select *
+    // Atualizamos a Promise para refletir que agora o objeto traz um campo extra
+    public async getPost(slug: string): Promise<(Posts & { idiom_name: string }) | undefined> {
+        const result = await this.db.select({
+            ...getTableColumns(posts), // Despeja todas as colunas da tabela posts
+            idiom_name: idioms.name    // Adiciona o campo específico da tabela idioms
+        })
         .from(posts)
+        .innerJoin(idioms, eq(posts.idioms_id, idioms.id)) // Realiza o Join
         .where(eq(posts.slug, slug))
-        .limit(1); // otimização para retornar apenas o primeiro resultado encontrado
+        .limit(1); 
+
         return result[0];
     }
+    
     public async getSimplePosts(limit: number, lang: string): Promise<SimplePosts[]> {
         const result = await this.db.select({
             id: posts.id,

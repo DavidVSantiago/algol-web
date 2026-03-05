@@ -1,0 +1,28 @@
+{
+    "pt-br": {
+        "hero_title": "Conheça as nossas publicações",
+        "book1_title": "Game Dev Series vol.01:",
+        "book1_subtitle": "Fundamentos de algoritmos para jogos digitais (versão Java).",
+        "book1_desc": "Diferente de tudo o que você já leu sobre programação para jogos! Aprenda a criar jogos usando apenas código de programação. Sem o uso de nenhuma Game Engine! Pensado nos mínimos detalhes, o GDS1 (Game Dev Series vol.01) te fornece, em 12 capítulos recheados de conteúdo, um passo a passo fantástico para você programar se divertindo.",
+        "book1_isbn": "ISBN: 978-65-00-07450-5",
+        "book1_pages": "Páginas: 360",
+        "book1_year": "Ano de publicação: 2020",
+        "book1_publisher": "Editora: Algol.dev",
+        "btn_download_book": "Baixar o livro",
+        "btn_download_files": "Baixar arquivos do livro",
+        "btn_test_game": "Testar jogo"
+    },
+    "en-us": {
+        "hero_title": "Discover our publications",
+        "book1_title": "Game Dev Series vol.01:",
+        "book1_subtitle": "Algorithm fundamentals for digital games (Java version).",
+        "book1_desc": "Unlike anything you have ever read about game programming! Learn to create games using only programming code. No Game Engine required! Thought out to the smallest detail, GDS1 (Game Dev Series vol.01) provides you, in 12 chapters packed with content, a fantastic step-by-step guide to programming while having fun.",
+        "book1_isbn": "ISBN: 978-65-00-07450-5",
+        "book1_pages": "Pages: 360",
+        "book1_year": "Publication year: 2020",
+        "book1_publisher": "Publisher: Algol.dev",
+        "btn_download_book": "Download the book",
+        "btn_download_files": "Download book files",
+        "btn_test_game": "Test game"
+    }
+}

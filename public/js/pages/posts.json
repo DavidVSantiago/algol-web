@@ -1,0 +1,14 @@
+{
+    "pt-br": {
+        "loading": "Carregando conteúdo...",
+        "hero_title": "Os mais variados assuntos sobre computação e tecnologia",
+        "loading_page": "Carregando página",
+        "error_load": "Erro ao carregar conteúdos."
+    },
+    "en-us": {
+        "loading": "Loading content...",
+        "hero_title": "A wide variety of topics on computing and technology",
+        "loading_page": "Loading page",
+        "error_load": "Error loading content."
+    }
+}

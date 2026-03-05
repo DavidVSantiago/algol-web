@@ -1,49 +1,24 @@
-
 class PageHome extends PageBase{
 
     constructor(container, params) {
         super(container, params);
-        this.dataCacheKey = 'dataCacheHome'; // cache de dados json, se houver
-        this.i18nCacheKey = 'i18nHome'; // cache das traduções
-        this.t = null; // guardará o dicionário atual
     }
 
-    async loadTranslations(lang){
-        if(this.t) return; // se ja carregou, encerra
+    /** ****************************************************** */
+    /** MÉTODOS SOBRESCRITOS ********************************* */
+    /** ****************************************************** */
 
-        // tenta buscar o dicionário no cache (para evitar fetch)
-        const cachedI18n = sessionStorage.getItem(this.i18nCacheKey);
-        if(cachedI18n){ // se conseguiu recuperar o dicionario do cache
-            const allTranslations = JSON.parse(cachedI18n); // desistringfica
-            this.t = allTranslations[lang] || allTranslations['pt-br']; // obtém o objeto do idioma
-            return;
-        }
+    /** @override */
+    getPageId() { return 'home'; }
 
-        // se não há cache, mostra msg de loading pra fazer fetch
-        this.container.innerHTML = `<h2 style="text-align: center; margin-top: 5vw;">Loading...</h2>`;
-        try {
-            // busca as traduções da página
-            const response = await fetch('/js/pages/home.json');
-            const allTranslations = await response.json();
-            // Salva o JSON completo no cache
-            sessionStorage.setItem(this.i18nCacheKey, JSON.stringify(allTranslations));
-            // obtém o objeto do idioma
-            this.t = allTranslations[lang] || allTranslations['pt-br'];
-        } catch (error) {
-            console.error("Erro ao carregar home.json:", error);
-            // Fallback de emergência caso o arquivo falhe
-            this.t = { loading: "Carregando...", hero_title: "Computação", error_load: "Erro." }; 
-        }
-    }
+    /** @override apenas se houver tradução para as páginas */ 
+    getTranslationPath() { return '/js/pages/home.json'; }
 
     /** @override */
     async render() {
         const lang = document.documentElement.lang || 'pt-br';
 
-        // 1. Aguarda as traduções estarem prontas
-        await this.loadTranslations(lang);
-
-        let cachedPostsHtml = null;// sessionStorage.getItem(this.dataCacheKey);
+        let cachedPostsHtml = null;// sessionStorage.getItem(this.cacheKeys.data);
 
         const postsContent = cachedPostsHtml
             ? cachedPostsHtml
@@ -128,11 +103,15 @@ class PageHome extends PageBase{
             `).join('');
             stringHtml += `</algol-grid-layout>`
             div.outerHTML = stringHtml; // substitui a div pelo <algol-grid-layout>
-            sessionStorage.setItem(this.dataCacheKey, stringHtml); // salva no cache do sessionStorage para evitar recarregar do servidor
+            sessionStorage.setItem(this.cacheKeys.data, stringHtml); // salva no cache do sessionStorage para evitar recarregar do servidor
 
         } catch (error) {
             console.error("Erro ao carregar artigos:", error);
             div.innerHTML = "<p>Erro ao carregar conteúdos.</p>";
         }
     }
+
+    /** ****************************************************** */
+    /** MÉTODOS ESPECÍFICOS ********************************** */
+    /** ****************************************************** */
 }

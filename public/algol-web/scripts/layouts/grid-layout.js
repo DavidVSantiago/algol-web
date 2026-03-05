@@ -34,7 +34,13 @@ class GridLayout extends BaseLayout {
             'colorbreak': '--grid-layout-colorbreak'
         };
     }
-    static get observedAttributes() {return Object.keys(GridLayout.ATTR_MAP);} // retorna a chaves do mapa de atributos
+    static get PROP_MAP() {
+        return {
+            'padding': 'update_padding',
+            'paddingbreak': 'update_paddingbreak',
+        };
+    }
+    static get observedAttributes() {return [...Object.keys(GridLayout.PROP_MAP), ...Object.keys(GridLayout.ATTR_MAP)];}
     constructor() {super();}
 
     // ****************************************************************************
@@ -50,6 +56,36 @@ class GridLayout extends BaseLayout {
     }
 
     // ****************************************************************************
+    // Métodos dos atributos
+    // ****************************************************************************
+
+    update_padding(val) {
+        this.style.setProperty('--grid-layout-padding', this._adjustPadding(val));
+    }
+    update_paddingbreak(val) {
+        this.style.setProperty('--grid-layout-paddingbreak', this._adjustPadding(val));
+    }
+
+    // ****************************************************************************
+    // Utils
+    // ****************************************************************************
+
+    _adjustPadding(val) {
+        if (!val) return '0vw'; // guard!
+        // 1. Converte para string, remove espaços extras nas pontas e divide pelos espaços internos
+        // O regex /\s+/ garante que múltiplos espaços contem como apenas um separador
+        const partes = val.toString().trim().split(/\s+/);
+        // 2. Mapeia cada parte (ex: "10", "20px") para o formato "Xvw"
+        const valoresConvertidos = partes.map(parte => {
+            const num = parseFloat(parte); 
+            // Se for número válido retorna com vw, senão retorna 0vw
+            return !isNaN(num) ? `${num}vw` : '0vw';
+        });
+        // 3. Junta tudo de volta em uma string separada por espaços
+        return valoresConvertidos.join(' ');
+    }
+
+    // ****************************************************************************
     // Injeção de estilo CSS
     // ****************************************************************************
     
@@ -61,6 +97,7 @@ class GridLayout extends BaseLayout {
                 justify-items: var(--grid-layout-posh, none);
                 align-items: var(--grid-layout-posv, none);
                 background-color: var(--grid-layout-color, none);
+                padding: var(--grid-layout-padding, none);
             }
                 
             @media (max-width: ${MOBILE_BREAKPOINT}) {
@@ -69,6 +106,7 @@ class GridLayout extends BaseLayout {
                 algol-grid-layout[poshbreak] {justify-items: var(--grid-layout-poshbreak) !important;}
                 algol-grid-layout[posvbreak] {align-items: var(--grid-layout-posvbreak) !important;}
                 algol-grid-layout[colorbreak] {background-color: var(--grid-layout-colorbreak) !important;}
+                algol-grid-layout[paddingbreak]{padding: var(--grid-layout-paddingbreak);}
             }
         `;
         BaseLayout._injectStyleOnHead('algol-grid-layout-style', css);

@@ -1,4 +1,2 @@
-- Criar os dicionarios de idioma das páginas 'post' e 'publication'
-- Propor uma reestruturação da hierarquia de páginas, para generalizar o sistema de dicionario de idiomas.
-   * a ideia é que a a classe base realize todos os procedimentos de carregamento da página de idiomas.
 - Propor o sistema para o primeiro nível de cache das páginas, que deve levar em consiuderação o idioma.
+- Resolver o CSS dos singles

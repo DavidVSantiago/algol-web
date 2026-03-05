@@ -3,38 +3,6 @@ const IMAGE_BUCKET = 'http://localhost:8080'; // fazer com que este valor seja e
 // lê no localstorage o idioma atual
 const currentLang = localStorage.getItem('app_lang') || 'pt-br';
 
-// Dicionário de traduções globais (Menu e Footer)
-const i18n = {
-    "pt-br": {
-        menu: {
-            home: "HOME",
-            articles: "ARTIGOS",
-            publications: "PUBLICAÇÕES",
-            courses: "CURSOS"
-        },
-        footer: {
-            subscribe: "Inscreva-se",
-            terms: "Termos de uso",
-            privacy: "Política de privacidade",
-            rights: "Todos os direitos reservados."
-        }
-    },
-    "en-us": {
-        menu: {
-            home: "HOME",
-            articles: "ARTICLES",
-            publications: "PUBLICATIONS",
-            courses: "COURSES"
-        },
-        footer: {
-            subscribe: "Subscribe",
-            terms: "Terms of use",
-            privacy: "Privacy policy",
-            rights: "All rights reserved."
-        }
-    }
-};
-
 document.documentElement.lang = currentLang; // atualiza o idioma da página
 
 let t = null;
@@ -56,7 +24,7 @@ async function initLayout() {
         await window.handleLocation();
         showApp();
     } catch (error) {
-        console.error("Erro ao carregar o arquivo index.json:", error);
+        console.error("Erro:", error);
     }
 }
 
@@ -104,7 +72,6 @@ function createMenu(){
     const butons = document.querySelectorAll('#menu li:has(a)');
     butons.forEach(button => {
         button.addEventListener("click", function (event) {
-            console.log("FUNFOU!");
             document.getElementById('menu').hide();
         });
     });
@@ -151,15 +118,15 @@ function changeLanguage(newLang) {
     // 1. Salva a nova preferência no localstorage
     localStorage.setItem('app_lang', newLang);
 
+    document.documentElement.lang = newLang; // altera na tag html
+
+    // TODO - Essa mecanica abaixo tem que levar em consideração a politica de cache que ainda será implementada
     // 2. Limpa o sessionStorage. 
     // Como suas classes PageHome e PagePosts usam sessionStorage para evitar recarregar dados do Elysia,
     // nós precisamos limpar esse cache. Caso contrário, o layout muda para inglês, mas os posts continuam em português.
     sessionStorage.clear();
 
-    // 3. Recarrega a página. 
-    // Em uma SPA, o reload reinicia o JS, pega o novo 'app_lang' logo no início do script, 
-    // refaz o menu/footer traduzidos e o router carrega a página atual com o idioma novo.
-    window.location.reload();
+    window.location.reload(); // 3. Recarrega a página para reaplicar as traduções
 }
 
 // esconde toda a aplicação

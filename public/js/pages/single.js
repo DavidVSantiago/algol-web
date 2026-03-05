@@ -5,16 +5,26 @@ class PageSingle extends PageBase{
         super(container, params);
     }
 
+    /** ****************************************************** */
+    /** MÉTODOS SOBRESCRITOS ********************************* */
+    /** ****************************************************** */
+
+    /** @override */
+    getPageId() { return 'single'; }
+
+    /** @override apenas se houver tradução para as páginas */ 
+    getTranslationPath() { return '/js/pages/single.json'; }
+
     /** @override */
     async render() {
-        let cachedPostsHtml = null;// sessionStorage.getItem(this.dataCacheKey);
+        let cachedPostsHtml = null;
 
         const postsContent = cachedPostsHtml
             ? cachedPostsHtml
             : /* html */`
                 <div id="single-container">
                     <h2 style="text-align: center;">
-                        Carregando conteúdo...
+                        ${this.t.loading}
                     </h2>
                </div>`;
                
@@ -25,7 +35,8 @@ class PageSingle extends PageBase{
         this.injectStyle(/* css */`
             #single-container{
                 background-color: white;
-                padding: 1vw
+                padding: 1vw;
+                margin: 0 10vw 3vw 10vw;
             }
             #single-container a:link{
                 text-decoration: underline;
@@ -341,6 +352,11 @@ class PageSingle extends PageBase{
             }
 
             @media (max-width:${MOBILE_BREAKPOINT}){
+                #single-container{
+                    padding: 2vw;
+                    margin: 0 0 10vw 0;
+                }
+
                 /***********************************************************************************************
                 Flexbox Layout
                 ***********************************************************************************************/
@@ -411,45 +427,54 @@ class PageSingle extends PageBase{
             const response = await fetch(`/api/post/${this.params.slug}`);
             const artigo = await response.json();
 
+            let stringHtml = "";
 
-            const content = this.processSingleContent(artigo.content); // faz substituições de tags marcadas no artigo
+            if(document.documentElement.lang != artigo.idiom_name){ // se o idioma da página for diferente ao do artigo
+                stringHtml = `
+                <h2 style="margin: 5vw">${this.t.invalid_idiom}</h2>
+                `
+            }else{ // apenas constroi o conteúdo do single se o idioma for válido
+                const content = this.processSingleContent(artigo.content); // faz substituições de tags marcadas no artigo
+                stringHtml = `
+                    <algol-grid-layout posh="stretch" cols="1fr">
+                        <algol-grid-item
+                        img="${IMAGE_BUCKET}${artigo.featured_image_url}"
+                        padding="15vw 5vw"
+                        paddingbreak="30vw 5vw"
+                        imgrepeat="no-repeat"
+                        imgsize="cover"
+                        imgpos="right"
+                        imgoverlay="0.6"
+                        posh="stretch">
+                            <h2 style="text-align: center; color: white; text-shadow: 0 calc(0.1vw * var(--scale-factor)) calc(0.1vw * var(--scale-factor)) black;">${artigo.title}</h2>
+                            <algol-spacer value="1.5"></algol-spacer>
+                            <p style="text-align: center; color: white;">${artigo.excerpt}</p>
+                            <algol-spacer value="1.5"></algol-spacer>
+                            <p style="text-align: center; color: white;">${artigo.date}</p>
+                        </algol-grid-item>
+                        
+                        <algol-grid-item>
+                            <algol-spacer value="1.5"></algol-spacer>
+                        </algol-grid-item>
 
-            let stringHtml = `
-                <algol-grid-layout posh="stretch" cols="1fr">
-                    <algol-grid-item
-                    img="${IMAGE_BUCKET}${artigo.featured_image_url}"
-                    padding="15vw 5vw"
-                    paddingbreak="30vw 5vw"
-                    imgrepeat="no-repeat"
-                    imgsize="cover"
-                    imgpos="right"
-                    imgoverlay="0.6"
-                    posh="stretch">
-                        <h2 style="text-align: center; color: white; text-shadow: 0 calc(0.1vw * var(--scale-factor)) calc(0.1vw * var(--scale-factor)) black;">${artigo.title}</h2>
-                        <algol-spacer value="1.5"></algol-spacer>
-                        <p style="text-align: center; color: white;">${artigo.excerpt}</p>
-                        <algol-spacer value="1.5"></algol-spacer>
-                        <p style="text-align: center; color: white;">${artigo.date}</p>
-                    </algol-grid-item>
-                    
-                    <algol-grid-item>
-                        <algol-spacer value="1.5"></algol-spacer>
-                    </algol-grid-item>
-
-                    <algol-grid-item id="single-container">
-                        ${content}
-                    </algol-grid-item>
-                </algol-grid-layout>
-            `;
+                        <algol-grid-item id="single-container">
+                            ${content}
+                        </algol-grid-item>
+                    </algol-grid-layout>
+                `;
+            }
 
             div.outerHTML = stringHtml; // substitui a div pelo <algol-grid-layout>
             this.attachVideoEvents();
 
         } catch (error) {
-            console.error("Erro ao carregar artigos:", error);
-            div.innerHTML = "<p>Erro ao carregar conteúdos.</p>";
+            div.innerHTML = `<p>${this.t.error_load}</p>`;
         }
     }
+
+    /** ****************************************************** */
+    /** MÉTODOS ESPECÍFICOS ********************************** */
+    /** ****************************************************** */
 
     processSingleContent(rawContent) {
         if (!rawContent) return '';

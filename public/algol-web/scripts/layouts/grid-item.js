@@ -118,7 +118,7 @@ class GridItem extends BaseLayout {
                 algol-grid-item[rowspanbreak] {grid-row-end: var(--grid-item-rowspan-break) !important;}
                 algol-grid-item[poshbreak] {justify-self: var(--grid-item-poshbreak) !important;}
                 algol-grid-item[posvbreak] {align-self: var(--grid-item-posvbreak) !important;}
-                algol-grid-item[paddingbreak]{padding: var(--grid-item-paddingbreak);}
+                algol-grid-item[paddingbreak]{padding: var(--grid-item-paddingbreak) !important;}
                 algol-grid-item[colorbreak] {background-color: var(--grid-item-colorbreak) !important;}
             }
         `;

@@ -1,0 +1,12 @@
+{
+    "pt-br": {
+        "invalid_idiom": "Idioma da página inválido para este artigo!",
+        "loading": "Carregando conteúdo...",
+        "error_load": "Erro ao carregar conteúdos."
+    },
+    "en-us": {
+        "invalid_idiom": "The page language is invalid for this Post!",
+        "loading": "Loading content...",
+        "error_load": "Error loading content."
+    }
+}

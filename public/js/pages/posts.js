@@ -2,7 +2,6 @@ class PagePosts extends PageBase{
 
     constructor(container, params) {
         super(container, params);
-        this.dataCacheKey = 'dataCachePosts'; // cache de dados json, se houver
         // para paginação
         this.currentPage = 1;
         this.postsPerPage = 6;
@@ -10,16 +9,26 @@ class PagePosts extends PageBase{
         this.isLoading = false;
     }
 
+    /** ****************************************************** */
+    /** MÉTODOS SOBRESCRITOS ********************************* */
+    /** ****************************************************** */
+
+    /** @override */
+    getPageId() { return 'posts'; }
+
+    /** @override apenas se houver tradução para as páginas */ 
+    getTranslationPath() { return '/js/pages/posts.json'; }
+
     /** @override */
     async render() {
-        let cachedPostsHtml = null; // sessionStorage.getItem(this.dataCacheKey);
+        let cachedPostsHtml = null; // sessionStorage.getItem(this.cacheKeys.data);
 
         const postsContent = cachedPostsHtml
             ? cachedPostsHtml
             : /* html */`
                 <div id="posts-container">
                     <h2 style="text-align: center;">
-                        Carregando conteúdo...
+                        ${this.t.loading}
                     </h2>
                </div>`;
                
@@ -34,7 +43,7 @@ class PagePosts extends PageBase{
                 imgpos="right"
                 imgoverlay="0.6"
                 posh="stretch">
-                    <h2 style="text-align: center; color: white; text-shadow: 0 calc(0.1vw * var(--scale-factor)) calc(0.1vw * var(--scale-factor)) black;">Os mais variados assuntos sobre computação e tecnologia</h2>
+                    <h2 style="text-align: center; color: white; text-shadow: 0 calc(0.1vw * var(--scale-factor)) calc(0.1vw * var(--scale-factor)) black;">${this.t.hero_title}</h2>
                 </algol-grid-item>
                 
                 <algol-grid-item>
@@ -106,28 +115,31 @@ class PagePosts extends PageBase{
                 const wrapper = document.getElementById('posts-wrapper');
                 if (wrapper) wrapper.innerHTML = stringHtml;
 
-                sessionStorage.setItem(this.dataCacheKey + page, stringHtml);
+                sessionStorage.setItem(this.cacheKeys.data + page, stringHtml);
             }
 
             // Invoca a construção dos botões na interface
             this.renderPaginationBar();
 
         } catch (error) {
-            console.error("Erro ao carregar artigos:", error);
             const wrapper = document.getElementById('posts-wrapper');
-            if (wrapper) wrapper.innerHTML = "<p>Erro ao carregar conteúdos.</p>";
+            if (wrapper) wrapper.innerHTML = `<p>${this.t.error_load}</p>`;
         } finally {
             this.isLoading = false;
         }
     }
 
-     /** Muda a página e faz o scroll suave para o topo do conteúdo */
+    /** ****************************************************** */
+    /** MÉTODOS ESPECÍFICOS ********************************** */
+    /** ****************************************************** */
+
+    /** Muda a página e faz o scroll suave para o topo do conteúdo */
     async goToPage(page) {
         this.currentPage = page;
         
         const wrapper = document.getElementById('posts-wrapper');
         if (wrapper) {
-            wrapper.innerHTML = /* html */`<div style="display: flex; justify-content: center; width: 100%; padding: 5vw 0;"><h2>Carregando página ${page}...</h2></div>`;
+            wrapper.innerHTML = /* html */`<div style="display: flex; justify-content: center; width: 100%; padding: 5vw 0;"><h2>${this.t.loading_page} ${page}...</h2></div>`;
             wrapper.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
         
