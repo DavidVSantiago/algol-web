@@ -87,7 +87,7 @@
             // 2. Limpa o sessionStorage. 
             // Como suas classes PageHome e PagePosts usam sessionStorage para evitar recarregar dados do Elysia,
             // nós precisamos limpar esse cache. Caso contrário, o layout muda para inglês, mas os posts continuam em português.
-            sessionStorage.clear();
+            // sessionStorage.clear();
 
             window.location.reload(); // 3. Recarrega a página para reaplicar as traduções
         }

@@ -16,20 +16,9 @@ class PageSingle extends PageBase{
     getTranslationPath() { return '/pages/single.json'; }
 
     /** @override */
-    async render() {
-        let cachedPostsHtml = null;
-
-        const postsContent = cachedPostsHtml
-            ? cachedPostsHtml
-            : /* html */`
-                <div id="single-container">
-                    <h2 style="text-align: center;">
-                        ${this.t.loading}
-                    </h2>
-               </div>`;
-               
+    async render() {   
         this.container.innerHTML = `
-            ${postsContent}
+            <div id="single-container"></div>
         `;
 
         this.injectStyle(/* css */`
@@ -412,9 +401,8 @@ class PageSingle extends PageBase{
                 }
             }
         `);
-
-        if (!cachedPostsHtml)
-            await this.loadData();
+        
+        await this.loadData();
     }
 
     /** @override */

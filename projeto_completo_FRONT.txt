@@ -1,4 +1,247 @@
 // ====================================
+// 📁 ./public\algol-spa\page_base.js
+// ====================================
+/** Classe base de uma página SPA */
+class PageBase {
+
+    constructor(container, params = {}) {
+        this.container = container; // container alvo da renderização
+        this.params = params;
+
+        this.cacheKeys = {
+            data: `dataCache_${this.getPageId()}`, // para os dados da página
+            i18n: `i18nCache_${this.getPageId()}`// para o dicionário de traduções
+        };
+
+        this.t = null; // guardará todo o dicionario em memória
+
+    }
+
+    /** ****************************************************** */
+    /** MÉTODOS ABSTRATOS ************************************ */
+    /** ****************************************************** */
+
+    /** @abstract */
+    getPageId() {throw new Error("getPageId() deve retornar um identificador único da página");}
+    /** @abstract */
+    async render() {throw new Error("render() não implementado");}
+    /** @abstract */
+    async loadData() {throw new Error("loadData() não implementado");}
+    
+    /** ****************************************************** */
+    /** MÉTODOS CONCRETOS ************************************ */
+    /** ****************************************************** */
+    
+    getTranslationPath() {
+        return null;
+    }
+
+    async start(){
+        await this.loadTranslations(); // 1. Aguarda as traduções estarem prontas
+        await this.render(); // renderiza a página
+    }
+
+    async loadTranslations(){
+        if (!this.getTranslationPath()) return; // Se a página não definiu tradução, ignora o i18n silenciosamente
+        
+        if (this.t) return; // se ja carregou, encerra
+
+        const lang = document.documentElement.lang; // obtem o idioma atual do html
+
+        // tenta buscar o dicionário no cache (para evitar fetch)
+        const cachedI18n = sessionStorage.getItem(this.cacheKeys.i18n);
+        if(cachedI18n){ // se conseguiu recuperar o dicionario do cache
+            const allTranslations = JSON.parse(cachedI18n); // desistringfica
+            this.t = allTranslations[lang] || allTranslations['pt-br']; // obtém o objeto do idioma
+            return;
+        }
+
+        // se não há cache, mostra msg de loading pra fazer fetch
+        this.container.innerHTML = `<h2 style="text-align: center; margin-top: 5vw;">Loading...</h2>`;
+        try {
+            // busca as traduções da página
+            const response = await fetch(this.getTranslationPath());
+            if (!response.ok) {throw new Error(`HTTP ${response.status}`);}
+
+            const allTranslations = await response.json();
+            // Salva o JSON completo no cache
+            sessionStorage.setItem(this.cacheKeys.i18n, JSON.stringify(allTranslations));
+            // obtém o objeto do idioma
+            this.t = allTranslations[lang] || allTranslations['pt-br'];
+        } catch (error) {
+            console.error("Erro ao carregar home.json:", error);
+            // Fallback de emergência caso o arquivo falhe
+            this.t = { loading: "Carregando...", error_load:  "Erro ao carregar traduções." }; 
+        }
+    }
+
+    // Método utilitário para injetar CSS dinâmico
+    injectStyle(cssString, id = 'dynamic-page-style') {
+        const style = document.createElement('style');
+        style.id = id; // Mesmo ID que o roteador vai procurar para apagar
+        style.textContent = cssString;
+        document.head.appendChild(style);
+    }
+}
+
+// ====================================
+// 📁 ./public\algol-spa\router.js
+// ====================================
+// Variável global para armazenar as rotas após o fetch
+let config = { routes: {}, catchAll: null, notFound: null };
+let menuContainer = null; // Vai guardar a referência do menu
+let pageContainer = null; // Vai guardar a referência do DOM para renderização das páginas
+let footerContainer = null; // Vai guardar a referência do footer
+
+// Função para buscar o JSON dinamicamente
+async function loadConfig() {
+    try {
+        const response = await fetch('/config.json');
+        config = await response.json();
+    } catch (error) {
+        console.error("Erro ao carregar config.json:", error);
+    }
+}
+
+// O "motor de partida" do roteador
+const initRouter = async (menuId, spaId, footerId) => {
+    hideApp(); // esconde a aplicação inteira na tela
+
+    pageContainer = document.getElementById(spaId); // obtem a ref do container das páginas
+    menuContainer = document.getElementById(menuId); // obtem a ref do container do menu
+    footerContainer = document.getElementById(footerId); // obtem a ref do container do footer
+
+    if(!pageContainer){console.error(`[Router] Container principal '${spaId}' não encontrado.`); return;} // guard para id errado!
+    await loadConfig(); // Carrega o arquivo de configurações da aplicação
+
+    /** Insere o menu */
+    if (config.layout?.menuClass && menuContainer) { // se a classe do menu foi definida nas configurações e o id de inserção correto foi passado
+        try{
+            const MenuClass = new Function(`return ${config.layout.menuClass}`)(); // obtem a referência da classe do menu
+            if (MenuClass) {
+                const menuComp = new MenuClass(menuContainer); // instancia a classe do menu
+                await menuComp.start(); // monta o menu na tela
+            }
+        }catch (e) {
+            console.error(`Falha ao montar Menu: Classe ${config.layout.menuClass} não encontrada.`);
+        }
+    }
+
+    /** Insere o footer */
+    if (config.layout?.footerClass && footerContainer) { // se a classe do menu foi definida nas configurações e o id de inserção correto foi passado
+        try{
+            const FooterClass = new Function(`return ${config.layout.footerClass}`)(); // obtem a referência da classe do footer
+            if (FooterClass) {
+                const footerComp = new FooterClass(footerContainer); // instancia a classe do footer
+                await footerComp.start(); // monta o footer na tela
+            }
+        }catch (e) {
+            console.error(`Falha ao montar Footer: Classe ${config.layout.footerClass} não encontrada.`);
+        }
+    }
+    await handleLocation();   // Dispara a renderização da primeira rota acessada
+    
+    showApp() // traz de volta a aplicação na tela
+}
+
+// função de roteamento (invocada pelos links do menu)
+const route = (event) =>{
+    event.preventDefault(); // impede recarregar a página
+    window.history.pushState({},"",event.currentTarget.href); // atualiza a URL com base na opção que voi clicada
+    handleLocation(); // handleLocation será a função que troca o conteúdo
+}
+
+/** função que gerencia a mudança dinâmica de conteúdo */
+const spa_container = document.getElementById('spa-container');
+const handleLocation = async () => {
+    if (!pageContainer) return; // guard
+
+    await hideContent(); // apaga o conteúdo da página
+    const path = window.location.pathname; // captura o caminho da url
+    
+    let pageClassName = config.routes.paths[path]; // retorna uma STRING (ex: "PageHome")
+    let params = {}; // Objeto de parâmetros para passar para as páginas
+
+    // Se a rota não existir nas configurações, assumimos que é uma página Single (rota dinâmica na raiz)
+    if (!pageClassName) {
+        // Quebra a URL em segmentos ignorando barras vazias (ex: "/curso/java" -> ["curso", "java"])
+        const segments = path.split('/').filter(Boolean);
+        if (segments.length > 0 && config.routes.catchAll) {
+            pageClassName = config.routes.catchAll;
+            // O roteador repassa os fragmentos genericamente. A classe da página decide o que fazer.
+            params = { 
+                segments, 
+                fullPath: path,
+                slug: segments[0] // Mantido temporariamente para não quebrar seu construtor atual do PageSingle
+            }; 
+        } else {
+            pageClassName = config.routes.notFound;
+        }
+    }
+
+    // Remove o estilo da página anterior, se existir ---
+    const oldStyle = document.getElementById('dynamic-page-style');
+    if (oldStyle) {oldStyle.remove();}
+
+    try {
+        const pageClass = new Function(`return ${pageClassName}`)();
+        if (pageClass) {
+            const page = new pageClass(pageContainer, params); 
+            await page.start(); 
+        } else {
+            throw new Error("Classe não definida");
+        }
+    } catch (e) {
+        console.error(`Falha ao instanciar a classe '${pageClassName}'. Verifique o config.json e os imports globais.`, e);
+    }
+    showContent();
+}
+
+// esconde toda a aplicação
+function hideApp(){
+    const app = document.getElementById("app")
+    app.style.opacity = "0";
+}
+// Revela toda a aplicação
+function showApp(){
+    const app = document.getElementById("app")
+    app.style.opacity = "1";
+    app.style.transition = "opacity 0.3s ease-in-out";
+}
+// Esconde apenas o miolo da página e ESPERA a animação terminar
+function hideContent() {
+    return new Promise(resolve => {
+        pageContainer.style.transition = "opacity 0.3s ease-in-out";
+        pageContainer.style.opacity = "0";
+        
+        // para evitar o footer jump
+        footerContainer.style.transition = "opacity 0.3s ease-in-out";
+        footerContainer.style.opacity = "0";
+        pageContainer.style.minHeight = pageContainer.offsetHeight + 'px';
+
+        // Aguarda 300ms antes de liberar o Javascript
+        setTimeout(() => {
+            // Zera o scroll silenciosamente enquanto a tela está "apagada"
+            window.scrollTo({ top: 0, behavior: 'instant' }); 
+            resolve();
+        }, 300); 
+    });
+}
+// Revela o miolo da página
+function showContent() {
+    pageContainer.style.opacity = "1";        
+    footerContainer.style.opacity = "1"; // para evitar o footer jump
+    setTimeout(() => {
+        pageContainer.style.minHeight = 'auto';
+    }, 300);
+}
+
+window.onpopstate = handleLocation; // para quando o usuário usar os botões de avançar e voltar
+window.route = route; // Expõe a função route no escopo global para que os onclick="route(event)" funcionem
+window.initRouter = initRouter; // Expõe o inicializador
+
+
+// ====================================
 // 📁 ./public\index.html
 // ====================================
 <!DOCTYPE html>
@@ -25,46 +268,35 @@
     <script src="/algol-web/scripts/layouts/grid-layout.js" ></script>
     <script src="/algol-web/scripts/layouts/grid-item.js" ></script>
     <script src="/algol-web/scripts/layouts/flex-item.js" ></script>
+    
     <!-- FIM - Importação da lib ALGOL WEB ------------------------------------>
     
-    <script src="/js/index.js" defer></script>
-    <script src="/js/pages/_base.js" defer></script>
-    <script src="/js/pages/home.js" defer></script>
-    <script src="/js/pages/posts.js" defer></script>
-    <script src="/js/pages/publications.js" defer></script>
-    <script src="/js/pages/courses.js" defer></script>
-    <script src="/js/pages/404.js" defer></script>  
-    <script src="/js/pages/single.js" defer></script>
-    <script src="/js/pages/courses/basic_prog_01.js" defer></script>
-    <script src="/js/pages/courses/basic_prog_02.js" defer></script>
-    <script src="/js/pages/courses/algo_analysis_01.js" defer></script>
-    <script src="/js/router.js" defer></script>
+    <!-- INICIO - Importação da lib ALGOL SPA --------------------------------->
+    <script src="/algol-spa/page_base.js" defer></script>
+    <script src="/algol-spa/router.js" defer></script>
+
+    <!-- FIM - Importação da lib ALGOL SPA ------------------------------------>
+
+    <!-- INICIO - Importação das páginas da aplicação ------------------------->
+    <script src="/pages/menu.js" defer></script>
+    <script src="/pages/footer.js" defer></script>
+    <script src="/pages/home.js" defer></script>
+    <script src="/pages/posts.js" defer></script>
+    <script src="/pages/publications.js" defer></script>
+    <script src="/pages/404.js" defer></script>  
+    <script src="/pages/single.js" defer></script>
+    
+    <!-- FIM - Importação das páginas da aplicação ---------------------------->
+
+    
+    
     <link rel="stylesheet" href="/css/fonts.css">
     <style>
-        #menu{
-            font-family: 'Roboto Condensed Regular' !important;
-        }
         @media(max-width: 1280px    ){
             #layout-screen{
                 grid-template-columns: 1fr;
             }
         }
-        .card-bg{
-            background-color: var(--bg-card-A);
-            box-shadow: 0 calc(0.1vw * var(--scale-factor)) calc(0.1vw * var(--scale-factor)) var(--bg-C);
-        }
-        #footer{
-            background-color: #24272d;
-            color: white;
-            #ano{
-                background-color: #222;
-                text-align: center;
-            }
-            a{color: white; text-decoration: none;}
-            a:hover{color: rgb(172, 190, 255);}
-            a:active{color: rgb(97, 124, 222);}
-        }
-
     </style>
 </head>
 <body>
@@ -72,205 +304,33 @@
         <algol-grid-item></algol-grid-item>
         
         <algol-grid-item id="app">        
-            <!-- MENU inserido dinamicamente aqui --------------------------->
+            <div id="menu-container"></div>
 
             <algol-spacer value="1" valuebreak="3"></algol-spacer>
+            
             <main id="spa-container"></main>
 
-            <!-- RODAPÉ inserido dinamicamente aqui --------------------------->
-        </algol-grid-item>
-
+            <div id="footer-container"></div>
+            
         <algol-grid-item></algol-grid-item>
     </algol-grid-layout>
+
+    <script defer>
+        const IMAGE_BUCKET = 'http://localhost:8080'; // fazer com que este valor seja enviado pleo servidor no request da rota '/'
+
+        const currentLang = localStorage.getItem('app_lang') || 'pt-br'; // lê no localstorage o idioma atual
+        document.documentElement.lang = currentLang; // atualiza o idioma da página
+        
+        document.addEventListener("DOMContentLoaded", async () => {
+            await window.initRouter('menu-container', 'spa-container', 'footer-container');
+        });
+    </script>
+
 </body>
 </html>
 
 // ====================================
-// 📁 ./public\js\index.js
-// ====================================
-const IMAGE_BUCKET = 'http://localhost:8080'; // fazer com que este valor seja enviado pleo servidor no request da rota '/'
-
-// lê no localstorage o idioma atual
-const currentLang = localStorage.getItem('app_lang') || 'pt-br';
-
-document.documentElement.lang = currentLang; // atualiza o idioma da página
-
-let t = null;
-
-/** Função que carrega e monta a página */
-async function initLayout() {
-    try {
-        hideApp();
-        // Busca o dicionário global do site
-        const response = await fetch('/js/index.json');
-        const i18n = await response.json();
-        
-        // Atribui o nó correto do JSON (com fallback para pt-br caso algo falhe)
-        t = i18n[currentLang] || i18n['pt-br'];
-
-        // Só desenha a interface depois que 't' estiver preenchido
-        createMenu();
-        createFooter();
-        await window.handleLocation();
-        showApp();
-    } catch (error) {
-        console.error("Erro:", error);
-    }
-}
-
-// insere dinamicamente o menu da página.
-function createMenu(){
-    const page_content = document.getElementById('app');
-
-    // Configura qual <option> de idioma do menu deve aparecer selecionado por padrão
-    const selectPt = currentLang === 'pt-br' ? 'selected' : '';
-    const selectEn = currentLang === 'en-us' ? 'selected' : '';
-
-    page_content.insertAdjacentHTML('afterbegin',`
-        <header>
-        <algol-power-menu id="menu"
-            logo="${IMAGE_BUCKET}/imagens/structural-site/logo_h.svg"
-            logoalt="logo"
-            logolink="/"
-            logowidth = 91
-            logoheight = 100
-            logosize = "12vw"
-            logosizebreak = "30vw"
-            >
-            <li><a href="/" onclick="route(event)">${t.menu.home}</a></li>
-            <li><a href="/posts" onclick="route(event)">${t.menu.articles}</a></li>
-            <li><a href="/publications" onclick="route(event)">${t.menu.publications}</a></li>
-            <li>
-                <algol-select name="select" id="select-lang">
-                    <option value="pt-br" ${selectPt}>Português &#x1F1E7;&#x1F1F7;</option>  
-                    <option value="en-us" ${selectEn}>English &#x1F1FA;&#x1F1F8;</option>
-                </algol-select>
-            </li>
-        </algol-power-menu>
-        </header>
-    `);
-
-    // evento para clique no seletor de idioma
-    document.getElementById("select-lang").addEventListener('algol-change', function (e) {
-        const selectedLang = e.detail.value;
-        if (selectedLang !== currentLang) { // se a selecionada é diferente da atual
-            changeLanguage(selectedLang);
-        }
-    });
-
-    // eventos para recolher o menu quando houver clique nos botão (modo mobile)
-    const butons = document.querySelectorAll('#menu li:has(a)');
-    butons.forEach(button => {
-        button.addEventListener("click", function (event) {
-            document.getElementById('menu').hide();
-        });
-    });
-
-}
-function createFooter(){
-    const page_content = document.getElementById('app');
-    const currentYear = new Date().getFullYear(); // TODO Buscar do servidor
-    page_content.insertAdjacentHTML('beforeend',`
-        <footer>
-        <algol-grid-layout cols="1fr" id="footer">
-            <algol-grid-item>
-                <algol-spacer value="1.2"></algol-spacer>
-                <algol-image size="12vw" sizebreak = "30vw" 
-                    src="${IMAGE_BUCKET}/imagens/structural-site/logo_h_pb.svg" alt="logo" width="91" height="100">
-                </algol-image>
-            </algol-grid-item>
-            <algol-flex-item posh="stretch">
-                <algol-spacer value="1.2" valuebreak="2"></algol-spacer>
-                    <a href="https://www.youtube.com/channel/UCVJGac_RO3I-yIM77xLYrdw" target="_blank">
-                        <p>${t.footer.subscribe}&nbsp;</p>
-                    </a>
-                    <a href="https://www.youtube.com/channel/UCVJGac_RO3I-yIM77xLYrdw" target="_blank">
-                        <algol-image size="2vw" sizebreak="7vw"
-                            src="https://algol-bucket.b-cdn.net/imagens/structural-site/icon-youtube.svg" alt="logo" width="91" height="100">
-                    </a>
-            </algol-flex-item>
-            <algol-flex-item>
-                <algol-spacer value="1.2" valuebreak="2"></algol-spacer>   
-                <p><a href="#">${t.footer.terms}</a></p>
-                <p>&nbsp;&nbsp;&nbsp;&nbsp;</p>
-                <p><a href="#">${t.footer.privacy}</a></p>
-                <algol-spacer value="1.2"></algol-spacer>
-            </algol-flex-item>
-            <algol-grid-item id="ano" padding="1.5vw 0" posh="stretch">
-                <p>©${currentYear} Algol.dev. ${t.footer.rights}.</p>
-            </algol-grid-item>
-        </algol-grid-layout>
-        </footer>
-    `);
-}
-
-function changeLanguage(newLang) {
-    // 1. Salva a nova preferência no localstorage
-    localStorage.setItem('app_lang', newLang);
-
-    document.documentElement.lang = newLang; // altera na tag html
-
-    // TODO - Essa mecanica abaixo tem que levar em consideração a politica de cache que ainda será implementada
-    // 2. Limpa o sessionStorage. 
-    // Como suas classes PageHome e PagePosts usam sessionStorage para evitar recarregar dados do Elysia,
-    // nós precisamos limpar esse cache. Caso contrário, o layout muda para inglês, mas os posts continuam em português.
-    sessionStorage.clear();
-
-    window.location.reload(); // 3. Recarrega a página para reaplicar as traduções
-}
-
-// esconde toda a aplicação
-function hideApp(){
-    const app = document.getElementById("app")
-    app.style.opacity = "0";
-}
-// Revela toda a aplicação
-function showApp(){
-    const app = document.getElementById("app")
-    app.style.opacity = "1";
-    app.style.transition = "opacity 0.3s ease-in-out";
-}
-// Esconde apenas o miolo da página e ESPERA a animação terminar
-function hideContent() {
-    return new Promise(resolve => {
-        const container = document.getElementById("spa-container");
-        const footer = document.getElementById("footer");
-        if (!container) return resolve();
-        
-        container.style.transition = "opacity 0.3s ease-in-out";
-        container.style.opacity = "0";
-        
-        // para evitar o footer jump
-        if (footer) {
-            footer.style.transition = "opacity 0.3s ease-in-out";
-            footer.style.opacity = "0";
-        }
-        container.style.minHeight = container.offsetHeight + 'px';
-
-        // Aguarda 300ms antes de liberar o Javascript
-        setTimeout(() => {
-            // Zera o scroll silenciosamente enquanto a tela está "apagada"
-            window.scrollTo({ top: 0, behavior: 'instant' }); 
-            resolve();
-        }, 300); 
-    });
-}
-// Revela o miolo da página
-function showContent() {
-    const container = document.getElementById("spa-container");
-    if (container) {
-        container.style.opacity = "1";        
-        document.getElementById("footer").style.opacity = "1"; // para evitar o footer jump
-        setTimeout(() => {
-            container.style.minHeight = 'auto';
-        }, 300);
-    }
-}
-
-initLayout();
-
-// ====================================
-// 📁 ./public\js\pages\404.js
+// 📁 ./public\pages\404.js
 // ====================================
 
 class Page404 extends PageBase{
@@ -293,445 +353,104 @@ class Page404 extends PageBase{
 }
 
 // ====================================
-// 📁 ./public\js\pages\courses\algo_analysis_01.js
+// 📁 ./public\pages\footer.js
 // ====================================
 
-class PageAlgoAnalysis01 extends PageBase{
+    class ComponentFooter extends PageBase{
 
-    constructor(container, params) {
-        super(container, params);
-    }
+        constructor(container, params) {
+            super(container, params);
+        }
 
-    /** @override */
-    render() {
-        this.container.innerHTML = /* html */ `
-            <algol-grid-layout posh="stretch" cols="1fr">
-                <algol-grid-item
-                img="${IMAGE_BUCKET}/imagens/cursos/analise-de-algoritmos/algorithm-analysis-course.webp"
-                padding="15vw 5vw"
-                paddingbreak="30vw 5vw"
-                imgrepeat="no-repeat"
-                imgsize="cover"
-                imgpos="right"
-                imgoverlay="0.6"
-                posh="stretch">
-                    <h2 style="text-align: center; color: white; text-shadow: 0 calc(0.1vw * var(--scale-factor)) calc(0.1vw * var(--scale-factor)) black;">Algorithm analysis - part 01</h2>
-                </algol-grid-item>
-            </algol-grid-layout>
-        `;
-    }
+        /** ****************************************************** */
+        /** MÉTODOS SOBRESCRITOS ********************************* */
+        /** ****************************************************** */
 
-    /** @override */
-    async loadData() {
-        // nada para carregar
+        /** @override */
+        getPageId() { return 'footer'; }
+
+        /** @override apenas se houver tradução para as páginas */ 
+        getTranslationPath() { return '/pages/footer.json'; }
+
+        /** @override */
+        render() {
+            const page_content = document.getElementById('app');
+            const currentYear = new Date().getFullYear(); // TODO Buscar do servidor
+            
+            this.container.innerHTML = /* html */ `
+                <algol-grid-layout cols="1fr" id="footer">
+                    <algol-grid-item>
+                        <algol-spacer value="1.2"></algol-spacer>
+                        <algol-image size="12vw" sizebreak = "30vw" 
+                            src="${IMAGE_BUCKET}/imagens/structural-site/logo_h_pb.svg" alt="logo" width="91" height="100">
+                        </algol-image>
+                    </algol-grid-item>
+                    <algol-flex-item posh="stretch">
+                        <algol-spacer value="1.2" valuebreak="2"></algol-spacer>
+                            <a href="https://www.youtube.com/channel/UCVJGac_RO3I-yIM77xLYrdw" target="_blank">
+                                <p>${this.t.subscribe}&nbsp;</p>
+                            </a>
+                            <a href="https://www.youtube.com/channel/UCVJGac_RO3I-yIM77xLYrdw" target="_blank">
+                                <algol-image size="2vw" sizebreak="7vw"
+                                    src="https://algol-bucket.b-cdn.net/imagens/structural-site/icon-youtube.svg" alt="logo" width="91" height="100">
+                            </a>
+                    </algol-flex-item>
+                    <algol-flex-item>
+                        <algol-spacer value="1.2" valuebreak="2"></algol-spacer>   
+                        <p><a href="#">${this.t.terms}</a></p>
+                        <p>&nbsp;&nbsp;&nbsp;&nbsp;</p>
+                        <p><a href="#">${this.t.privacy}</a></p>
+                        <algol-spacer value="1.2"></algol-spacer>
+                    </algol-flex-item>
+                    <algol-grid-item id="ano" padding="1.5vw 0" posh="stretch">
+                        <p>©${currentYear} Algol.dev. ${this.t.rights}.</p>
+                    </algol-grid-item>
+                </algol-grid-layout>
+            `;
+
+            this.injectStyle(/* css */ `
+                #footer{
+                    background-color: #24272d;
+                    color: white;
+                    #ano{
+                        background-color: #222;
+                        text-align: center;
+                    }
+                    a{color: white; text-decoration: none;}
+                    a:hover{color: rgb(172, 190, 255);}
+                    a:active{color: rgb(97, 124, 222);}
+                }
+            `,"footer-style");
+        }
+
+        /** @override */
+        async loadData() {
+            // nada para carregar
+        }
+
+        /** ****************************************************** */
+        /** MÉTODOS ESPECÍFICOS ********************************** */
+        /** ****************************************************** */
+
+        /** Muda o idioma da página */
+        changeLanguage(newLang) {
+            // 1. Salva a nova preferência no localstorage
+            localStorage.setItem('app_lang', newLang);
+
+            document.documentElement.lang = newLang; // altera na tag html
+
+            // TODO - Essa mecanica abaixo tem que levar em consideração a politica de cache que ainda será implementada
+            // 2. Limpa o sessionStorage. 
+            // Como suas classes PageHome e PagePosts usam sessionStorage para evitar recarregar dados do Elysia,
+            // nós precisamos limpar esse cache. Caso contrário, o layout muda para inglês, mas os posts continuam em português.
+            sessionStorage.clear();
+
+            window.location.reload(); // 3. Recarrega a página para reaplicar as traduções
+        }
     }
-}
 
 // ====================================
-// 📁 ./public\js\pages\courses\basic_prog_01.js
-// ====================================
-class PageBasicProg01 extends PageBase{
-
-    constructor(container, params) {
-        super(container, params);
-        this.courseData = [
-            {
-                "imgurl":"/imagens/posts/_covers/2020/algoritmos_algorithm_cover.webp",
-                "title":"01 - Algoritmo: o que é?",
-                "description":"Você sabe o que é um algoritmo? Neste artigo você vai aprender de uma forma nunca vista antes em um conteúdo gratuito! E ainda tem exercício!",
-                "link":"/algoritmo-o-que-e",
-                "lang":"pt-br"
-            },
-            {
-                "imgurl":"/imagens/posts/_covers/2020/comandos_entrada_saida_input_output_cover.webp",
-                "title":"02 - Comandos de entrada e saída: o seu início na programação",
-                "description":"Dê seus primeiros passos na programação. Aprenda sobre os comandos de entrada e saída, e como ele te permite se comunicar com o computador.",
-                "link":"/comandos-entrada-saida-inicio-programacao",
-                "lang":"pt-br"
-            },
-            {
-                "imgurl":"/imagens/posts/_covers/2020/variavel_variable_cover.webp",
-                "title":"03 - Variável: O que é?",
-                "description":"Aprenda o significado de uma variável. Entenda como as linguagens de programação as utilizam para armazenar e processar as informações.",
-                "link":"/variavel-o-que-e",
-                "lang":"pt-br"
-            },
-            {
-                "imgurl":"/imagens/posts/_covers/2020/oper_atribuicao_cover.webp",
-                "title":"04 - Operador de atribuição",
-                "description":"Aprenda sobre o operador de atribuição, o mais simples da programação. Veja como ele é usado para colocar informações dentro das variáveis.",
-                "link":"/operador-de-atribuicao",
-                "lang":"pt-br"
-            },
-            {
-                "imgurl":"/imagens/posts/_covers/2020/operadores_aritmeticos_arithmetic_operators_cover-b.webp",
-                "title":"05 - Operadores aritméticos",
-                "description":"Aprenda sobre a 2ª categoria de operadores. Veja como os operadores aritméticos são usados para realizar cálculos matemáticos.",
-                "link":"/operadores-aritmeticos",
-                "lang":"pt-br"
-            },
-            {
-                "imgurl":"/imagens/posts/_covers/2020/declaracoes_condicionais_conditional_statements_cover.webp",
-                "title":"06 - Declarações condicionais",
-                "description":"As declarações condicionais te permitem criar algoritmos mais inteligentes, fazendo-os tomar decisões durante a sua execução.",
-                "link":"/declaracoes-condicionais",
-                "lang":"pt-br"
-            },
-            {
-                "imgurl":"/imagens/posts/_covers/2020/operadores_relacionais-b.webp",
-                "title":"07 - Operadores relacionais",
-                "description":"Aprenda sobre a 3ª categoria de operadores. Veja como os operadores relacionais são usados para criar expressões condicionais.",
-                "link":"/operadores-relacionais",
-                "lang":"pt-br"
-            },
-            {
-                "imgurl":"/imagens/posts/_covers/2020/operadores_logicos_logical_operators_cover_b.webp",
-                "title":"08 - Operadores lógicos",
-                "description":"Aprenda sobre a 4ª categoria de operadores. Veja como os operadores lógicos são usados para criar expressões condicionais complexas.",
-                "link":"/operadores-logicos",
-                "lang":"pt-br"
-            },
-            {
-                "imgurl":"/imagens/posts/_covers/2020/operadores_compostos_cover.webp",
-                "title":"09 - Operadores compostos",
-                "description":"Aprenda sobre a 5ª categoria de operadores. Veja como os operadores compostos, tais como o de incremento e decremento, simplificam os cálculos.",
-                "link":"/operadores-compostos",
-                "lang":"pt-br"
-            }
-        ]
-    }
-
-    /** @override */
-    render() {
-        const coursesHTML = this.courseData.map(course => `
-            <algol-grid-layout posh="stretch" cols="1fr">
-                <algol-grid-item color="#fff">
-                    <a href="${course.link}" onclick="route(event)" style="text-decoration: none; color: inherit;">
-                        <algol-grid-layout class="card-bg" posh="stretch" cols="0.3fr 0.7fr" colsbreak="1fr" gap="1vw">
-
-                            <algol-grid-item padding="1vw">
-                                <algol-image 
-                                    radius="0.1vw" 
-                                    size="100%" 
-                                    src="${IMAGE_BUCKET}${course.imgurl}" 
-                                    alt="landscape" 
-                                    width="400" 
-                                    height="200">
-                                </algol-image>
-                            </algol-grid-item>
-
-                            <algol-grid-item padding="0 2vw" paddingbreak="5vw 3vw" posh="start">
-                                <h2>${course.title}</h2>
-                                <algol-spacer value="1.5"></algol-spacer>
-                                <p>${course.description}</p>
-                            </algol-grid-item>
-
-                        </algol-grid-layout>
-                    </a>
-                </algol-grid-item>
-            </algol-grid-layout>
-            <algol-spacer value="3" valuebreak="5"></algol-spacer>
-        `).join('');
-        
-        this.container.innerHTML = `
-            <algol-grid-layout posh="stretch" cols="1fr">
-                <algol-grid-item
-                    img="${IMAGE_BUCKET}/imagens/cursos/programacao-basica/programacao-basica-basic-programming-01-cover.webp"
-                    padding="15vw 5vw"
-                    paddingbreak="30vw 5vw"
-                    imgrepeat="no-repeat"
-                    imgsize="cover"
-                    imgpos="right"
-                    imgoverlay="0.6"
-                    posh="stretch">
-                    <h2 style="text-align: center; color: white; text-shadow: 0 calc(0.1vw * var(--scale-factor)) calc(0.1vw * var(--scale-factor)) black;">
-                        Basic programming - part 01
-                    </h2>
-                </algol-grid-item>
-            </algol-grid-layout>
-
-            <algol-spacer value="7" valuebreak="5"></algol-spacer>
-
-            ${coursesHTML}
-
-            <algol-spacer value="7" valuebreak="5"></algol-spacer>
-        `;
-    }
-
-    /** @override */
-    async loadData() {
-        // nada para carregar
-    }
-}
-
-// ====================================
-// 📁 ./public\js\pages\courses\basic_prog_02 copy.js
-// ====================================
-
-class PageBasicProg02 extends PageBase{
-
-    constructor(container, params) {
-        super(container, params);
-    }
-
-    /** @override */
-    render() {
-        this.container.innerHTML = /* html */ `
-            <algol-grid-layout posh="stretch" cols="1fr">
-                <algol-grid-item
-                img="${IMAGE_BUCKET}/imagens/cursos/programacao-basica/programacao-basica-basic-programming-02-cover.webp"
-                padding="15vw 5vw"
-                paddingbreak="30vw 5vw"
-                imgrepeat="no-repeat"
-                imgsize="cover"
-                imgpos="right"
-                imgoverlay="0.6"
-                posh="stretch">
-                    <h2 style="text-align: center; color: white; text-shadow: 0 calc(0.1vw * var(--scale-factor)) calc(0.1vw * var(--scale-factor)) black;">Basic programming - part 02</h2>
-                </algol-grid-item>
-            </algol-grid-layout>
-        `;
-    }
-
-    /** @override */
-    async loadData() {
-        // nada para carregar
-    }
-}
-
-// ====================================
-// 📁 ./public\js\pages\courses\basic_prog_02.js
-// ====================================
-class PageBasicProg02 extends PageBase{
-
-    constructor(container, params) {
-        super(container, params);
-        this.courseData = [
-            {
-                "imgurl":"/imagens/posts/_covers/2020/algoritmos_algorithm_cover.webp",
-                "title":"01 - Algoritmo: o que é?",
-                "description":"Você sabe o que é um algoritmo? Neste artigo você vai aprender de uma forma nunca vista antes em um conteúdo gratuito! E ainda tem exercício!",
-                "link":"/algoritmo-o-que-e",
-                "lang":"pt-br"
-            },
-            {
-                "imgurl":"/imagens/posts/_covers/2020/comandos_entrada_saida_input_output_cover.webp",
-                "title":"02 - Comandos de entrada e saída: o seu início na programação",
-                "description":"Dê seus primeiros passos na programação. Aprenda sobre os comandos de entrada e saída, e como ele te permite se comunicar com o computador.",
-                "link":"/comandos-entrada-saida-inicio-programacao",
-                "lang":"pt-br"
-            },
-            {
-                "imgurl":"/imagens/posts/_covers/2020/variavel_variable_cover.webp",
-                "title":"03 - Variável: O que é?",
-                "description":"Aprenda o significado de uma variável. Entenda como as linguagens de programação as utilizam para armazenar e processar as informações.",
-                "link":"/variavel-o-que-e",
-                "lang":"pt-br"
-            },
-            {
-                "imgurl":"/imagens/posts/_covers/2020/oper_atribuicao_cover.webp",
-                "title":"04 - Operador de atribuição",
-                "description":"Aprenda sobre o operador de atribuição, o mais simples da programação. Veja como ele é usado para colocar informações dentro das variáveis.",
-                "link":"/operador-de-atribuicao",
-                "lang":"pt-br"
-            },
-            {
-                "imgurl":"/imagens/posts/_covers/2020/operadores_aritmeticos_arithmetic_operators_cover-b.webp",
-                "title":"05 - Operadores aritméticos",
-                "description":"Aprenda sobre a 2ª categoria de operadores. Veja como os operadores aritméticos são usados para realizar cálculos matemáticos.",
-                "link":"/operadores-aritmeticos",
-                "lang":"pt-br"
-            },
-            {
-                "imgurl":"/imagens/posts/_covers/2020/declaracoes_condicionais_conditional_statements_cover.webp",
-                "title":"06 - Declarações condicionais",
-                "description":"As declarações condicionais te permitem criar algoritmos mais inteligentes, fazendo-os tomar decisões durante a sua execução.",
-                "link":"/declaracoes-condicionais",
-                "lang":"pt-br"
-            },
-            {
-                "imgurl":"/imagens/posts/_covers/2020/operadores_relacionais-b.webp",
-                "title":"07 - Operadores relacionais",
-                "description":"Aprenda sobre a 3ª categoria de operadores. Veja como os operadores relacionais são usados para criar expressões condicionais.",
-                "link":"/operadores-relacionais",
-                "lang":"pt-br"
-            },
-            {
-                "imgurl":"/imagens/posts/_covers/2020/operadores_logicos_logical_operators_cover_b.webp",
-                "title":"08 - Operadores lógicos",
-                "description":"Aprenda sobre a 4ª categoria de operadores. Veja como os operadores lógicos são usados para criar expressões condicionais complexas.",
-                "link":"/operadores-logicos",
-                "lang":"pt-br"
-            },
-            {
-                "imgurl":"/imagens/posts/_covers/2020/operadores_compostos_cover.webp",
-                "title":"09 - Operadores compostos",
-                "description":"Aprenda sobre a 5ª categoria de operadores. Veja como os operadores compostos, tais como o de incremento e decremento, simplificam os cálculos.",
-                "link":"/operadores-compostos",
-                "lang":"pt-br"
-            }
-        ]
-    }
-
-    /** @override */
-    render() {
-        const coursesHTML = this.courseData.map(course => `
-            <algol-grid-layout posh="stretch" cols="1fr">
-                <algol-grid-item color="#fff">
-                    <a href="${course.link}" onclick="route(event)" style="text-decoration: none; color: inherit;">
-                        <algol-grid-layout class="card-bg" posh="stretch" cols="0.3fr 0.7fr" colsbreak="1fr" gap="1vw">
-
-                            <algol-grid-item padding="1vw">
-                                <algol-image 
-                                    radius="0.1vw" 
-                                    size="100%" 
-                                    src="${IMAGE_BUCKET}${course.imgurl}" 
-                                    alt="landscape" 
-                                    width="400" 
-                                    height="200">
-                                </algol-image>
-                            </algol-grid-item>
-
-                            <algol-grid-item padding="0 2vw" paddingbreak="5vw 3vw" posh="start">
-                                <h2>${course.title}</h2>
-                                <algol-spacer value="1.5"></algol-spacer>
-                                <p>${course.description}</p>
-                            </algol-grid-item>
-
-                        </algol-grid-layout>
-                    </a>
-                </algol-grid-item>
-            </algol-grid-layout>
-            <algol-spacer value="3" valuebreak="5"></algol-spacer>
-        `).join('');
-        
-        this.container.innerHTML = `
-            <algol-grid-layout posh="stretch" cols="1fr">
-                <algol-grid-item
-                    img="${IMAGE_BUCKET}/imagens/cursos/programacao-basica/programacao-basica-basic-programming-02-cover.webp"
-                    padding="15vw 5vw"
-                    paddingbreak="30vw 5vw"
-                    imgrepeat="no-repeat"
-                    imgsize="cover"
-                    imgpos="right"
-                    imgoverlay="0.6"
-                    posh="stretch">
-                    <h2 style="text-align: center; color: white; text-shadow: 0 calc(0.1vw * var(--scale-factor)) calc(0.1vw * var(--scale-factor)) black;">
-                        Basic programming - part 02
-                    </h2>
-                </algol-grid-item>
-            </algol-grid-layout>
-
-            <algol-spacer value="7" valuebreak="5"></algol-spacer>
-
-            ${coursesHTML}
-
-            <algol-spacer value="7" valuebreak="5"></algol-spacer>
-        `;
-    }
-
-    /** @override */
-    async loadData() {
-        // nada para carregar
-    }
-}
-
-// ====================================
-// 📁 ./public\js\pages\courses.js
-// ====================================
-
-class PageCourses extends PageBase{
-
-    constructor(container) {
-        super(container);
-    }
-
-    /** @override */
-    render() {
-        this.container.innerHTML = /* html */ `
-            <algol-grid-layout posh="stretch" cols="1fr">
-                <algol-grid-item
-                img="${IMAGE_BUCKET}/imagens/structural-site/course-page-cover.webp"
-                padding="15vw 5vw"
-                paddingbreak="30vw 5vw"
-                imgrepeat="no-repeat"
-                imgsize="cover"
-                imgpos="right"
-                imgoverlay="0.6"
-                posh="stretch">
-                    <h2 style="text-align: center; color: white; text-shadow: 0 calc(0.1vw * var(--scale-factor)) calc(0.1vw * var(--scale-factor)) black;">Escolha o seu curso gratuito</h2>
-                </algol-grid-item>
-
-                <algol-grid-item>
-                    <algol-spacer value="7" valuebreak="5"></algol-spacer>
-                    <a href="/courses/basic-programming-part-01" onclick="route(event)" style="text-decoration: none; color: inherit;">
-                        <algol-grid-layout class="card-bg" posh="stretch" cols="0.3fr 0.7fr" colsbreak="1fr" gap="1vw">
-                            <algol-grid-item>
-                                <algol-image
-                                size="100%"
-                                radius="1vw"
-                                expand src="${IMAGE_BUCKET}/imagens/cursos/programacao-basica/programacao-basica-basic-programming-01-cover.webp" alt="landscape" width="400" height="200"></algol-image>
-                            </algol-grid-item>
-                            <algol-grid-item padding="0 2vw" paddingbreak="5vw 3vw" posh="start">
-                                <h2>Programação básica - parte 01</h2>
-                                <algol-spacer value="1.5"></algol-spacer>
-                                <p>Comece com os conceitos básicos de programação de computadores.</p>
-                            </algol-grid-item>
-                        </algol-grid-layout>
-                    </a>
-                </algol-grid-item>
-
-                <algol-grid-item>
-                    <algol-spacer value="7" valuebreak="5"></algol-spacer>
-                    <a href="/courses/basic-programming-part-02" onclick="route(event)" style="text-decoration: none; color: inherit;">
-                        <algol-grid-layout class="card-bg" posh="stretch" cols="0.3fr 0.7fr" colsbreak="1fr" gap="1vw">
-                            <algol-grid-item>
-                                    <algol-image
-                                    size="100%"
-                                    radius="1vw"
-                                    expand src="${IMAGE_BUCKET}/imagens/cursos/programacao-basica/programacao-basica-basic-programming-02-cover.webp" alt="landscape" width="400" height="200"></algol-image>
-                            </algol-grid-item>
-                            <algol-grid-item padding="0 2vw" paddingbreak="5vw 3vw" posh="start">
-                                    <h2>Programação básica - parte 02</h2>
-                                    <algol-spacer value="1.5"></algol-spacer>
-                                    <p>Agora que você sabe o básico da programação de computadores, vamos para os assuntos mais desafiadores</p>
-                            </algol-grid-item>
-                        </algol-grid-layout>
-                    </a>
-                </algol-grid-item>
-
-                <algol-grid-item>
-                    <algol-spacer value="7" valuebreak="5"></algol-spacer>
-                    <a href="/courses/algorithm-analysis-part-01" onclick="route(event)" style="text-decoration: none; color: inherit;">
-                        <algol-grid-layout class="card-bg" posh="stretch" cols="0.3fr 0.7fr" colsbreak="1fr" gap="1vw">
-                            <algol-grid-item>
-                                    <algol-image
-                                    size="100%"
-                                    radius="1vw"
-                                    expand src="${IMAGE_BUCKET}/imagens/cursos/analise-de-algoritmos/algorithm-analysis-course.webp" alt="landscape" width="400" height="200"></algol-image>
-                            </algol-grid-item>
-                            <algol-grid-item padding="0 2vw" paddingbreak="5vw 3vw" posh="start">
-                                    <h2>Análise de algoritmos - parte 01</h2>
-                                    <algol-spacer value="1.5"></algol-spacer>
-                                    <p>Aprenda, de forma detalhada, a medir desempenho de algoritmos.</p>
-                            </algol-grid-item>
-                        </algol-grid-layout>
-                    </a>
-                    <algol-spacer value="7" valuebreak="5"></algol-spacer>
-                </algol-grid-item>
-
-            </algol-grid-layout>
-        `;
-    }
-
-    /** @override */
-    async loadData() {
-        // nada para carregar
-    }
-}
-
-// ====================================
-// 📁 ./public\js\pages\home.js
+// 📁 ./public\pages\home.js
 // ====================================
 class PageHome extends PageBase{
 
@@ -747,7 +466,7 @@ class PageHome extends PageBase{
     getPageId() { return 'home'; }
 
     /** @override apenas se houver tradução para as páginas */ 
-    getTranslationPath() { return '/js/pages/home.json'; }
+    getTranslationPath() { return '/pages/home.json'; }
 
     /** @override */
     async render() {
@@ -852,7 +571,105 @@ class PageHome extends PageBase{
 }
 
 // ====================================
-// 📁 ./public\js\pages\posts.js
+// 📁 ./public\pages\menu.js
+// ====================================
+
+    class ComponentMenu extends PageBase{
+
+        constructor(container, params) {
+            super(container, params);
+        }
+
+        /** ****************************************************** */
+        /** MÉTODOS SOBRESCRITOS ********************************* */
+        /** ****************************************************** */
+
+        /** @override */
+        getPageId() { return 'menu'; }
+
+        /** @override apenas se houver tradução para as páginas */ 
+        getTranslationPath() { return '/pages/menu.json'; }
+
+        /** @override */
+        render() {
+            const currentLang = document.documentElement.lang; // obtém o idioma atual da página
+            const selectPt = currentLang === 'pt-br' ? 'selected' : '';
+            const selectEn = currentLang === 'en-us' ? 'selected' : '';
+            
+            this.container.innerHTML = /* html */ `
+                <algol-power-menu id="menu"
+                    logo="${IMAGE_BUCKET}/imagens/structural-site/logo_h.svg"
+                    logoalt="logo"
+                    logolink="/"
+                    logowidth = 91
+                    logoheight = 100
+                    logosize = "12vw"
+                    logosizebreak = "30vw"
+                    >
+                    <li><a href="/" onclick="route(event)">${this.t.home}</a></li>
+                    <li><a href="/posts" onclick="route(event)">${this.t.articles}</a></li>
+                    <li><a href="/publications" onclick="route(event)">${this.t.publications}</a></li>
+                    <li>
+                        <algol-select name="select" id="select-lang">
+                            <option value="pt-br" ${selectPt}>Português &#x1F1E7;&#x1F1F7;</option>  
+                            <option value="en-us" ${selectEn}>English &#x1F1FA;&#x1F1F8;</option>
+                        </algol-select>
+                    </li>
+                </algol-power-menu>
+            `;
+
+            // evento para clique no seletor de idioma
+            document.getElementById("select-lang").addEventListener('algol-change', (e) => {
+                const selectedLang = e.detail.value;
+                if (selectedLang !== currentLang) { // se a selecionada é diferente da atual
+                    this.changeLanguage(selectedLang);
+                }
+            });
+
+            // eventos para recolher o menu quando houver clique nos botão (modo mobile)
+            const butons = document.querySelectorAll('#menu li:has(a)');
+            butons.forEach(button => {
+                button.addEventListener("click", function (event) {
+                    document.getElementById('menu').hide();
+                });
+            });
+
+
+            this.injectStyle(/* css */ `
+                #menu{
+                    font-family: 'Roboto Condensed Regular' !important;
+                }
+            `,"menu-style");
+        }
+
+        /** @override */
+        async loadData() {
+            // nada para carregar
+        }
+
+        /** ****************************************************** */
+        /** MÉTODOS ESPECÍFICOS ********************************** */
+        /** ****************************************************** */
+
+        /** Muda o idioma da página */
+        changeLanguage(newLang) {
+            // 1. Salva a nova preferência no localstorage
+            localStorage.setItem('app_lang', newLang);
+
+            document.documentElement.lang = newLang; // altera na tag html
+
+            // TODO - Essa mecanica abaixo tem que levar em consideração a politica de cache que ainda será implementada
+            // 2. Limpa o sessionStorage. 
+            // Como suas classes PageHome e PagePosts usam sessionStorage para evitar recarregar dados do Elysia,
+            // nós precisamos limpar esse cache. Caso contrário, o layout muda para inglês, mas os posts continuam em português.
+            sessionStorage.clear();
+
+            window.location.reload(); // 3. Recarrega a página para reaplicar as traduções
+        }
+    }
+
+// ====================================
+// 📁 ./public\pages\posts.js
 // ====================================
 class PagePosts extends PageBase{
 
@@ -873,7 +690,7 @@ class PagePosts extends PageBase{
     getPageId() { return 'posts'; }
 
     /** @override apenas se houver tradução para as páginas */ 
-    getTranslationPath() { return '/js/pages/posts.json'; }
+    getTranslationPath() { return '/pages/posts.json'; }
 
     /** @override */
     async render() {
@@ -1041,7 +858,7 @@ class PagePosts extends PageBase{
 }
 
 // ====================================
-// 📁 ./public\js\pages\publications.js
+// 📁 ./public\pages\publications.js
 // ====================================
 
     class PagePublications extends PageBase{
@@ -1058,7 +875,7 @@ class PagePosts extends PageBase{
         getPageId() { return 'publications'; }
 
         /** @override apenas se houver tradução para as páginas */ 
-        getTranslationPath() { return '/js/pages/publications.json'; }
+        getTranslationPath() { return '/pages/publications.json'; }
 
         /** @override */
         render() {
@@ -1132,7 +949,7 @@ class PagePosts extends PageBase{
                 <algol-spacer value="7" valuebreak="5"></algol-spacer>
             `;
 
-            this.injectStyle(`
+            this.injectStyle( /* css */`
                 @media (max-width: ${MOBILE_BREAKPOINT}) {
                     #btn-testar{
                         display: none;
@@ -1152,7 +969,7 @@ class PagePosts extends PageBase{
     }
 
 // ====================================
-// 📁 ./public\js\pages\single.js
+// 📁 ./public\pages\single.js
 // ====================================
 
 class PageSingle extends PageBase{
@@ -1169,7 +986,7 @@ class PageSingle extends PageBase{
     getPageId() { return 'single'; }
 
     /** @override apenas se houver tradução para as páginas */ 
-    getTranslationPath() { return '/js/pages/single.json'; }
+    getTranslationPath() { return '/pages/single.json'; }
 
     /** @override */
     async render() {
@@ -1694,150 +1511,4 @@ class PageSingle extends PageBase{
     }
 
 }
-
-// ====================================
-// 📁 ./public\js\pages\_base.js
-// ====================================
-/** Classe base de uma página SPA */
-class PageBase {
-
-    constructor(container, params = {}) {
-        this.container = container; // container alvo da renderização
-        this.params = params;
-
-        this.cacheKeys = {
-            data: `dataCache_${this.getPageId()}`, // para os dados da página
-            i18n: `i18nCache_${this.getPageId()}`// para o dicionário de traduções
-        };
-
-        this.t = null; // guardará todo o dicionario em memória
-
-    }
-
-    /** ****************************************************** */
-    /** MÉTODOS ABSTRATOS ************************************ */
-    /** ****************************************************** */
-
-    /** @abstract */
-    getPageId() {throw new Error("getPageId() deve retornar um identificador único da página");}
-    /** @abstract */
-    async render() {throw new Error("render() não implementado");}
-    /** @abstract */
-    async loadData() {throw new Error("loadData() não implementado");}
-    
-    /** ****************************************************** */
-    /** MÉTODOS CONCRETOS ************************************ */
-    /** ****************************************************** */
-    
-    getTranslationPath() {
-        return null;
-    }
-
-    async start(){
-        await this.loadTranslations(); // 1. Aguarda as traduções estarem prontas
-        await this.render(); // renderiza a página
-    }
-
-    async loadTranslations(){
-        if (!this.getTranslationPath()) return; // Se a página não definiu tradução, ignora o i18n silenciosamente
-        
-        if (this.t) return; // se ja carregou, encerra
-
-        const lang = document.documentElement.lang; // obtem o idioma atual do html
-
-        // tenta buscar o dicionário no cache (para evitar fetch)
-        const cachedI18n = sessionStorage.getItem(this.cacheKeys.i18n);
-        if(cachedI18n){ // se conseguiu recuperar o dicionario do cache
-            const allTranslations = JSON.parse(cachedI18n); // desistringfica
-            this.t = allTranslations[lang] || allTranslations['pt-br']; // obtém o objeto do idioma
-            return;
-        }
-
-        // se não há cache, mostra msg de loading pra fazer fetch
-        this.container.innerHTML = `<h2 style="text-align: center; margin-top: 5vw;">Loading...</h2>`;
-        try {
-            // busca as traduções da página
-            const response = await fetch(this.getTranslationPath());
-            if (!response.ok) {throw new Error(`HTTP ${response.status}`);}
-
-            const allTranslations = await response.json();
-            // Salva o JSON completo no cache
-            sessionStorage.setItem(this.cacheKeys.i18n, JSON.stringify(allTranslations));
-            // obtém o objeto do idioma
-            this.t = allTranslations[lang] || allTranslations['pt-br'];
-        } catch (error) {
-            console.error("Erro ao carregar home.json:", error);
-            // Fallback de emergência caso o arquivo falhe
-            this.t = { loading: "Carregando...", error_load:  "Erro ao carregar traduções." }; 
-        }
-    }
-
-    // Método utilitário para injetar CSS dinâmico
-    injectStyle(cssString) {
-        const style = document.createElement('style');
-        style.id = 'dynamic-page-style'; // Mesmo ID que o roteador vai procurar para apagar
-        style.textContent = cssString;
-        document.head.appendChild(style);
-    }
-}
-
-// ====================================
-// 📁 ./public\js\router.js
-// ====================================
-// identifica a a classe da página associada a cada rota
-const urlRoutes = {
-    "/": PageHome,
-    "/posts": PagePosts,
-    "/publications": PagePublications,
-    "/courses": PageCourses,
-    "/courses/basic-programming-part-01": PageBasicProg01,
-    "/courses/basic-programming-part-02": PageBasicProg02,
-    "/courses/algorithm-analysis-part-01": PageAlgoAnalysis01,
-    404: Page404,
-};
-
-// função de roteamento (invocada pelos links do menu)
-const route = (event) =>{
-    event.preventDefault(); // impede recarregar a página
-    window.history.pushState({},"",event.currentTarget.href); // atualiza a URL com base na opção que voi clicada
-    handleLocation(); // handleLocation será a função que troca o conteúdo
-}
-
-/** função que gerencia a mudança dinâmica de conteúdo */
-const spa_container = document.getElementById('spa-container');
-const handleLocation = async () => {
-    await hideContent(); // apaga o conteúdo da página
-    const path = window.location.pathname; // captura o caminho da url
-    let pageClass = urlRoutes[path]; // seleciona a classe(página), com base na rota
-    let slug = null;
-    let params = {}; // Objeto de parâmetros para passar para as páginas
-
-    // Se a rota não existir no dicionário, assumimos que é uma página Single (rota dinâmica na raiz)
-    if (!pageClass) {
-        // Remove a primeira barra para extrair o slug (ex: "/java-linguagem" -> "java-linguagem")
-        slug = path.substring(1);
-        // Evita erro caso o path seja apenas uma barra solta ou algo bizarro não mapeado
-        if (slug.length > 0) {
-            pageClass = PageSingle; // Direciona para a página do post
-            params = { slug } // passa o slug do artigo a ser carregado para a página single
-        } else {
-            pageClass = urlRoutes[404];
-        }
-    }
-
-    // Remove o estilo da página anterior, se existir ---
-    const oldStyle = document.getElementById('dynamic-page-style');
-    if (oldStyle) {
-        oldStyle.remove();
-    }
-
-    const page = new pageClass(spa_container, params) // instancia a classe da página da rota atual
-    await page.start(); // invoca a funçao de construção da página
-    showContent();
-}
-
-window.onpopstate = handleLocation; // para quando o usuário usar os botões de avançar e voltar
-window.route = route; // Expõe a função route no escopo global para que os onclick="route(event)" funcionem
-window.handleLocation = handleLocation; // Exponha o handleLocation globalmente
-
 

@@ -7,6 +7,10 @@ const postsService = new PostsService();
 
 export const apiRoutes = new Elysia({ prefix: '/api'})
     .use(globals) // para acessar as variáveis globais
+    // --- MIDDLEWARE DE DELAY (Apenas para testes) ---
+    .onBeforeHandle(async () => {
+        await Bun.sleep(2000); // Congela a execução por 2000 milissegundos (2 segundos)
+    })
     .get('/simple-posts/', async ({query }) => {
         const limit = Number(query.limit) || 6;
         const lang = query.lang || 'pt-br';

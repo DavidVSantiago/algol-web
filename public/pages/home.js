@@ -15,20 +15,7 @@ class PageHome extends PageBase{
     getTranslationPath() { return '/pages/home.json'; }
 
     /** @override */
-    async render() {
-        const lang = document.documentElement.lang || 'pt-br';
-
-        let cachedPostsHtml = null;// sessionStorage.getItem(this.cacheKeys.data);
-
-        const postsContent = cachedPostsHtml
-            ? cachedPostsHtml
-            : /* html */`
-                <div id="posts-container">
-                    <h2 style="text-align: center;">
-                        ${this.t.loading}
-                    </h2>
-               </div>`;
-               
+    async render() {        
         this.container.innerHTML = /* html */ `
             <algol-grid-layout posh="stretch" cols="1fr">
                 <algol-grid-item
@@ -72,15 +59,14 @@ class PageHome extends PageBase{
                     <h3 style="text-align: center;">${this.t.articles_title}</h3>
                     <algol-spacer value="3"></algol-spacer>
                     
-                    ${postsContent}
+                    <div id="posts-container"></div>
                     
                     <algol-spacer value="7" valuebreak="5"></algol-spacer>
                 </algol-grid-item>
             </algol-grid-layout>
         `;
 
-        if (!cachedPostsHtml)
-           await this.loadData();
+        await this.loadData();
     }
 
     /** @override */
@@ -88,11 +74,19 @@ class PageHome extends PageBase{
         const div = document.getElementById('posts-container');
         if (!div) return;
         try {
-            const lang = document.documentElement.lang; // obtem o idioma atual da página
-            const response = await fetch(`/api/simple-posts?limit=${6}&lang=${lang}`);
-            const artigos = await response.json();
             
-            let stringHtml = `<algol-grid-layout  class="card-bg" posh="stretch" cols="1fr 1fr 1fr" colsbreak="1fr 1fr" gap="1vw">`
+            // tenta buscar os dados da página no cache (para evitar fetch)
+            let stringHtml = sessionStorage.getItem(this.getDataCacheKey());
+
+            if(stringHtml){ // se conseguiu recuperar os dados do cache
+                div.outerHTML = stringHtml; // substitui a div pelo conteúdo do cache
+                return;
+            }
+
+            const lang = document.documentElement.lang; // obtem o idioma atual da página
+            const response = await fetch(`/api/simple-posts?limit=${6}&lang=${lang}`); // vai buscar os dados no servidor
+            const artigos = await response.json(); // desistringfica
+            stringHtml = `<algol-grid-layout  class="card-bg" posh="stretch" cols="1fr 1fr 1fr" colsbreak="1fr 1fr" gap="1vw">`
             stringHtml += artigos.map(artigo => /* html */`
                 <algol-grid-item padding="1vw">
                     <a href="/${artigo.slug}" onclick="route(event)">
@@ -102,8 +96,9 @@ class PageHome extends PageBase{
                 </algol-grid-item>
             `).join('');
             stringHtml += `</algol-grid-layout>`
+
             div.outerHTML = stringHtml; // substitui a div pelo <algol-grid-layout>
-            sessionStorage.setItem(this.cacheKeys.data, stringHtml); // salva no cache do sessionStorage para evitar recarregar do servidor
+            sessionStorage.setItem(this.getDataCacheKey(), stringHtml); // salva no cache do sessionStorage para evitar recarregar do servidor
 
         } catch (error) {
             console.error("Erro ao carregar artigos:", error);

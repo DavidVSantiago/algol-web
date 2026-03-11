@@ -20,18 +20,7 @@ class PagePosts extends PageBase{
     getTranslationPath() { return '/pages/posts.json'; }
 
     /** @override */
-    async render() {
-        let cachedPostsHtml = null; // sessionStorage.getItem(this.cacheKeys.data);
-
-        const postsContent = cachedPostsHtml
-            ? cachedPostsHtml
-            : /* html */`
-                <div id="posts-container">
-                    <h2 style="text-align: center;">
-                        ${this.t.loading}
-                    </h2>
-               </div>`;
-               
+    async render() {        
         this.container.innerHTML = /* html */ `
             <algol-grid-layout posh="stretch" cols="1fr">
                 <algol-grid-item
@@ -49,11 +38,11 @@ class PagePosts extends PageBase{
                 <algol-grid-item>
                     <algol-spacer value="7" valuebreak="8"></algol-spacer>
                     
-                    <div id="posts-wrapper">
-                        ${postsContent}
-                    </div> 
+                    <div class="pagination-container" style="display: flex; justify-content: center; align-items: center; gap: 0.5vw; flex-wrap: wrap;"></div>
                     <algol-spacer value="4"></algol-spacer>
-                    <div id="pagination-container" style="display: flex; justify-content: center; align-items: center; gap: 0.5vw; flex-wrap: wrap;"></div>
+                    <div id="posts-container"></div>
+                    <algol-spacer value="4"></algol-spacer>
+                    <div class="pagination-container" style="display: flex; justify-content: center; align-items: center; gap: 0.5vw; flex-wrap: wrap;"></div>
                    
                     <algol-spacer value="7" valuebreak="5"></algol-spacer>
                 </algol-grid-item>
@@ -61,69 +50,85 @@ class PagePosts extends PageBase{
             </algol-grid-layout>
         `;
 
-        document.getElementById('pagination-container')?.addEventListener('click', (e) => {
-            const btn = e.target.closest('algol-button');
-            if (!btn || btn.hasAttribute('disabled')) return;
-            
-            const targetPage = parseInt(btn.getAttribute('data-page'));
-            if (targetPage && targetPage !== this.currentPage) {
-                this.goToPage(targetPage);
-            }
-        });
-
-        if (!cachedPostsHtml)
-            await this.loadData(1);
-        else
-            this.loadData(1, true); // Se a página 1 veio do cache, renderiza apenas os botões 
+        const paginationContainers = document.querySelectorAll('.pagination-container');
+        for (const container of paginationContainers) {
+            container.addEventListener('click', async (e) => {
+                const btn = e.target.closest('algol-button');
+                if (!btn || btn.hasAttribute('disabled')) return;
+                
+                const targetPage = parseInt(btn.getAttribute('data-page'));
+                if (targetPage && targetPage !== this.currentPage) {
+                    await this.goToPage(targetPage);
+                }
+            });
+        }
+        
+        await this.loadData(1);
     }
 
     /** @override */
-    async loadData(page = 1, isRebuildingPaginationOnly = false) {
+    async loadData(page = 1) {
         if (this.isLoading) return;
         this.isLoading = true;
+        
+        const div = document.getElementById('posts-container');
+
         const limit = this.postsPerPage;
         const lang = document.documentElement.lang; // obtem o idioma atual da página
+        const cacheKey = `${this.getDataCacheKey()}_${page}`; // Chave única por página
+        
         try {
+            // 1. TENTA BUSCAR NO CACHE PRIMEIRO
+            const cachedData = sessionStorage.getItem(cacheKey);
+            if (cachedData) { // se teve sucesso ao buscar no cache
+                const parsedCache = JSON.parse(cachedData);
+                div.innerHTML = parsedCache.html; // Restaura o HTML
+                this.totalPages = parsedCache.totalPages; // Restaura o total de páginas
+                this.renderPaginationBar(); // Desenha os botões
+                this.isLoading = false;
+                return; // Fim! Zero requisições ao servidor.
+            }
+
+            // 2. SE NÃO TEM CACHE, VAI BUSCAR NO SERVIDOR
             const response = await fetch(`/api/paginated-posts?page=${page}&limit=${limit}&lang=${lang}`);
             const resultado = await response.json();
             
             this.totalPages = Math.ceil(resultado.totalCount / limit);
             const artigos = resultado.data;
 
-            if (!isRebuildingPaginationOnly) {
-                let stringHtml = `<algol-grid-layout class="card-bg" posh="stretch" cols="1fr 1fr 1fr" colsbreak="1fr" gap="1vw" gapbreak="10vw" style="align-items: start;">`;
-                
-                stringHtml += artigos.map(artigo => /* html */`
-                    <algol-grid-item padding="1vw">
-                        <a href="/${artigo.slug}" onclick="route(event)" style="text-decoration: none; color: inherit;">
-                            <algol-image radius="0.1vw" size="100%" src="${IMAGE_BUCKET}${artigo.featured_image_url}" alt="landscape" width="400" height="200"></algol-image>
-                            <algol-grid-layout cols="1fr" color="white">
-                                <algol-grid-item padding="1vw" paddingbreak="4vw">
-                                    <algol-spacer value="1"></algol-spacer>
-                                    <h3 style="text-align:left;">${artigo.title}</h3>
-                                    <algol-spacer value="1"></algol-spacer>
-                                    <p style="text-align:left;">${artigo.excerpt}</p>
-                                    <algol-spacer value="1"></algol-spacer>
-                                </algol-grid-item>
-                            </algol-grid-layout>
-                        </a>
-                    </algol-grid-item>
-                `).join('');
-                
-                stringHtml += `</algol-grid-layout>`;
+            let stringHtml = `<algol-grid-layout class="card-bg" posh="stretch" cols="1fr 1fr 1fr" colsbreak="1fr" gap="1vw" gapbreak="10vw" style="align-items: start;">`;
+            stringHtml += artigos.map(artigo => /* html */`
+                <algol-grid-item padding="1vw">
+                    <a href="/${artigo.slug}" onclick="route(event)" style="text-decoration: none; color: inherit;">
+                        <algol-image radius="0.1vw" size="100%" src="${IMAGE_BUCKET}${artigo.featured_image_url}" alt="landscape" width="400" height="200"></algol-image>
+                        <algol-grid-layout cols="1fr" color="white">
+                            <algol-grid-item padding="1vw" paddingbreak="4vw">
+                                <algol-spacer value="1"></algol-spacer>
+                                <h3 style="text-align:left;">${artigo.title}</h3>
+                                <algol-spacer value="1"></algol-spacer>
+                                <p style="text-align:left;">${artigo.excerpt}</p>
+                                <algol-spacer value="1"></algol-spacer>
+                            </algol-grid-item>
+                        </algol-grid-layout>
+                    </a>
+                </algol-grid-item>
+            `).join('');
+            stringHtml += `</algol-grid-layout>`;
 
-                const wrapper = document.getElementById('posts-wrapper');
-                if (wrapper) wrapper.innerHTML = stringHtml;
+            div.innerHTML = stringHtml;
 
-                sessionStorage.setItem(this.cacheKeys.data + page, stringHtml);
-            }
+            // 6. SALVA NO CACHE, o HTML e o totalPages juntos
+            sessionStorage.setItem(cacheKey, JSON.stringify({
+                html: stringHtml,
+                totalPages: this.totalPages
+            }));
 
             // Invoca a construção dos botões na interface
             this.renderPaginationBar();
 
         } catch (error) {
-            const wrapper = document.getElementById('posts-wrapper');
-            if (wrapper) wrapper.innerHTML = `<p>${this.t.error_load}</p>`;
+            console.error("Erro ao carregar artigos:", error);
+            div.innerHTML = `<p>${this.t.error_load}</p>`;
         } finally {
             this.isLoading = false;
         }
@@ -137,10 +142,10 @@ class PagePosts extends PageBase{
     async goToPage(page) {
         this.currentPage = page;
         
-        const wrapper = document.getElementById('posts-wrapper');
-        if (wrapper) {
-            wrapper.innerHTML = /* html */`<div style="display: flex; justify-content: center; width: 100%; padding: 5vw 0;"><h2>${this.t.loading_page} ${page}...</h2></div>`;
-            wrapper.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        const div = document.getElementById('posts-container');
+        if (div) {
+            div.innerHTML = /* html */`<div style="display: flex; justify-content: center; width: 100%; padding: 5vw 0;"><h2>${this.t.loading_page} ${page}...</h2></div>`;
+            div.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
         
         await this.loadData(page);
@@ -148,11 +153,14 @@ class PagePosts extends PageBase{
 
     /** Renderiza os botões numéricos com suporte a elipses */
     renderPaginationBar() {
-        const container = document.getElementById('pagination-container');
-        if (!container) return; // guard
+        // Busca todos os elementos que possuem a classe .pagination-container
+        const containers = document.querySelectorAll('.pagination-container');
+        if (containers.length === 0) return; // guard
         
         if (this.totalPages <= 1) { // se não houver páginas
-            container.innerHTML = '';
+            for (const container of containers) {
+                container.innerHTML = '';
+            }
             return;
         }
 
@@ -180,6 +188,9 @@ class PagePosts extends PageBase{
             html += `<algol-button data-page="${this.currentPage + 1}">&rarr;</algol-button>`;
         }
 
-        container.innerHTML = html;
+        // Aplica o HTML gerado em todas as divs capturadas
+        for (const container of containers) {
+            container.innerHTML = html;
+        }
     }
 }
