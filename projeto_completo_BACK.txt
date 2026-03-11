@@ -1,11 +1,11 @@
 // ====================================
 // 📁 ./db\dao\posts_dao.ts
 // ====================================
-import { eq } from "drizzle-orm";
+import { count, eq, getTableColumns} from "drizzle-orm";
 import { Database } from "../database";
-import { posts } from "../schema";
-import type { Posts, NewPosts, RecentPost } from "../schema";
-import postsData from "../../utils/fillPosts/fillPosts.json";
+import { posts, idioms } from "../schema";
+import type { SimplePosts, Posts, NewPosts } from "../schema";
+import postsData from "../../services/_mocks/full_posts.json";
 
 /** DAO da tabela LINK */
 export class PostsDAO{
@@ -18,37 +18,102 @@ export class PostsDAO{
         const result = await this.db.insert(posts).values(data).returning();
         return result[0];
     }
-    // cRud
-    public async getRecentPosts(): Promise<RecentPost[]> {
-        // Busca apenas os 6 primeiros registros
-        const artigos = await this.db
-        .select({
+    // Atualizamos a Promise para refletir que agora o objeto traz um campo extra
+    public async getPost(slug: string): Promise<(Posts & { idiom_name: string }) | undefined> {
+        const result = await this.db.select({
+            ...getTableColumns(posts), // Despeja todas as colunas da tabela posts
+            idiom_name: idioms.name    // Adiciona o campo específico da tabela idioms
+        })
+        .from(posts)
+        .innerJoin(idioms, eq(posts.idioms_id, idioms.id)) // Realiza o Join
+        .where(eq(posts.slug, slug))
+        .limit(1); 
+
+        return result[0];
+    }
+    
+    public async getSimplePosts(limit: number, lang: string): Promise<SimplePosts[]> {
+        const result = await this.db.select({
             id: posts.id,
             title: posts.title,
             featured_image_url: posts.featured_image_url,
+            slug: posts.slug,
+            excerpt: posts.excerpt,
+            idioms_id: posts.idioms_id
         })
         .from(posts)
-        .limit(6);
-
-        return artigos;
+        .innerJoin(idioms, eq(posts.idioms_id, idioms.id))
+        .where(eq(idioms.name, lang.toLowerCase()))
+        .limit(limit); // otimização para retornar a quantidade solicitada (-1 == todos)
+        return result;
     }
+    public async getPaginatedPosts(page: number, limit: number, lang: string){
+        const offset = (page - 1) * limit; // calcula o offset, de onde devemos começar a buscar
+
+        // usa uma Promisse.all para obter o máximo de desempenho em consultas simultâneas
+        const [countPosts, data] = await Promise.all([ // passa um array de promisses, no caso, duas consultas
+            // consulta de contagem do total de artigos no banco
+            this.db.select({total: count()})
+            .from(posts)
+            .innerJoin(idioms, eq(posts.idioms_id,idioms.id))
+            .where(eq(idioms.name,lang.toLowerCase())), // para restringir ao idioma da página
+
+            this.db.select({
+                id: posts.id,
+                title: posts.title,
+                featured_image_url: posts.featured_image_url,
+                slug: posts.slug,
+                excerpt: posts.excerpt,
+                idioms_id: posts.idioms_id
+            })
+            .from(posts).innerJoin(idioms,eq(posts.idioms_id,idioms.id))
+            .where(eq(idioms.name,lang.toLowerCase()))
+            .limit(limit) // para obter até uma certa quantidade (paginação)
+            .offset(offset) // para pular (paginação)
+        ]);
+
+        const totalCount = countPosts[0].total; // obtém o resultado da primeira consulta
+        
+        // retorna um objeto estruturado, com os dados dos artigos e o total de artigos
+        return{data,totalCount};
+    }
+
+    // cRud
+    // public async getRecentPosts(): Promise<RecentPost[]> {
+    //     // Busca apenas os 6 primeiros registros
+    //     const artigos = await this.db
+    //     .select({
+    //         id: posts.id,
+    //         title: posts.title,
+    //         featured_image_url: posts.featured_image_url,
+    //     })
+    //     .from(posts)
+    //     .limit(6);
+
+    //     return artigos;
+    // }
     
+
+    
+    /*************************************************************************************** */
+    /** FUNÇÕES DE SERVIÇO ***************************************************************** */
+    /*************************************************************************************** */
+
     public async fillTable(): Promise<void> {
         // 1. Transformamos o JSON bruto no formato do Schema
         const formattedData = postsData.map((item) => ({
-            date: Math.floor(new Date(item.post_date).getTime() / 1000),
-            title: item.post_title,
-            excerpt: item.post_excerpt,
-            slug: item.post_name,
-            category_id: 1,
-            idiom_id: 1,
-            featured_image_url: item.thumb_url,
-            content: "" // Campo obrigatório não nulo
+            date: Math.floor(new Date(item.date).getTime() / 1000),
+            title: item.title,
+            excerpt: item.excerpt,
+            slug: item.slug,
+            category_id: item.category_id,
+            idioms_id: item.idioms_id,
+            featured_image_url: item.featured_image_url,
+            content: item.content,
         }));
 
         try {
             console.log(`⏳ Iniciando inserção de ${formattedData.length} registros...`);
-            
             // 2. O "Pulo do Gato": Bulk Insert
             await this.db
                 .insert(posts)
@@ -132,7 +197,7 @@ export const posts = sqliteTable('posts', {
             onDelete: 'cascade',
             onUpdate: 'cascade',
     }),
-    idiom_id: integer('idiom_id')
+    idioms_id: integer('idioms_id')
         .notNull()
         .references(() => idioms.id, {
             onDelete: 'cascade',
@@ -146,32 +211,10 @@ export const posts = sqliteTable('posts', {
 // Para gerar os tipos automaticamente
 export type Posts = typeof posts.$inferSelect;
 export type NewPosts = typeof posts.$inferInsert;
-/** Tipo para especificar o retorno de posts recentes da página Home*/
-export type RecentPosts = {
-    id: number;
-    title: string;
-    slug: string;
-    featured_image_url: string;
-};
-/** Tipo para especificar o retorno de posts resumidos da página Posts*/
-export type SimplePosts = {
-    id: number;
-    title: string;
-    slug: string;
-    featured_image_url: string;
-};
-/** Tipo para especificar o retorno de um único post para usar na página Single*/
-export type Post = {
-    id: number;
-    date: number;
-    title: string;
-    excerpt: string;
-    slug: string;
-    category_id: string;
-    idioms_id: string;
-    featured_image_url: string;
-    content: string;
-};
+
+/** Tipo para especificar o retorno de posts resumidos*/
+export type SimplePosts = Pick<Posts,"id" | "title" | "slug" | "featured_image_url">;
+
 
 // ====================================
 // 📁 ./drizzle.config.ts
@@ -192,8 +235,8 @@ export default defineConfig({
 // 📁 ./index.ts
 // ====================================
 import { Elysia } from 'elysia';
-import { siteRoutes } from './routes/acesso_site'; //    
-import { apiRoutes } from './routes/rest_api';
+import { siteRoutes } from './routes/site_routes'; //    
+import { apiRoutes } from './routes/api_routes';
 
 // const IMAGE_BUCKET = 'https://algol-bucket.b-cdn.net';
 // const IMAGE_BUCKET = 'http://localhost:8080';
@@ -207,32 +250,7 @@ export const app = new Elysia()
 console.log(`🦊 Servidor modular rodando em ${app.server?.hostname}:${app.server?.port}`);
 
 // ====================================
-// 📁 ./routes\acesso_site.ts
-// ====================================
-/** Possui as rotas de acesso público do site */
-import { Elysia, t } from 'elysia';
-
-export const siteRoutes = new Elysia()
-    .get('/', () => Bun.file('public/index.html'))
-    .get('/posts', () => Bun.file('public/index.html'))
-    .get('/publications', () => Bun.file('public/index.html'))
-    .get('/courses', () => Bun.file('public/index.html'))
-    .get('/*', async ({ path }) => {
-        // Tenta mapear a URL para um arquivo físico na pasta public
-        const file = Bun.file(`public${path}`);
-        // Se o arquivo físico existir (ex: /css/style.css, /js/app.js, imagens)
-        // O Bun automaticamente lida com os MIME Types corretos
-        if (await file.exists()) {
-            return file;
-        }
-        // Se o arquivo não existir, é uma rota do frontend (ex: /algoritmo-o-que-e)
-        // Então fazemos o fallback para o index.html
-        return Bun.file('public/index.html');
-    })
-;
-
-// ====================================
-// 📁 ./routes\rest_api.ts
+// 📁 ./routes\api_routes.ts
 // ====================================
 import { Elysia } from 'elysia';
 import { PostsService } from '../services/posts_service';
@@ -243,9 +261,39 @@ const postsService = new PostsService();
 
 export const apiRoutes = new Elysia({ prefix: '/api'})
     .use(globals) // para acessar as variáveis globais
-    .get('/recent-posts', async () => await postsService.getRecentPosts())
-    .get('/simple-posts', async () => await postsService.getSimplePosts())
-    .get('/single', async () => await postsService.getSingle())
+    .get('/simple-posts/', async ({query }) => {
+        const limit = Number(query.limit) || 6;
+        const lang = query.lang || 'pt-br';
+        return await postsService.getSimplePosts(limit, lang);
+    })
+    .get('/paginated-posts/', async ({ query }) => {
+        const page = Number(query.page) || 1;
+        const limit = Number(query.limit) || 6;
+        const lang = query.lang || 'pt-br';
+        return await postsService.getPaginatedPosts(page,limit,lang);
+    })
+    .get('/post/:slug', async ({ params }) => await postsService.getPost(params.slug))
+;
+
+// ====================================
+// 📁 ./routes\site_routes.ts
+// ====================================
+/** Possui as rotas de acesso público do site */
+import { Elysia, t } from 'elysia';
+
+export const siteRoutes = new Elysia()
+    .get('/*', async ({ path }) => {
+        // Tenta mapear a URL para um arquivo físico na pasta public
+        const file = Bun.file(`public${path}`);
+        // Se o arquivo físico existir (ex: /css/style.css, /js/app.js, imagens)
+        // O Bun automaticamente lida   com os MIME Types corretos
+        if (await file.exists()) {
+            return file;
+        }
+        // Se o arquivo não existir, é uma rota do frontend (ex: /algoritmo-o-que-e)
+        // Então fazemos o fallback para o index.html
+        return Bun.file('public/index.html');
+    })
 ;
 
 // ====================================
@@ -254,7 +302,7 @@ export const apiRoutes = new Elysia({ prefix: '/api'})
 import { PostsDAO } from '../db/dao/posts_dao';
 import { redis } from '../db/redis';
 import { readFile } from 'node:fs/promises';
-import type { RecentPosts, SimplePosts, Post} from '../db/schema';
+import type {SimplePosts, Posts} from '../db/schema';
 import recentPosts from "./_mocks/recent_posts.json"
 import simplePosts from "./_mocks/simple_posts.json"
 import post from "./_mocks/post.json"
@@ -291,14 +339,14 @@ export class PostsService {
     // }
 
     /** Retorna dados mockados */
-    public async getRecentPosts(): Promise<RecentPosts[]> {
-        return recentPosts as unknown as RecentPosts[];
+    public async getPost(slug: string): Promise<Posts | undefined> {
+        return await this.dao.getPost(slug);
     }
-    public async getSimplePosts(): Promise<SimplePosts[]> {
-        return simplePosts as unknown as SimplePosts[];
+    public async getSimplePosts(limit: number, lang: string): Promise<SimplePosts[]> {
+        return await this.dao.getSimplePosts(limit,lang);
     }
-    public async getSingle(): Promise<Post[]> {
-        return post as unknown as Post[];
+    public async getPaginatedPosts(page: number, limit: number, lang: string){
+        return await this.dao.getPaginatedPosts(page,limit,lang);
     }
 }
 

@@ -13,7 +13,7 @@ class PageSingle extends PageBase{
     getPageId() { return 'single'; }
 
     /** @override apenas se houver tradução para as páginas */ 
-    getTranslationPath() { return '/js/pages/single.json'; }
+    getTranslationPath() { return '/pages/single.json'; }
 
     /** @override */
     async render() {

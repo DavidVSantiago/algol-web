@@ -1,2 +1,5 @@
-- Propor o sistema para o primeiro nível de cache das páginas, que deve levar em consiuderação o idioma.
+- Implementar o cache do this.cacheKeys.data, na função loadData. Para fazer as páginas buscarem o cache local, ao inves de solicitar ao servidor
+    * precisa gerar uma chave com o idioma tb.
+    * a página single, precisa sobrescrever o this.cacheKeys.data para incluir o slug tb, uma vez que todos os posts são exibidos na mesma página
+- mudara a mecanica de "sessionStorage.clear();" no changeLanguage, uma vez que o idioma será colocado no cacheKey
 - Resolver o CSS dos singles

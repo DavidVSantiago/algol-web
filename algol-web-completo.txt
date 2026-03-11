@@ -1,5 +1,5 @@
 // ====================================
-// 📁 ./scripts/variaveis.js
+// 📁 ./public\algol-web\scripts\variaveis.js
 // ====================================
 // ----------------------------
 // VARIÁVEIS GLOBAIS DO LAYOUT
@@ -157,7 +157,7 @@ injectGlobalClasses();
 // **********************************************************************************************************************
 
 // ====================================
-// 📁 ./scripts/bases/base_component.js
+// 📁 ./public\algol-web\scripts\bases\base_component.js
 // ====================================
 class BaseComponent extends HTMLElement {
     static useShadow = true; // Usa shadow DOM?
@@ -339,8 +339,9 @@ class BaseComponent extends HTMLElement {
 
     }
 }
+
 // ====================================
-// 📁 ./scripts/bases/base_layout.js
+// 📁 ./public\algol-web\scripts\bases\base_layout.js
 // ====================================
     class BaseLayout extends HTMLElement {
         static get observedAttributes() { return []; } 
@@ -457,8 +458,9 @@ class BaseComponent extends HTMLElement {
             document.head.appendChild(style);
         }
     }
+
 // ====================================
-// 📁 ./scripts/components/buttons.js
+// 📁 ./public\algol-web\scripts\components\buttons.js
 // ====================================
 /**
  * Componente Web `<algol-button>`.
@@ -493,8 +495,8 @@ class Button extends BaseComponent {
     }
     static get ATTR_MAP() {
         return {
-            'bgcolor': '--accent-A', // cor do fundo botão
-            'color': '--text-A', // cor do texto do botão
+            'color': '--button-color', // cor do fundo do botão
+            'textcolor': '--button-textcolor', // cor do texto do botão
         };
     }
     static get observedAttributes() {return [...Object.keys(Button.PROP_MAP), ...Object.keys(Button.ATTR_MAP)];}
@@ -620,6 +622,8 @@ algol_button_sheet.replaceSync(`
         text-shadow: 0 calc(0.1vw * var(--scale-factor)) calc(0.1vw * var(--scale-factor)) var(--bg-A);
 
     }
+    :host([color]) button{background-color: var(--button-color);}
+    :host([textcolor]) button{color: var(--button-textcolor);}
 
     /* --- Hover e Active --------------------------------------------------------------- */
     button:hover:not(:disabled) {
@@ -687,8 +691,9 @@ algol_button_sheet.replaceSync(`
 customElements.define('algol-button', Button); // Registra o componente customizado
 
 
+
 // ====================================
-// 📁 ./scripts/components/checkables.js
+// 📁 ./public\algol-web\scripts\components\checkables.js
 // ====================================
 class BaseCheckable extends BaseComponent {
     static get formAssociated() { return true; }
@@ -1120,8 +1125,9 @@ customElements.define('algol-checkbox', Checkbox);
 customElements.define('algol-switch-checkbox', SwitchCheckbox);
 customElements.define('algol-radio', Radio);
 customElements.define('algol-switch-radio', SwitchRadio);
+
 // ====================================
-// 📁 ./scripts/components/image.js
+// 📁 ./public\algol-web\scripts\components\image.js
 // ====================================
 class Image extends BaseComponent {
     // Mapa de atributos válidos (chaves) e seus respectivos métodos (valores)
@@ -1265,8 +1271,9 @@ algol_image_sheet.replaceSync(`
 
 // ----------------------------------------------------------------------------------------------------------------------------------
 customElements.define('algol-image', Image); // Registra o componente customizado
+
 // ====================================
-// 📁 ./scripts/components/inputs.js
+// 📁 ./public\algol-web\scripts\components\inputs.js
 // ====================================
 /**
  * Componente Web `<algol-input>`.
@@ -2506,8 +2513,9 @@ customElements.define('algol-input-time', InputTime);
 customElements.define('algol-input-color', InputColor); 
 customElements.define('algol-input-range', InputRange); 
 customElements.define('algol-input-file', InputFile);
+
 // ====================================
-// 📁 ./scripts/components/power_menu.js
+// 📁 ./public\algol-web\scripts\components\power_menu.js
 // ====================================
 class PowerMenu extends BaseComponent {
     static useShadow = false; // Usa shadow DOM?
@@ -2642,6 +2650,11 @@ class PowerMenu extends BaseComponent {
             }
         };
         ul.style.gridTemplateColumns = `repeat(${childCount}, auto)`;
+    }
+
+    hide(){
+        this.elems.menuBtns.classList.remove('show');
+        this.elems.menuOverlay.classList.remove('show');
     }
 
     // ****************************************************************************
@@ -2826,8 +2839,9 @@ class PowerMenu extends BaseComponent {
 // ----------------------------------------------------------------------------------------------------------------------------------
 customElements.define('algol-power-menu', PowerMenu); // Registra o componente customizado
 PowerMenu.injectStyles(); // injeta CSS desse componente
+
 // ====================================
-// 📁 ./scripts/components/select.js
+// 📁 ./public\algol-web\scripts\components\select.js
 // ====================================
 /**
  * Componente Web `<algol-select>`.
@@ -3067,8 +3081,9 @@ algol_select_sheet.replaceSync(`
 
 // ----------------------------------------------------------------------------------------------------------------------------------
 customElements.define('algol-select', Select); // Registra o componente customizado
+
 // ====================================
-// 📁 ./scripts/components/spacer.js
+// 📁 ./public\algol-web\scripts\components\spacer.js
 // ====================================
 /**
  * Componente Web `<algol-spacer>`.
@@ -3154,8 +3169,9 @@ algol_spacer_sheet.replaceSync(`
 
 // ----------------------------------------------------------------------------------------------------------------------------------
 customElements.define('algol-spacer', Spacer); // Registra o componente customizado
+
 // ====================================
-// 📁 ./scripts/components/textarea.js
+// 📁 ./public\algol-web\scripts\components\textarea.js
 // ====================================
 /**
  * Componente Web `<algol-textarea>`.
@@ -3378,8 +3394,9 @@ algol_textarea_sheet.replaceSync(`
 
 // ----------------------------------------------------------------------------------------------------------------------------------
 customElements.define('algol-textarea', TextArea); // Registra o componente customizado
+
 // ====================================
-// 📁 ./scripts/layouts/flex-item.js
+// 📁 ./public\algol-web\scripts\layouts\flex-item.js
 // ====================================
 /**
  * Componente Web `<algol-flex-item>`.
@@ -3508,8 +3525,9 @@ class FlexItem extends BaseLayout {
 
 customElements.define('algol-flex-item', FlexItem); // Registra o componente customizado
 FlexItem.injectStyles(); // injeta CSS desse componente
+
 // ====================================
-// 📁 ./scripts/layouts/grid-item.js
+// 📁 ./public\algol-web\scripts\layouts\grid-item.js
 // ====================================
 /**
  * Componente Web `<algol-grid-item>`.
@@ -3548,6 +3566,9 @@ class GridItem extends BaseLayout {
             'imgrepeat': '--grid-item-imgrepeat', // no-repeat, repeat, repeat-x, repeat-y, ...
             'imgpos': '--grid-item-imgpos', // top, bottom, center, left, right, ...
             'imgsize': '--grid-item-imgsize', // contain, cover, ...
+            'imgoverlay': '--grid-item-imgoverlay', // valor entre 0 e 1
+            'color': '--grid-item-color',
+            'colorbreak': '--grid-item-colorbreak'
         };
     }
     static get PROP_MAP() {
@@ -3614,18 +3635,22 @@ class GridItem extends BaseLayout {
             algol-grid-item[posh]{justify-self: var(--grid-item-posh);}
             algol-grid-item[posv]{align-self: var(--grid-item-posv);}
             algol-grid-item[img]{background-image: var(--grid-item-img);}
+            algol-grid-item[imgoverlay]{background:linear-gradient(rgba(0,0,0,var(--grid-item-imgoverlay)), rgba(0,0,0,var(--grid-item-imgoverlay))), var(--grid-item-img);}
             algol-grid-item[imgattach]{background-attachment: var(--grid-item-imgattach);}
             algol-grid-item[imgrepeat]{background-repeat: var(--grid-item-imgrepeat);}
             algol-grid-item[imgpos]{background-position: var(--grid-item-imgpos);}
             algol-grid-item[imgsize]{background-size: var(--grid-item-imgsize);}
             algol-grid-item[padding]{padding: var(--grid-item-padding);}
+            algol-grid-item[color]{background-color: var(--grid-item-color);}
+            
 
             @media (max-width: ${MOBILE_BREAKPOINT}) {
                 algol-grid-item[colspanbreak] {grid-column-end: var(--grid-item-colspan-break) !important;}
                 algol-grid-item[rowspanbreak] {grid-row-end: var(--grid-item-rowspan-break) !important;}
                 algol-grid-item[poshbreak] {justify-self: var(--grid-item-poshbreak) !important;}
                 algol-grid-item[posvbreak] {align-self: var(--grid-item-posvbreak) !important;}
-                algol-grid-item[paddingbreak]{padding: var(--grid-item-paddingbreak);}
+                algol-grid-item[paddingbreak]{padding: var(--grid-item-paddingbreak) !important;}
+                algol-grid-item[colorbreak] {background-color: var(--grid-item-colorbreak) !important;}
             }
         `;
 
@@ -3637,8 +3662,9 @@ class GridItem extends BaseLayout {
 
 customElements.define('algol-grid-item', GridItem); // Registra o componente customizado
 GridItem.injectStyles(); // injeta CSS desse componente
+
 // ====================================
-// 📁 ./scripts/layouts/grid-layout.js
+// 📁 ./public\algol-web\scripts\layouts\grid-layout.js
 // ====================================
 /**
  * Componente de layout `<algol-grid-layout>`.
@@ -3671,10 +3697,18 @@ class GridLayout extends BaseLayout {
             'posh':      '--grid-layout-posh',
             'poshbreak': '--grid-layout-poshbreak',
             'posv':      '--grid-layout-posv',
-            'posvbreak': '--grid-layout-posvbreak'
+            'posvbreak': '--grid-layout-posvbreak',
+            'color': '--grid-layout-color',
+            'colorbreak': '--grid-layout-colorbreak'
         };
     }
-    static get observedAttributes() {return Object.keys(GridLayout.ATTR_MAP);} // retorna a chaves do mapa de atributos
+    static get PROP_MAP() {
+        return {
+            'padding': 'update_padding',
+            'paddingbreak': 'update_paddingbreak',
+        };
+    }
+    static get observedAttributes() {return [...Object.keys(GridLayout.PROP_MAP), ...Object.keys(GridLayout.ATTR_MAP)];}
     constructor() {super();}
 
     // ****************************************************************************
@@ -3690,6 +3724,36 @@ class GridLayout extends BaseLayout {
     }
 
     // ****************************************************************************
+    // Métodos dos atributos
+    // ****************************************************************************
+
+    update_padding(val) {
+        this.style.setProperty('--grid-layout-padding', this._adjustPadding(val));
+    }
+    update_paddingbreak(val) {
+        this.style.setProperty('--grid-layout-paddingbreak', this._adjustPadding(val));
+    }
+
+    // ****************************************************************************
+    // Utils
+    // ****************************************************************************
+
+    _adjustPadding(val) {
+        if (!val) return '0vw'; // guard!
+        // 1. Converte para string, remove espaços extras nas pontas e divide pelos espaços internos
+        // O regex /\s+/ garante que múltiplos espaços contem como apenas um separador
+        const partes = val.toString().trim().split(/\s+/);
+        // 2. Mapeia cada parte (ex: "10", "20px") para o formato "Xvw"
+        const valoresConvertidos = partes.map(parte => {
+            const num = parseFloat(parte); 
+            // Se for número válido retorna com vw, senão retorna 0vw
+            return !isNaN(num) ? `${num}vw` : '0vw';
+        });
+        // 3. Junta tudo de volta em uma string separada por espaços
+        return valoresConvertidos.join(' ');
+    }
+
+    // ****************************************************************************
     // Injeção de estilo CSS
     // ****************************************************************************
     
@@ -3700,6 +3764,8 @@ class GridLayout extends BaseLayout {
                 gap: var(--grid-layout-gap, none);
                 justify-items: var(--grid-layout-posh, none);
                 align-items: var(--grid-layout-posv, none);
+                background-color: var(--grid-layout-color, none);
+                padding: var(--grid-layout-padding, none);
             }
                 
             @media (max-width: ${MOBILE_BREAKPOINT}) {
@@ -3707,6 +3773,8 @@ class GridLayout extends BaseLayout {
                 algol-grid-layout[gapbreak] {gap: var(--grid-layout-gap-break) !important;}
                 algol-grid-layout[poshbreak] {justify-items: var(--grid-layout-poshbreak) !important;}
                 algol-grid-layout[posvbreak] {align-items: var(--grid-layout-posvbreak) !important;}
+                algol-grid-layout[colorbreak] {background-color: var(--grid-layout-colorbreak) !important;}
+                algol-grid-layout[paddingbreak]{padding: var(--grid-layout-paddingbreak);}
             }
         `;
         BaseLayout._injectStyleOnHead('algol-grid-layout-style', css);
@@ -3717,3 +3785,6 @@ class GridLayout extends BaseLayout {
 
 customElements.define('algol-grid-layout', GridLayout); // Registra o componente customizado
 GridLayout.injectStyles(); // injeta CSS desse componente
+
+
+

@@ -12,7 +12,7 @@ class PageHome extends PageBase{
     getPageId() { return 'home'; }
 
     /** @override apenas se houver tradução para as páginas */ 
-    getTranslationPath() { return '/js/pages/home.json'; }
+    getTranslationPath() { return '/pages/home.json'; }
 
     /** @override */
     async render() {

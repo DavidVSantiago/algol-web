@@ -73,9 +73,9 @@ class PageBase {
     }
 
     // Método utilitário para injetar CSS dinâmico
-    injectStyle(cssString) {
+    injectStyle(cssString, id = 'dynamic-page-style') {
         const style = document.createElement('style');
-        style.id = 'dynamic-page-style'; // Mesmo ID que o roteador vai procurar para apagar
+        style.id = id; // Mesmo ID que o roteador vai procurar para apagar
         style.textContent = cssString;
         document.head.appendChild(style);
     }

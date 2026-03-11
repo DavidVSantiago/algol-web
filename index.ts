@@ -1,6 +1,6 @@
 import { Elysia } from 'elysia';
-import { siteRoutes } from './routes/acesso_site'; //    
-import { apiRoutes } from './routes/rest_api';
+import { siteRoutes } from './routes/site_routes'; //    
+import { apiRoutes } from './routes/api_routes';
 
 // const IMAGE_BUCKET = 'https://algol-bucket.b-cdn.net';
 // const IMAGE_BUCKET = 'http://localhost:8080';

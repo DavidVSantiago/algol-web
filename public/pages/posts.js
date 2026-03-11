@@ -17,7 +17,7 @@ class PagePosts extends PageBase{
     getPageId() { return 'posts'; }
 
     /** @override apenas se houver tradução para as páginas */ 
-    getTranslationPath() { return '/js/pages/posts.json'; }
+    getTranslationPath() { return '/pages/posts.json'; }
 
     /** @override */
     async render() {

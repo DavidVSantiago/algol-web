@@ -22,46 +22,37 @@
     <script src="/algol-web/scripts/layouts/grid-layout.js" ></script>
     <script src="/algol-web/scripts/layouts/grid-item.js" ></script>
     <script src="/algol-web/scripts/layouts/flex-item.js" ></script>
+    
+    <!-- <script src="/algol-web/min.js"></script> -->
     <!-- FIM - Importação da lib ALGOL WEB ------------------------------------>
     
-    <script src="/js/index.js" defer></script>
-    <script src="/js/pages/_base.js" defer></script>
-    <script src="/js/pages/home.js" defer></script>
-    <script src="/js/pages/posts.js" defer></script>
-    <script src="/js/pages/publications.js" defer></script>
-    <script src="/js/pages/courses.js" defer></script>
-    <script src="/js/pages/404.js" defer></script>  
-    <script src="/js/pages/single.js" defer></script>
-    <script src="/js/pages/courses/basic_prog_01.js" defer></script>
-    <script src="/js/pages/courses/basic_prog_02.js" defer></script>
-    <script src="/js/pages/courses/algo_analysis_01.js" defer></script>
-    <script src="/js/router.js" defer></script>
+    <!-- INICIO - Importação da lib ALGOL SPA --------------------------------->
+    <script src="/algol-spa/page_base.js" defer></script>
+    <script src="/algol-spa/router.js" defer></script>
+    <!-- <script src="/algol-spa/min.js"></script> -->
+    <!-- FIM - Importação da lib ALGOL SPA ------------------------------------>
+
+    <!-- INICIO - Importação das páginas da aplicação ------------------------->
+    <script src="/pages/menu.js" defer></script>
+    <script src="/pages/footer.js" defer></script>
+    <script src="/pages/home.js" defer></script>
+    <script src="/pages/posts.js" defer></script>
+    <script src="/pages/publications.js" defer></script>
+    <script src="/pages/404.js" defer></script>  
+    <script src="/pages/single.js" defer></script>
+    
+    <!-- <script src="/pages/min.js"></script> -->
+    <!-- FIM - Importação das páginas da aplicação ---------------------------->
+
+    
+    
     <link rel="stylesheet" href="/css/fonts.css">
     <style>
-        #menu{
-            font-family: 'Roboto Condensed Regular' !important;
-        }
         @media(max-width: 1280px    ){
             #layout-screen{
                 grid-template-columns: 1fr;
             }
         }
-        .card-bg{
-            background-color: var(--bg-card-A);
-            box-shadow: 0 calc(0.1vw * var(--scale-factor)) calc(0.1vw * var(--scale-factor)) var(--bg-C);
-        }
-        #footer{
-            background-color: #24272d;
-            color: white;
-            #ano{
-                background-color: #222;
-                text-align: center;
-            }
-            a{color: white; text-decoration: none;}
-            a:hover{color: rgb(172, 190, 255);}
-            a:active{color: rgb(97, 124, 222);}
-        }
-
     </style>
 </head>
 <body>
@@ -69,15 +60,27 @@
         <algol-grid-item></algol-grid-item>
         
         <algol-grid-item id="app">        
-            <!-- MENU inserido dinamicamente aqui --------------------------->
+            <div id="menu-container"></div>
 
             <algol-spacer value="1" valuebreak="3"></algol-spacer>
+            
             <main id="spa-container"></main>
 
-            <!-- RODAPÉ inserido dinamicamente aqui --------------------------->
-        </algol-grid-item>
-
+            <div id="footer-container"></div>
+            
         <algol-grid-item></algol-grid-item>
     </algol-grid-layout>
+
+    <script defer>
+        const IMAGE_BUCKET = 'http://localhost:8080'; // fazer com que este valor seja enviado pleo servidor no request da rota '/'
+
+        const currentLang = localStorage.getItem('app_lang') || 'pt-br'; // lê no localstorage o idioma atual
+        document.documentElement.lang = currentLang; // atualiza o idioma da página
+        
+        document.addEventListener("DOMContentLoaded", async () => {
+            await window.initRouter('menu-container', 'spa-container', 'footer-container');
+        });
+    </script>
+
 </body>
 </html>

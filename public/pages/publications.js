@@ -13,7 +13,7 @@
         getPageId() { return 'publications'; }
 
         /** @override apenas se houver tradução para as páginas */ 
-        getTranslationPath() { return '/js/pages/publications.json'; }
+        getTranslationPath() { return '/pages/publications.json'; }
 
         /** @override */
         render() {
@@ -87,7 +87,7 @@
                 <algol-spacer value="7" valuebreak="5"></algol-spacer>
             `;
 
-            this.injectStyle(`
+            this.injectStyle( /* css */`
                 @media (max-width: ${MOBILE_BREAKPOINT}) {
                     #btn-testar{
                         display: none;

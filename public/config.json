@@ -1,0 +1,20 @@
+{
+    "layout": {
+        "menuClass": "ComponentMenu",
+        "footerClass": "ComponentFooter"
+    },
+    
+    "routes":{
+        "paths": {
+            "/": "PageHome",
+            "/posts": "PagePosts",
+            "/publications": "PagePublications",
+            "/courses": "PageCourses",
+            "/courses/basic-programming-part-01": "PageBasicProg01",
+            "/courses/basic-programming-part-02": "PageBasicProg02",
+            "/courses/algorithm-analysis-part-01": "PageAlgoAnalysis01"
+        },
+        "catchAll": "PageSingle",
+        "notFound": "Page404"
+    }
+}

@@ -1,0 +1,14 @@
+{
+    "pt-br": {
+        "home": "INÍCIO",
+        "articles": "ARTIGOS",
+        "publications": "PUBLICAÇÕES",
+        "courses": "CURSOS"
+    },
+    "en-us": {
+        "home": "HOME",
+        "articles": "POSTS",
+        "publications": "PUBLICATIONS",
+        "courses": "COURSES"
+    }
+}
