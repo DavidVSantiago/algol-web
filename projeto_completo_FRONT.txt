@@ -7,14 +7,7 @@ class PageBase {
     constructor(container, params = {}) {
         this.container = container; // container alvo da renderização
         this.params = params;
-
-        this.cacheKeys = {
-            data: `dataCache_${this.getPageId()}`, // para os dados da página
-            i18n: `i18nCache_${this.getPageId()}`// para o dicionário de traduções
-        };
-
         this.t = null; // guardará todo o dicionario em memória
-
     }
 
     /** ****************************************************** */
@@ -32,6 +25,25 @@ class PageBase {
     /** MÉTODOS CONCRETOS ************************************ */
     /** ****************************************************** */
     
+    /** Permite que os dados sejam salvos no cache, sem a necessidade das páginas implementarem (padrão CACHE-ASIDE) */
+    async withCache(cacheKey, fetchCallback, isJson = false) {
+        const cachedData = sessionStorage.getItem(cacheKey); // tenta obter o cache informado
+        if(cachedData) // se existir o cache
+            return isJson? JSON.parse(cachedData) : cachedData; // retorna o cache em JSON ou em texto
+        const freshData = await fetchCallback(); // se não encontrou, executa a regra do chamador
+        const dataToCache = isJson? JSON.stringify(freshData): freshData; // prepara os dados para salvamento no cache
+        sessionStorage.setItem(cacheKey,dataToCache); // salva no cache
+        return freshData; // retorna os dados
+    }
+
+    getDataCacheKey(){ // id único para cache dos dados da página
+        return `dataCache_${this.getPageId()}`;
+    }
+
+    getI18nCacheKey(){ // id único para o dicionário de traduções da página
+        return `i18nCache_${this.getPageId()}`;
+    }
+
     getTranslationPath() {
         return null;
     }
@@ -43,33 +55,25 @@ class PageBase {
 
     async loadTranslations(){
         if (!this.getTranslationPath()) return; // Se a página não definiu tradução, ignora o i18n silenciosamente
-        
         if (this.t) return; // se ja carregou, encerra
 
-        const lang = document.documentElement.lang; // obtem o idioma atual do html
-
-        // tenta buscar o dicionário no cache (para evitar fetch)
-        const cachedI18n = sessionStorage.getItem(this.cacheKeys.i18n);
-        if(cachedI18n){ // se conseguiu recuperar o dicionario do cache
-            const allTranslations = JSON.parse(cachedI18n); // desistringfica
-            this.t = allTranslations[lang] || allTranslations['pt-br']; // obtém o objeto do idioma
-            return;
-        }
-
-        // se não há cache, mostra msg de loading pra fazer fetch
-        this.container.innerHTML = `<h2 style="text-align: center; margin-top: 5vw;">Loading...</h2>`;
+        const lang = document.documentElement.lang; // obtém o idioma atual do html
+        
         try {
-            // busca as traduções da página
-            const response = await fetch(this.getTranslationPath());
-            if (!response.ok) {throw new Error(`HTTP ${response.status}`);}
-
-            const allTranslations = await response.json();
-            // Salva o JSON completo no cache
-            sessionStorage.setItem(this.cacheKeys.i18n, JSON.stringify(allTranslations));
-            // obtém o objeto do idioma
-            this.t = allTranslations[lang] || allTranslations['pt-br'];
+            
+            const translationsData = await this.withCache(this.getI18nCacheKey(),async()=>{ // padrão CACHE-ASIDE
+                this.container.innerHTML = `<h2 style="text-align: center; margin-top: 5vw;">Loading...</h2>`; // texto de loading
+                // busca as traduções da página
+                const response = await fetch(this.getTranslationPath());
+                if (!response.ok) {throw new Error(`HTTP ${response.status}`);}
+                const allTranslations = await response.json();
+                return allTranslations; // retorna o json das traduções
+            },true);
+            
+            this.t = translationsData[lang] || translationsData['pt-br'];
+        
         } catch (error) {
-            console.error("Erro ao carregar home.json:", error);
+            console.error("Erro no processamento de traduções:", error);
             // Fallback de emergência caso o arquivo falhe
             this.t = { loading: "Carregando...", error_load:  "Erro ao carregar traduções." }; 
         }
@@ -77,6 +81,7 @@ class PageBase {
 
     // Método utilitário para injetar CSS dinâmico
     injectStyle(cssString, id = 'dynamic-page-style') {
+        if (document.getElementById(id)) return; // Evita duplicar estilos já injetados
         const style = document.createElement('style');
         style.id = id; // Mesmo ID que o roteador vai procurar para apagar
         style.textContent = cssString;
@@ -269,12 +274,13 @@ window.initRouter = initRouter; // Expõe o inicializador
     <script src="/algol-web/scripts/layouts/grid-item.js" ></script>
     <script src="/algol-web/scripts/layouts/flex-item.js" ></script>
     
+    <!-- <script src="/algol-web/min.js"></script> -->
     <!-- FIM - Importação da lib ALGOL WEB ------------------------------------>
     
     <!-- INICIO - Importação da lib ALGOL SPA --------------------------------->
     <script src="/algol-spa/page_base.js" defer></script>
     <script src="/algol-spa/router.js" defer></script>
-
+    <!-- <script src="/algol-spa/min.js"></script> -->
     <!-- FIM - Importação da lib ALGOL SPA ------------------------------------>
 
     <!-- INICIO - Importação das páginas da aplicação ------------------------->
@@ -286,6 +292,7 @@ window.initRouter = initRouter; // Expõe o inicializador
     <script src="/pages/404.js" defer></script>  
     <script src="/pages/single.js" defer></script>
     
+    <!-- <script src="/pages/min.js"></script> -->
     <!-- FIM - Importação das páginas da aplicação ---------------------------->
 
     
@@ -431,22 +438,6 @@ class Page404 extends PageBase{
         /** ****************************************************** */
         /** MÉTODOS ESPECÍFICOS ********************************** */
         /** ****************************************************** */
-
-        /** Muda o idioma da página */
-        changeLanguage(newLang) {
-            // 1. Salva a nova preferência no localstorage
-            localStorage.setItem('app_lang', newLang);
-
-            document.documentElement.lang = newLang; // altera na tag html
-
-            // TODO - Essa mecanica abaixo tem que levar em consideração a politica de cache que ainda será implementada
-            // 2. Limpa o sessionStorage. 
-            // Como suas classes PageHome e PagePosts usam sessionStorage para evitar recarregar dados do Elysia,
-            // nós precisamos limpar esse cache. Caso contrário, o layout muda para inglês, mas os posts continuam em português.
-            sessionStorage.clear();
-
-            window.location.reload(); // 3. Recarrega a página para reaplicar as traduções
-        }
     }
 
 // ====================================
@@ -469,20 +460,7 @@ class PageHome extends PageBase{
     getTranslationPath() { return '/pages/home.json'; }
 
     /** @override */
-    async render() {
-        const lang = document.documentElement.lang || 'pt-br';
-
-        let cachedPostsHtml = null;// sessionStorage.getItem(this.cacheKeys.data);
-
-        const postsContent = cachedPostsHtml
-            ? cachedPostsHtml
-            : /* html */`
-                <div id="posts-container">
-                    <h2 style="text-align: center;">
-                        ${this.t.loading}
-                    </h2>
-               </div>`;
-               
+    async render() {        
         this.container.innerHTML = /* html */ `
             <algol-grid-layout posh="stretch" cols="1fr">
                 <algol-grid-item
@@ -526,39 +504,41 @@ class PageHome extends PageBase{
                     <h3 style="text-align: center;">${this.t.articles_title}</h3>
                     <algol-spacer value="3"></algol-spacer>
                     
-                    ${postsContent}
+                    <div id="posts-container"></div>
                     
                     <algol-spacer value="7" valuebreak="5"></algol-spacer>
                 </algol-grid-item>
             </algol-grid-layout>
         `;
 
-        if (!cachedPostsHtml)
-           await this.loadData();
+        await this.loadData();
     }
 
     /** @override */
     async loadData() {
         const div = document.getElementById('posts-container');
-        if (!div) return;
+        if (!div) return; // guard!
         try {
-            const lang = document.documentElement.lang; // obtem o idioma atual da página
-            const response = await fetch(`/api/simple-posts?limit=${6}&lang=${lang}`);
-            const artigos = await response.json();
+            const htmlContent = await this.withCache(`${this.getDataCacheKey()}_${document.documentElement.lang}`, async ()=>{ // padrão CACHE-ASIDE
+                div.innerHTML = `<h2 style="text-align: center;">${this.t.loading || 'Carregando...'}</h2>`;
+                const lang = document.documentElement.lang; // obtém o idioma atual da página
+                const response = await fetch(`/api/simple-posts?limit=${6}&lang=${lang}`); // vai buscar os dados no servidor
+                if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
+                const artigos = await response.json(); // desistringfica
+                let stringHtml = `<algol-grid-layout  class="card-bg" posh="stretch" cols="1fr 1fr 1fr" colsbreak="1fr 1fr" gap="1vw">`
+                stringHtml += artigos.map(artigo => /* html */`
+                    <algol-grid-item padding="1vw">
+                        <a href="/${artigo.slug}" onclick="route(event)">
+                            <algol-image radius="0.4vw" size="100%" src="${IMAGE_BUCKET}${artigo.featured_image_url}" alt="landscape" width="400" height="200"></algol-image>
+                            <p style="text-align:center;">${artigo.title}</p>
+                        </a>
+                    </algol-grid-item>
+                `).join('');
+                stringHtml += `</algol-grid-layout>`
+                return stringHtml;
+            },false);
             
-            let stringHtml = `<algol-grid-layout  class="card-bg" posh="stretch" cols="1fr 1fr 1fr" colsbreak="1fr 1fr" gap="1vw">`
-            stringHtml += artigos.map(artigo => /* html */`
-                <algol-grid-item padding="1vw">
-                    <a href="/${artigo.slug}" onclick="route(event)">
-                        <algol-image radius="0.4vw" size="100%" src="${IMAGE_BUCKET}${artigo.featured_image_url}" alt="landscape" width="400" height="200"></algol-image>
-                        <p style="text-align:center;">${artigo.title}</p>
-                    </a>
-                </algol-grid-item>
-            `).join('');
-            stringHtml += `</algol-grid-layout>`
-            div.outerHTML = stringHtml; // substitui a div pelo <algol-grid-layout>
-            sessionStorage.setItem(this.cacheKeys.data, stringHtml); // salva no cache do sessionStorage para evitar recarregar do servidor
-
+            div.innerHTML = htmlContent; // substitui a div pelo <algol-grid-layout>
         } catch (error) {
             console.error("Erro ao carregar artigos:", error);
             div.innerHTML = "<p>Erro ao carregar conteúdos.</p>";
@@ -655,15 +635,7 @@ class PageHome extends PageBase{
         changeLanguage(newLang) {
             // 1. Salva a nova preferência no localstorage
             localStorage.setItem('app_lang', newLang);
-
             document.documentElement.lang = newLang; // altera na tag html
-
-            // TODO - Essa mecanica abaixo tem que levar em consideração a politica de cache que ainda será implementada
-            // 2. Limpa o sessionStorage. 
-            // Como suas classes PageHome e PagePosts usam sessionStorage para evitar recarregar dados do Elysia,
-            // nós precisamos limpar esse cache. Caso contrário, o layout muda para inglês, mas os posts continuam em português.
-            sessionStorage.clear();
-
             window.location.reload(); // 3. Recarrega a página para reaplicar as traduções
         }
     }
@@ -693,18 +665,7 @@ class PagePosts extends PageBase{
     getTranslationPath() { return '/pages/posts.json'; }
 
     /** @override */
-    async render() {
-        let cachedPostsHtml = null; // sessionStorage.getItem(this.cacheKeys.data);
-
-        const postsContent = cachedPostsHtml
-            ? cachedPostsHtml
-            : /* html */`
-                <div id="posts-container">
-                    <h2 style="text-align: center;">
-                        ${this.t.loading}
-                    </h2>
-               </div>`;
-               
+    async render() {        
         this.container.innerHTML = /* html */ `
             <algol-grid-layout posh="stretch" cols="1fr">
                 <algol-grid-item
@@ -722,11 +683,11 @@ class PagePosts extends PageBase{
                 <algol-grid-item>
                     <algol-spacer value="7" valuebreak="8"></algol-spacer>
                     
-                    <div id="posts-wrapper">
-                        ${postsContent}
-                    </div> 
+                    <div class="pagination-container" style="display: flex; justify-content: center; align-items: center; gap: 0.5vw; flex-wrap: wrap;"></div>
                     <algol-spacer value="4"></algol-spacer>
-                    <div id="pagination-container" style="display: flex; justify-content: center; align-items: center; gap: 0.5vw; flex-wrap: wrap;"></div>
+                    <div id="posts-container"></div>
+                    <algol-spacer value="4"></algol-spacer>
+                    <div class="pagination-container" style="display: flex; justify-content: center; align-items: center; gap: 0.5vw; flex-wrap: wrap;"></div>
                    
                     <algol-spacer value="7" valuebreak="5"></algol-spacer>
                 </algol-grid-item>
@@ -734,38 +695,46 @@ class PagePosts extends PageBase{
             </algol-grid-layout>
         `;
 
-        document.getElementById('pagination-container')?.addEventListener('click', (e) => {
-            const btn = e.target.closest('algol-button');
-            if (!btn || btn.hasAttribute('disabled')) return;
-            
-            const targetPage = parseInt(btn.getAttribute('data-page'));
-            if (targetPage && targetPage !== this.currentPage) {
-                this.goToPage(targetPage);
-            }
-        });
-
-        if (!cachedPostsHtml)
-            await this.loadData(1);
-        else
-            this.loadData(1, true); // Se a página 1 veio do cache, renderiza apenas os botões 
+        const paginationContainers = document.querySelectorAll('.pagination-container');
+        for (const container of paginationContainers) {
+            container.addEventListener('click', async (e) => {
+                const btn = e.target.closest('algol-button');
+                if (!btn || btn.hasAttribute('disabled')) return;
+                
+                const targetPage = parseInt(btn.getAttribute('data-page'));
+                if (targetPage && targetPage !== this.currentPage) {
+                    await this.goToPage(targetPage);
+                }
+            });
+        }
+        
+        await this.loadData(1);
     }
 
     /** @override */
-    async loadData(page = 1, isRebuildingPaginationOnly = false) {
+    async loadData(page = 1) {
         if (this.isLoading) return;
         this.isLoading = true;
+        
+        const div = document.getElementById('posts-container');
         const limit = this.postsPerPage;
         const lang = document.documentElement.lang; // obtem o idioma atual da página
+        const cacheKey = `${this.getDataCacheKey()}_${document.documentElement.lang}_${page}`; // Chave única por página
+        
         try {
-            const response = await fetch(`/api/paginated-posts?page=${page}&limit=${limit}&lang=${lang}`);
-            const resultado = await response.json();
-            
-            this.totalPages = Math.ceil(resultado.totalCount / limit);
-            const artigos = resultado.data;
 
-            if (!isRebuildingPaginationOnly) {
-                let stringHtml = `<algol-grid-layout class="card-bg" posh="stretch" cols="1fr 1fr 1fr" colsbreak="1fr" gap="1vw" gapbreak="10vw" style="align-items: start;">`;
+            const data = await this.withCache(cacheKey, async ()=>{ // padrão CACHE-ASIDE
+
+                div.innerHTML = /* html */`<div style="display: flex; justify-content: center; width: 100%; padding: 5vw 0;"><h2>${this.t.loading_page} ${page}...</h2></div>`;
+
+                const response = await fetch(`/api/paginated-posts?page=${page}&limit=${limit}&lang=${lang}`);
+                if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
+                const resultado = await response.json();
                 
+                const totalPages = Math.ceil(resultado.totalCount / limit);
+                const artigos = resultado.data;
+
+                let stringHtml = `<algol-grid-layout class="card-bg" posh="stretch" cols="1fr 1fr 1fr" colsbreak="1fr" gap="1vw" gapbreak="10vw" style="align-items: start;">`;
                 stringHtml += artigos.map(artigo => /* html */`
                     <algol-grid-item padding="1vw">
                         <a href="/${artigo.slug}" onclick="route(event)" style="text-decoration: none; color: inherit;">
@@ -782,21 +751,19 @@ class PagePosts extends PageBase{
                         </a>
                     </algol-grid-item>
                 `).join('');
-                
                 stringHtml += `</algol-grid-layout>`;
 
-                const wrapper = document.getElementById('posts-wrapper');
-                if (wrapper) wrapper.innerHTML = stringHtml;
-
-                sessionStorage.setItem(this.cacheKeys.data + page, stringHtml);
-            }
-
+                return {html: stringHtml, totalPages};
+            }, true);
+            // recupera os dados vindos da requisição (ou do cache)
+            div.innerHTML = data.html; 
+            this.totalPages = data.totalPages;
             // Invoca a construção dos botões na interface
             this.renderPaginationBar();
 
         } catch (error) {
-            const wrapper = document.getElementById('posts-wrapper');
-            if (wrapper) wrapper.innerHTML = `<p>${this.t.error_load}</p>`;
+            console.error("Erro ao carregar artigos:", error);
+            div.innerHTML = `<p>${this.t.error_load}</p>`;
         } finally {
             this.isLoading = false;
         }
@@ -810,10 +777,9 @@ class PagePosts extends PageBase{
     async goToPage(page) {
         this.currentPage = page;
         
-        const wrapper = document.getElementById('posts-wrapper');
-        if (wrapper) {
-            wrapper.innerHTML = /* html */`<div style="display: flex; justify-content: center; width: 100%; padding: 5vw 0;"><h2>${this.t.loading_page} ${page}...</h2></div>`;
-            wrapper.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        const div = document.getElementById('posts-container');
+        if (div) {
+            div.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
         
         await this.loadData(page);
@@ -821,11 +787,14 @@ class PagePosts extends PageBase{
 
     /** Renderiza os botões numéricos com suporte a elipses */
     renderPaginationBar() {
-        const container = document.getElementById('pagination-container');
-        if (!container) return; // guard
+        // Busca todos os elementos que possuem a classe .pagination-container
+        const containers = document.querySelectorAll('.pagination-container');
+        if (containers.length === 0) return; // guard
         
         if (this.totalPages <= 1) { // se não houver páginas
-            container.innerHTML = '';
+            for (const container of containers) {
+                container.innerHTML = '';
+            }
             return;
         }
 
@@ -853,7 +822,10 @@ class PagePosts extends PageBase{
             html += `<algol-button data-page="${this.currentPage + 1}">&rarr;</algol-button>`;
         }
 
-        container.innerHTML = html;
+        // Aplica o HTML gerado em todas as divs capturadas
+        for (const container of containers) {
+            container.innerHTML = html;
+        }
     }
 }
 
@@ -989,20 +961,9 @@ class PageSingle extends PageBase{
     getTranslationPath() { return '/pages/single.json'; }
 
     /** @override */
-    async render() {
-        let cachedPostsHtml = null;
-
-        const postsContent = cachedPostsHtml
-            ? cachedPostsHtml
-            : /* html */`
-                <div id="single-container">
-                    <h2 style="text-align: center;">
-                        ${this.t.loading}
-                    </h2>
-               </div>`;
-               
+    async render() {   
         this.container.innerHTML = `
-            ${postsContent}
+            <div id="single-container"></div>
         `;
 
         this.injectStyle(/* css */`
@@ -1385,9 +1346,8 @@ class PageSingle extends PageBase{
                 }
             }
         `);
-
-        if (!cachedPostsHtml)
-            await this.loadData();
+        
+        await this.loadData();
     }
 
     /** @override */
@@ -1396,19 +1356,13 @@ class PageSingle extends PageBase{
         if (!div) return;
 
         try {
-
-            const response = await fetch(`/api/post/${this.params.slug}`);
-            const artigo = await response.json();
-
-            let stringHtml = "";
-
-            if(document.documentElement.lang != artigo.idiom_name){ // se o idioma da página for diferente ao do artigo
-                stringHtml = `
-                <h2 style="margin: 5vw">${this.t.invalid_idiom}</h2>
-                `
-            }else{ // apenas constroi o conteúdo do single se o idioma for válido
+            const singleData = await this.withCache(`${this.getDataCacheKey()}_${this.params.slug}`, async ()=>{ // padrão CACHE-ASIDE
+                const response = await fetch(`/api/post/${this.params.slug}`); // buscar os dados do artigo
+                const artigo = await response.json(); // desistringfica
+                if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
                 const content = this.processSingleContent(artigo.content); // faz substituições de tags marcadas no artigo
-                stringHtml = `
+                // constroi o html do artigo
+                let stringHtml = `
                     <algol-grid-layout posh="stretch" cols="1fr">
                         <algol-grid-item
                         img="${IMAGE_BUCKET}${artigo.featured_image_url}"
@@ -1435,10 +1389,28 @@ class PageSingle extends PageBase{
                         </algol-grid-item>
                     </algol-grid-layout>
                 `;
-            }
+                return {html:stringHtml,lang: artigo.idiom_name};
+            },true);
 
-            div.outerHTML = stringHtml; // substitui a div pelo <algol-grid-layout>
-            this.attachVideoEvents();
+            if(document.documentElement.lang != singleData.lang){ // se o idioma da página for diferente ao do artigo
+                div.outerHTML = `
+                    <div style="text-align: center; margin: 5vw;">
+                        <h2>${this.t.invalid_idiom}</h2>
+                        <algol-spacer value="2"></algol-spacer>
+                        <algol-button id="btn-change-lang">
+                            ${this.t.change_lang} ${singleData.lang}
+                        </algol-button>
+                    </div>
+                    `;
+                document.getElementById('btn-change-lang').addEventListener('click', () => {
+                    localStorage.setItem('app_lang', singleData.lang);
+                    document.documentElement.lang = singleData.lang; // altera na tag html
+                    window.location.reload(); // Recarrega a página para reaplicar as traduções
+                });
+            }else{
+                div.outerHTML = singleData.html; // imprime o conteúdo do single
+                this.attachVideoEvents(); // adiciona os eventos do video
+            }
 
         } catch (error) {
             div.innerHTML = `<p>${this.t.error_load}</p>`;

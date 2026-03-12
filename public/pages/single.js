@@ -9,9 +9,6 @@ class PageSingle extends PageBase{
     /** MÉTODOS SOBRESCRITOS ********************************* */
     /** ****************************************************** */
 
-    /** @override */
-    getPageId() { return 'single'; }
-
     /** @override apenas se houver tradução para as páginas */ 
     getTranslationPath() { return '/pages/single.json'; }
 
@@ -411,19 +408,13 @@ class PageSingle extends PageBase{
         if (!div) return;
 
         try {
-
-            const response = await fetch(`/api/post/${this.params.slug}`);
-            const artigo = await response.json();
-
-            let stringHtml = "";
-
-            if(document.documentElement.lang != artigo.idiom_name){ // se o idioma da página for diferente ao do artigo
-                stringHtml = `
-                <h2 style="margin: 5vw">${this.t.invalid_idiom}</h2>
-                `
-            }else{ // apenas constroi o conteúdo do single se o idioma for válido
+            const singleData = await this.withCache(`${this.getDataCacheKey()}_${this.params.slug}`, async ()=>{ // padrão CACHE-ASIDE
+                const response = await fetch(`/api/post/${this.params.slug}`); // buscar os dados do artigo
+                const artigo = await response.json(); // desistringfica
+                if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
                 const content = this.processSingleContent(artigo.content); // faz substituições de tags marcadas no artigo
-                stringHtml = `
+                // constroi o html do artigo
+                let stringHtml = `
                     <algol-grid-layout posh="stretch" cols="1fr">
                         <algol-grid-item
                         img="${IMAGE_BUCKET}${artigo.featured_image_url}"
@@ -450,10 +441,28 @@ class PageSingle extends PageBase{
                         </algol-grid-item>
                     </algol-grid-layout>
                 `;
-            }
+                return {html:stringHtml,lang: artigo.idiom_name};
+            },true);
 
-            div.outerHTML = stringHtml; // substitui a div pelo <algol-grid-layout>
-            this.attachVideoEvents();
+            if(document.documentElement.lang != singleData.lang){ // se o idioma da página for diferente ao do artigo
+                div.outerHTML = `
+                    <div style="text-align: center; margin: 5vw;">
+                        <h2>${this.t.invalid_idiom}</h2>
+                        <algol-spacer value="2"></algol-spacer>
+                        <algol-button id="btn-change-lang">
+                            ${this.t.change_lang} ${singleData.lang}
+                        </algol-button>
+                    </div>
+                    `;
+                document.getElementById('btn-change-lang').addEventListener('click', () => {
+                    localStorage.setItem('app_lang', singleData.lang);
+                    document.documentElement.lang = singleData.lang; // altera na tag html
+                    window.location.reload(); // Recarrega a página para reaplicar as traduções
+                });
+            }else{
+                div.outerHTML = singleData.html; // imprime o conteúdo do single
+                this.attachVideoEvents(); // adiciona os eventos do video
+            }
 
         } catch (error) {
             div.innerHTML = `<p>${this.t.error_load}</p>`;

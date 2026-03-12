@@ -9,9 +9,6 @@
         /** MÉTODOS SOBRESCRITOS ********************************* */
         /** ****************************************************** */
 
-        /** @override */
-        getPageId() { return 'menu'; }
-
         /** @override apenas se houver tradução para as páginas */ 
         getTranslationPath() { return '/pages/menu.json'; }
 
@@ -80,15 +77,7 @@
         changeLanguage(newLang) {
             // 1. Salva a nova preferência no localstorage
             localStorage.setItem('app_lang', newLang);
-
             document.documentElement.lang = newLang; // altera na tag html
-
-            // TODO - Essa mecanica abaixo tem que levar em consideração a politica de cache que ainda será implementada
-            // 2. Limpa o sessionStorage. 
-            // Como suas classes PageHome e PagePosts usam sessionStorage para evitar recarregar dados do Elysia,
-            // nós precisamos limpar esse cache. Caso contrário, o layout muda para inglês, mas os posts continuam em português.
-            // sessionStorage.clear();
-
             window.location.reload(); // 3. Recarrega a página para reaplicar as traduções
         }
     }

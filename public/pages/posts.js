@@ -13,9 +13,6 @@ class PagePosts extends PageBase{
     /** MÉTODOS SOBRESCRITOS ********************************* */
     /** ****************************************************** */
 
-    /** @override */
-    getPageId() { return 'posts'; }
-
     /** @override apenas se houver tradução para as páginas */ 
     getTranslationPath() { return '/pages/posts.json'; }
 
@@ -72,57 +69,47 @@ class PagePosts extends PageBase{
         this.isLoading = true;
         
         const div = document.getElementById('posts-container');
-
         const limit = this.postsPerPage;
         const lang = document.documentElement.lang; // obtem o idioma atual da página
-        const cacheKey = `${this.getDataCacheKey()}_${page}`; // Chave única por página
+        const cacheKey = `${this.getDataCacheKey()}_${document.documentElement.lang}_${page}`; // Chave única por página
         
         try {
-            // 1. TENTA BUSCAR NO CACHE PRIMEIRO
-            const cachedData = sessionStorage.getItem(cacheKey);
-            if (cachedData) { // se teve sucesso ao buscar no cache
-                const parsedCache = JSON.parse(cachedData);
-                div.innerHTML = parsedCache.html; // Restaura o HTML
-                this.totalPages = parsedCache.totalPages; // Restaura o total de páginas
-                this.renderPaginationBar(); // Desenha os botões
-                this.isLoading = false;
-                return; // Fim! Zero requisições ao servidor.
-            }
 
-            // 2. SE NÃO TEM CACHE, VAI BUSCAR NO SERVIDOR
-            const response = await fetch(`/api/paginated-posts?page=${page}&limit=${limit}&lang=${lang}`);
-            const resultado = await response.json();
-            
-            this.totalPages = Math.ceil(resultado.totalCount / limit);
-            const artigos = resultado.data;
+            const data = await this.withCache(cacheKey, async ()=>{ // padrão CACHE-ASIDE
 
-            let stringHtml = `<algol-grid-layout class="card-bg" posh="stretch" cols="1fr 1fr 1fr" colsbreak="1fr" gap="1vw" gapbreak="10vw" style="align-items: start;">`;
-            stringHtml += artigos.map(artigo => /* html */`
-                <algol-grid-item padding="1vw">
-                    <a href="/${artigo.slug}" onclick="route(event)" style="text-decoration: none; color: inherit;">
-                        <algol-image radius="0.1vw" size="100%" src="${IMAGE_BUCKET}${artigo.featured_image_url}" alt="landscape" width="400" height="200"></algol-image>
-                        <algol-grid-layout cols="1fr" color="white">
-                            <algol-grid-item padding="1vw" paddingbreak="4vw">
-                                <algol-spacer value="1"></algol-spacer>
-                                <h3 style="text-align:left;">${artigo.title}</h3>
-                                <algol-spacer value="1"></algol-spacer>
-                                <p style="text-align:left;">${artigo.excerpt}</p>
-                                <algol-spacer value="1"></algol-spacer>
-                            </algol-grid-item>
-                        </algol-grid-layout>
-                    </a>
-                </algol-grid-item>
-            `).join('');
-            stringHtml += `</algol-grid-layout>`;
+                div.innerHTML = /* html */`<div style="display: flex; justify-content: center; width: 100%; padding: 5vw 0;"><h2>${this.t.loading_page} ${page}...</h2></div>`;
 
-            div.innerHTML = stringHtml;
+                const response = await fetch(`/api/paginated-posts?page=${page}&limit=${limit}&lang=${lang}`);
+                if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
+                const resultado = await response.json();
+                
+                const totalPages = Math.ceil(resultado.totalCount / limit);
+                const artigos = resultado.data;
 
-            // 6. SALVA NO CACHE, o HTML e o totalPages juntos
-            sessionStorage.setItem(cacheKey, JSON.stringify({
-                html: stringHtml,
-                totalPages: this.totalPages
-            }));
+                let stringHtml = `<algol-grid-layout class="card-bg" posh="stretch" cols="1fr 1fr 1fr" colsbreak="1fr" gap="1vw" gapbreak="10vw" style="align-items: start;">`;
+                stringHtml += artigos.map(artigo => /* html */`
+                    <algol-grid-item padding="1vw">
+                        <a href="/${artigo.slug}" onclick="route(event)" style="text-decoration: none; color: inherit;">
+                            <algol-image radius="0.1vw" size="100%" src="${IMAGE_BUCKET}${artigo.featured_image_url}" alt="landscape" width="400" height="200"></algol-image>
+                            <algol-grid-layout cols="1fr" color="white">
+                                <algol-grid-item padding="1vw" paddingbreak="4vw">
+                                    <algol-spacer value="1"></algol-spacer>
+                                    <h3 style="text-align:left;">${artigo.title}</h3>
+                                    <algol-spacer value="1"></algol-spacer>
+                                    <p style="text-align:left;">${artigo.excerpt}</p>
+                                    <algol-spacer value="1"></algol-spacer>
+                                </algol-grid-item>
+                            </algol-grid-layout>
+                        </a>
+                    </algol-grid-item>
+                `).join('');
+                stringHtml += `</algol-grid-layout>`;
 
+                return {html: stringHtml, totalPages};
+            }, true);
+            // recupera os dados vindos da requisição (ou do cache)
+            div.innerHTML = data.html; 
+            this.totalPages = data.totalPages;
             // Invoca a construção dos botões na interface
             this.renderPaginationBar();
 
@@ -144,7 +131,6 @@ class PagePosts extends PageBase{
         
         const div = document.getElementById('posts-container');
         if (div) {
-            div.innerHTML = /* html */`<div style="display: flex; justify-content: center; width: 100%; padding: 5vw 0;"><h2>${this.t.loading_page} ${page}...</h2></div>`;
             div.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
         

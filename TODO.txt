@@ -1,3 +1,3 @@
-- Implementar o sistema de cache da página Single
-    * a página single, precisa sobrescrever o this.cacheKeys.data para incluir o slug tb, uma vez que todos os posts são exibidos na mesma página
+- Criar sistema de Breadcrumbs
+- Criar sistema de SEO e Meta Tags Dinâmicas
 - Resolver o CSS dos singles

@@ -9,9 +9,6 @@
         /** MÉTODOS SOBRESCRITOS ********************************* */
         /** ****************************************************** */
 
-        /** @override */
-        getPageId() { return 'publications'; }
-
         /** @override apenas se houver tradução para as páginas */ 
         getTranslationPath() { return '/pages/publications.json'; }
 

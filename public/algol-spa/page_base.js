@@ -12,8 +12,6 @@ class PageBase {
     /** ****************************************************** */
 
     /** @abstract */
-    getPageId() {throw new Error("getPageId() deve retornar um identificador único da página");}
-    /** @abstract */
     async render() {throw new Error("render() não implementado");}
     /** @abstract */
     async loadData() {throw new Error("loadData() não implementado");}
@@ -22,12 +20,23 @@ class PageBase {
     /** MÉTODOS CONCRETOS ************************************ */
     /** ****************************************************** */
     
+    /** Permite que os dados sejam salvos no cache, sem a necessidade das páginas implementarem (padrão CACHE-ASIDE) */
+    async withCache(cacheKey, fetchCallback, isJson = false) {
+        const cachedData = sessionStorage.getItem(cacheKey); // tenta obter o cache informado
+        if(cachedData) // se existir o cache
+            return isJson? JSON.parse(cachedData) : cachedData; // retorna o cache em JSON ou em texto
+        const freshData = await fetchCallback(); // se não encontrou, executa a regra do chamador
+        const dataToCache = isJson? JSON.stringify(freshData): freshData; // prepara os dados para salvamento no cache
+        sessionStorage.setItem(cacheKey,dataToCache); // salva no cache
+        return freshData; // retorna os dados
+    }
+
     getDataCacheKey(){ // id único para cache dos dados da página
-        return `dataCache_${this.getPageId()}_${document.documentElement.lang}`;
+        return `dataCache_${this.constructor.name}`;
     }
 
     getI18nCacheKey(){ // id único para o dicionário de traduções da página
-        return `i18nCache_${this.getPageId()}`;
+        return `i18nCache_${this.constructor.name}`;
     }
 
     getTranslationPath() {
@@ -43,28 +52,21 @@ class PageBase {
         if (!this.getTranslationPath()) return; // Se a página não definiu tradução, ignora o i18n silenciosamente
         if (this.t) return; // se ja carregou, encerra
 
-        const lang = document.documentElement.lang; // obtem o idioma atual do html
-
+        const lang = document.documentElement.lang; // obtém o idioma atual do html
+        
         try {
-            // tenta buscar o dicionário no cache (para evitar fetch)
-            const cachedI18n = sessionStorage.getItem(this.getI18nCacheKey());
-            if(cachedI18n){ // se conseguiu recuperar o dicionario do cache
-                const allTranslations = JSON.parse(cachedI18n); // desistringfica
-                this.t = allTranslations[lang] || allTranslations['pt-br']; // obtém o objeto do idioma
-                return;
-            }
-
-            // se não há cache, mostra msg de loading pra fazer fetch
-            this.container.innerHTML = `<h2 style="text-align: center; margin-top: 5vw;">Loading...</h2>`;
-            // busca as traduções da página
-            const response = await fetch(this.getTranslationPath());
-            if (!response.ok) {throw new Error(`HTTP ${response.status}`);}
-
-            const allTranslations = await response.json();
-            // Salva o JSON completo no cache
-            sessionStorage.setItem(this.getI18nCacheKey(), JSON.stringify(allTranslations));
-            // obtém o objeto do idioma
-            this.t = allTranslations[lang] || allTranslations['pt-br'];
+            
+            const translationsData = await this.withCache(this.getI18nCacheKey(),async()=>{ // padrão CACHE-ASIDE
+                this.container.innerHTML = `<h2 style="text-align: center; margin-top: 5vw;">Loading...</h2>`; // texto de loading
+                // busca as traduções da página
+                const response = await fetch(this.getTranslationPath());
+                if (!response.ok) {throw new Error(`HTTP ${response.status}`);}
+                const allTranslations = await response.json();
+                return allTranslations; // retorna o json das traduções
+            },true);
+            
+            this.t = translationsData[lang] || translationsData['pt-br'];
+        
         } catch (error) {
             console.error("Erro no processamento de traduções:", error);
             // Fallback de emergência caso o arquivo falhe

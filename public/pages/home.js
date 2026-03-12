@@ -8,9 +8,6 @@ class PageHome extends PageBase{
     /** MÉTODOS SOBRESCRITOS ********************************* */
     /** ****************************************************** */
 
-    /** @override */
-    getPageId() { return 'home'; }
-
     /** @override apenas se houver tradução para as páginas */ 
     getTranslationPath() { return '/pages/home.json'; }
 
@@ -72,34 +69,28 @@ class PageHome extends PageBase{
     /** @override */
     async loadData() {
         const div = document.getElementById('posts-container');
-        if (!div) return;
+        if (!div) return; // guard!
         try {
+            const htmlContent = await this.withCache(`${this.getDataCacheKey()}_${document.documentElement.lang}`, async ()=>{ // padrão CACHE-ASIDE
+                div.innerHTML = `<h2 style="text-align: center;">${this.t.loading || 'Carregando...'}</h2>`;
+                const lang = document.documentElement.lang; // obtém o idioma atual da página
+                const response = await fetch(`/api/simple-posts?limit=${6}&lang=${lang}`); // vai buscar os dados no servidor
+                if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
+                const artigos = await response.json(); // desistringfica
+                let stringHtml = `<algol-grid-layout  class="card-bg" posh="stretch" cols="1fr 1fr 1fr" colsbreak="1fr 1fr" gap="1vw">`
+                stringHtml += artigos.map(artigo => /* html */`
+                    <algol-grid-item padding="1vw">
+                        <a href="/${artigo.slug}" onclick="route(event)">
+                            <algol-image radius="0.4vw" size="100%" src="${IMAGE_BUCKET}${artigo.featured_image_url}" alt="landscape" width="400" height="200"></algol-image>
+                            <p style="text-align:center;">${artigo.title}</p>
+                        </a>
+                    </algol-grid-item>
+                `).join('');
+                stringHtml += `</algol-grid-layout>`
+                return stringHtml;
+            },false);
             
-            // tenta buscar os dados da página no cache (para evitar fetch)
-            let stringHtml = sessionStorage.getItem(this.getDataCacheKey());
-
-            if(stringHtml){ // se conseguiu recuperar os dados do cache
-                div.outerHTML = stringHtml; // substitui a div pelo conteúdo do cache
-                return;
-            }
-
-            const lang = document.documentElement.lang; // obtem o idioma atual da página
-            const response = await fetch(`/api/simple-posts?limit=${6}&lang=${lang}`); // vai buscar os dados no servidor
-            const artigos = await response.json(); // desistringfica
-            stringHtml = `<algol-grid-layout  class="card-bg" posh="stretch" cols="1fr 1fr 1fr" colsbreak="1fr 1fr" gap="1vw">`
-            stringHtml += artigos.map(artigo => /* html */`
-                <algol-grid-item padding="1vw">
-                    <a href="/${artigo.slug}" onclick="route(event)">
-                        <algol-image radius="0.4vw" size="100%" src="${IMAGE_BUCKET}${artigo.featured_image_url}" alt="landscape" width="400" height="200"></algol-image>
-                        <p style="text-align:center;">${artigo.title}</p>
-                    </a>
-                </algol-grid-item>
-            `).join('');
-            stringHtml += `</algol-grid-layout>`
-
-            div.outerHTML = stringHtml; // substitui a div pelo <algol-grid-layout>
-            sessionStorage.setItem(this.getDataCacheKey(), stringHtml); // salva no cache do sessionStorage para evitar recarregar do servidor
-
+            div.innerHTML = htmlContent; // substitui a div pelo <algol-grid-layout>
         } catch (error) {
             console.error("Erro ao carregar artigos:", error);
             div.innerHTML = "<p>Erro ao carregar conteúdos.</p>";
