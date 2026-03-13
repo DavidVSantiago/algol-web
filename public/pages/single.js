@@ -413,6 +413,9 @@ class PageSingle extends PageBase{
                 const artigo = await response.json(); // desistringfica
                 if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
                 const content = this.processSingleContent(artigo.content); // faz substituições de tags marcadas no artigo
+                const lang = document.documentElement.lang || 'pt-br';
+                const opt = { year: 'numeric', month: 'long', day: 'numeric' };
+                const dataFormatada = new Date(artigo.date * 1000).toLocaleDateString(lang,opt);
                 // constroi o html do artigo
                 let stringHtml = `
                     <algol-grid-layout posh="stretch" cols="1fr">
@@ -429,7 +432,7 @@ class PageSingle extends PageBase{
                             <algol-spacer value="1.5"></algol-spacer>
                             <p style="text-align: center; color: white;">${artigo.excerpt}</p>
                             <algol-spacer value="1.5"></algol-spacer>
-                            <p style="text-align: center; color: white;">${artigo.date}</p>
+                            <p style="text-align: center; color: white;">${dataFormatada}</p>
                         </algol-grid-item>
                         
                         <algol-grid-item>
