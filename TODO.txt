@@ -1,3 +1,2 @@
-- Criar sistema de Breadcrumbs
-- Criar sistema de SEO e Meta Tags Dinâmicas
 - Resolver o CSS dos singles
+- fazer o sistema de cache do backend

@@ -82,4 +82,42 @@ class PageBase {
         style.textContent = cssString;
         document.head.appendChild(style);
     }
+
+    /** permite inserir as metatags da página */
+    setMetaTags({ title, description, image, url }) {
+        // 1. Atualiza o título da aba do navegador
+        if (title) document.title = title;
+
+        // Função auxiliar para injetar/atualizar tags no <head>
+        const setMeta = (property, content, attribute = 'name') => {
+            if (!content) return;
+            // Tenta achar a tag existente (ex: <meta name="description" ...>)
+            let tag = document.querySelector(`meta[${attribute}="${property}"]`);
+            if (!tag) {
+                // Se não existir, cria e anexa ao <head>
+                tag = document.createElement('meta');
+                tag.setAttribute(attribute, property);
+                document.head.appendChild(tag);
+            }
+            tag.setAttribute('content', content);
+        };
+
+        const currentUrl = url || window.location.href;
+
+        // 2. SEO Padrão
+        setMeta('description', description);
+
+        // 3. Open Graph (Facebook, LinkedIn, WhatsApp)
+        setMeta('og:title', title, 'property');
+        setMeta('og:description', description, 'property');
+        setMeta('og:image', image, 'property');
+        setMeta('og:url', currentUrl, 'property');
+        setMeta('og:type', 'website', 'property');
+
+        // 4. Twitter Cards (X)
+        setMeta('twitter:card', 'summary_large_image');
+        setMeta('twitter:title', title);
+        setMeta('twitter:description', description);
+        setMeta('twitter:image', image);
+    }
 }

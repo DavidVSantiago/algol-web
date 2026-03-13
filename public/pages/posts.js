@@ -47,6 +47,14 @@ class PagePosts extends PageBase{
             </algol-grid-layout>
         `;
 
+        // 💡 INJEÇÃO DE SEO ESTÁTICO AQUI!
+        this.setMetaTags({
+            title: `Algol.dev | Posts`,
+            description: this.t.hero_title,
+            image: `${IMAGE_BUCKET}/imagens/structural-site/articles-page-cover.webp`,
+            url: window.location.href
+        });
+
         const paginationContainers = document.querySelectorAll('.pagination-container');
         for (const container of paginationContainers) {
             container.addEventListener('click', async (e) => {

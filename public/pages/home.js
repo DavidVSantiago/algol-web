@@ -63,6 +63,14 @@ class PageHome extends PageBase{
             </algol-grid-layout>
         `;
 
+        // 💡 INJEÇÃO DE SEO ESTÁTICO AQUI!
+        this.setMetaTags({
+            title: `Algol.dev | Home`,
+            description: this.t.hero_title,
+            image: `${IMAGE_BUCKET}/imagens/structural-site/slide-img-01.webp`,
+            url: window.location.href
+        });
+
         await this.loadData();
     }
 
@@ -70,6 +78,7 @@ class PageHome extends PageBase{
     async loadData() {
         const div = document.getElementById('posts-container');
         if (!div) return; // guard!
+
         try {
             const htmlContent = await this.withCache(`${this.getDataCacheKey()}_${document.documentElement.lang}`, async ()=>{ // padrão CACHE-ASIDE
                 div.innerHTML = `<h2 style="text-align: center;">${this.t.loading || 'Carregando...'}</h2>`;

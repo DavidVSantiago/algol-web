@@ -413,6 +413,15 @@ class PageSingle extends PageBase{
                 const artigo = await response.json(); // desistringfica
                 if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
                 const content = this.processSingleContent(artigo.content); // faz substituições de tags marcadas no artigo
+
+                // 1. Prepara o objeto de SEO para ser salvo no cache
+                const seoData = {
+                    title: `${artigo.title} | Algol.dev`,
+                    description: artigo.excerpt,
+                    image: `${IMAGE_BUCKET}${artigo.featured_image_url}`,
+                    url: window.location.href
+                };
+                
                 const lang = document.documentElement.lang || 'pt-br';
                 const opt = { year: 'numeric', month: 'long', day: 'numeric' };
                 const dataFormatada = new Date(artigo.date * 1000).toLocaleDateString(lang,opt);
@@ -444,8 +453,11 @@ class PageSingle extends PageBase{
                         </algol-grid-item>
                     </algol-grid-layout>
                 `;
-                return {html:stringHtml,lang: artigo.idiom_name};
+                return {html:stringHtml, lang:artigo.idiom_name, seo:seoData};
             },true);
+
+            // INJEÇÃO DE SEO AQUI!
+            this.setMetaTags(singleData.seo);
 
             if(document.documentElement.lang != singleData.lang){ // se o idioma da página for diferente ao do artigo
                 div.outerHTML = `

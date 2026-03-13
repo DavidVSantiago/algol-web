@@ -91,6 +91,14 @@
                     }
                 }
             `);
+
+            // 💡 INJEÇÃO DE SEO ESTÁTICO AQUI!
+            this.setMetaTags({
+                title: `Algol.dev | Publications`,
+                description: this.t.book1_subtitle,
+                image: `${IMAGE_BUCKET}/imagens/structural-site/books-page-cover.webp`,
+                url: window.location.href
+            });
         }
 
         /** @override */

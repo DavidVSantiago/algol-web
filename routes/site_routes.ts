@@ -10,6 +10,12 @@ export const siteRoutes = new Elysia()
         if (await file.exists()) {
             return file;
         }
+
+        // 💡 ATUALIZADO: Adicionamos txt e xml na lista
+        if (path.match(/\.(js|css|png|jpg|jpeg|svg|webp|woff|woff2|ttf|ico|json|txt|xml)$/i)) {
+            return new Response('Not Found', { status: 404 });
+        }
+
         // Se o arquivo não existir, é uma rota do frontend (ex: /algoritmo-o-que-e)
         // Então fazemos o fallback para o index.html
         return Bun.file('public/index.html');
