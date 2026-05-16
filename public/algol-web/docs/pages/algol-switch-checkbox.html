@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentação Algol UI - Switch Checkbox</title>
+    <style>
+        :root {
+            --primary-color: #0056b3;
+            --text-color: #333;
+            --bg-color: #fff;
+            --border-color: #e0e0e0;
+            --code-bg: #f8f9fa;
+            --code-color: #d63384;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        h1, h2, h3 {
+            color: var(--primary-color);
+            margin-top: 2rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.5rem;
+        }
+
+        h1 { font-size: 2.5rem; margin-top: 0; }
+        h2 { font-size: 1.75rem; }
+
+        code {
+            background-color: var(--code-bg);
+            color: var(--code-color);
+            padding: 0.2em 0.4em;
+            border-radius: 4px;
+            font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+            font-size: 0.9em;
+        }
+
+        pre {
+            background-color: var(--code-bg);
+            padding: 1rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            border: 1px solid var(--border-color);
+        }
+
+        pre code {
+            background-color: transparent;
+            color: var(--text-color);
+            padding: 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background-color: var(--code-bg);
+            font-weight: 600;
+        }
+
+        ul {
+            padding-left: 1.5rem;
+        }
+
+        li {
+            margin-bottom: 1.5rem;
+        }
+
+        .alert-info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            padding: 1rem;
+            border-left: 4px solid #117a8b;
+            margin-bottom: 1rem;
+        }
+        
+        .alert-warning {
+            background-color: #fff3cd;
+            color: #856404;
+            padding: 1rem;
+            border-left: 4px solid #ffeeba;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+
+    <main>
+        <article id="algol-switch-checkbox">
+            <h1><code>&lt;algol-switch-checkbox&gt;</code></h1>
+            
+            <section>
+                <h2>Visão Geral</h2>
+                <p>Componente de interruptor (Toggle Switch). Visualmente, ele exibe uma interface moderna de deslizar (on/off), ideal para painéis de configurações. Mecanicamente, ele é idêntico a um checkbox padrão, herdando toda a robustez da classe <strong><code>BaseCheckable</code></strong>.</p>
+                <pre><code>&lt;algol-switch-checkbox name="notificacoes" checked&gt;Ativar notificações&lt;/algol-switch-checkbox&gt;</code></pre>
+            </section>
+
+            <section>
+                <h2>Diferencial Semântico</h2>
+                <div class="alert-info">
+                    <strong>Quando usar?</strong> Enquanto o <code>&lt;algol-checkbox&gt;</code> é ideal para múltiplos itens em uma lista ou aceite de termos, o <code>&lt;algol-switch-checkbox&gt;</code> passa a sensação de "mudança instantânea de estado". É a escolha perfeita para ativar Dark Mode, ligar/desligar Wi-Fi em um painel ou habilitar configurações de usuário.
+                </div>
+            </section>
+
+            <section>
+                <h2>Atributos de Configuração</h2>
+                <p>Por ser um herdeiro direto do <code>BaseCheckable</code>, ele compartilha exatamente os mesmos atributos do checkbox convencional:</p>
+                <ul>
+                    <li><code>checked</code>: Faz a bolinha iniciar na posição "Ligado" (à direita, colorida).</li>
+                    <li><code>name</code>: Nome do campo no formulário.</li>
+                    <li><code>value</code>: O valor enviado quando está na posição "Ligado" (padrão <code>"on"</code>).</li>
+                    <li><code>disabled</code>: Trava a animação, escurece o componente e impede o clique.</li>
+                    <li><code>required</code>: Impede o envio do formulário se o interruptor estiver desligado.</li>
+                    <li><code>label</code>: Texto embutido (embora o uso de <code>&lt;slot&gt;</code> seja recomendado para textos clicáveis).</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Eventos Emitidos</h2>
+                <p>A captura de dados é feita da mesma forma, escutando a mudança de estado da chave:</p>
+                
+                <ul>
+                    <li>
+                        <strong><code>algol-input</code></strong>: Disparado no momento em que a chave termina a animação de deslizar.
+                        <pre><code>document.querySelector('algol-switch-checkbox').addEventListener('algol-input', e =&gt; {
+  const isLigado = e.detail.origin.checked;
+  console.log(`Interruptor alterado. Estado atual: ${isLigado ? 'LIGADO' : 'DESLIGADO'}`);
+});</code></pre>
+                    </li>
+                </ul>
+            </section>
+        </article>
+    </main>
+
+</body>
+</html>

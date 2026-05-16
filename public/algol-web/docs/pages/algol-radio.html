@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentação Algol UI - Radio</title>
+    <style>
+        :root {
+            --primary-color: #0056b3;
+            --text-color: #333;
+            --bg-color: #fff;
+            --border-color: #e0e0e0;
+            --code-bg: #f8f9fa;
+            --code-color: #d63384;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        h1, h2, h3 {
+            color: var(--primary-color);
+            margin-top: 2rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.5rem;
+        }
+
+        h1 { font-size: 2.5rem; margin-top: 0; }
+        h2 { font-size: 1.75rem; }
+
+        code {
+            background-color: var(--code-bg);
+            color: var(--code-color);
+            padding: 0.2em 0.4em;
+            border-radius: 4px;
+            font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+            font-size: 0.9em;
+        }
+
+        pre {
+            background-color: var(--code-bg);
+            padding: 1rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            border: 1px solid var(--border-color);
+        }
+
+        pre code {
+            background-color: transparent;
+            color: var(--text-color);
+            padding: 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background-color: var(--code-bg);
+            font-weight: 600;
+        }
+
+        ul {
+            padding-left: 1.5rem;
+        }
+
+        li {
+            margin-bottom: 1.5rem;
+        }
+
+        .alert-info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            padding: 1rem;
+            border-left: 4px solid #117a8b;
+            margin-bottom: 1rem;
+        }
+
+        .alert-warning {
+            background-color: #fff3cd;
+            color: #856404;
+            padding: 1rem;
+            border-left: 4px solid #ffeeba;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+
+    <main>
+        <article id="algol-radio">
+            <h1><code>&lt;algol-radio&gt;</code></h1>
+            
+            <section>
+                <h2>Visão Geral</h2>
+                <p>Componente de botão de opção (Radio Button) customizado. Utilizado quando o usuário precisa selecionar <strong>apenas uma opção</strong> dentre um conjunto mutuamente exclusivo. Assim como o checkbox, ele herda sua inteligência da classe <code>BaseCheckable</code>, mas com uma interface circular padrão para este tipo de controle.</p>
+                <pre><code>&lt;algol-radio name="plano" value="basico" checked&gt;Plano Básico&lt;/algol-radio&gt;
+&lt;algol-radio name="plano" value="premium"&gt;Plano Premium&lt;/algol-radio&gt;</code></pre>
+            </section>
+
+            <section>
+                <h2>Agrupamento e Exclusividade</h2>
+                <div class="alert-warning">
+                    <strong>A Importância do Atributo <code>name</code>:</strong> Para que os botões de rádio funcionem corretamente (onde marcar um desmarca o outro automaticamente), <strong>todos os itens do mesmo grupo devem ter o exato mesmo valor no atributo <code>name</code></strong>. A Algol UI rastreia o DOM ativamente para desmarcar os "irmãos" sempre que um novo item é clicado.
+                </div>
+            </section>
+
+            <section>
+                <h2>Atributos de Configuração</h2>
+                <p>O <code>algol-radio</code> compartilha os mesmos atributos de seus componentes irmãos herdados do <code>BaseCheckable</code>:</p>
+                <ul>
+                    <li><code>name</code>: <strong>Obrigatório</strong> para criar grupos de múltipla escolha onde apenas um vence.</li>
+                    <li><code>value</code>: O valor único que representa esta opção caso seja a escolhida e o formulário seja enviado.</li>
+                    <li><code>checked</code>: Define qual opção inicia pré-selecionada.</li>
+                    <li><code>disabled</code>: Bloqueia a interação do usuário com esta opção específica.</li>
+                    <li><code>required</code>: Exige que ao menos uma opção do grupo seja escolhida antes de submeter o formulário.</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Flexibilidade de Texto (Slot)</h2>
+                <p>Assim como no checkbox, o conteúdo de texto ao lado do rádio pode ser passado diretamente no "miolo" da tag (via <code>&lt;slot&gt;</code>), permitindo negritos, ícones ou links, em vez de usar apenas o atributo simples de label.</p>
+            </section>
+
+            <section>
+                <h2>Eventos Emitidos</h2>
+                <p>Sempre que o usuário seleciona uma opção não marcada, o evento de input é disparado:</p>
+                
+                <ul>
+                    <li>
+                        <strong><code>algol-input</code></strong>: Disparado quando este rádio específico é ativado. Note que, pelo comportamento nativo do Radio Button, você geralmente não captura o evento de "desmarcar", apenas o de "marcar" a nova opção escolhida.
+                        <pre><code>document.querySelectorAll('algol-radio[name="plano"]').forEach(radio =&gt; {
+  radio.addEventListener('algol-input', e =&gt; {
+      const { value } = e.detail;
+      console.log(`Nova opção selecionada: ${value}`);
+  });
+});</code></pre>
+                    </li>
+                </ul>
+            </section>
+        </article>
+    </main>
+
+</body>
+</html>

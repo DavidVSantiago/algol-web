@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentação Algol UI - Switch Radio</title>
+    <style>
+        :root {
+            --primary-color: #0056b3;
+            --text-color: #333;
+            --bg-color: #fff;
+            --border-color: #e0e0e0;
+            --code-bg: #f8f9fa;
+            --code-color: #d63384;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        h1, h2, h3 {
+            color: var(--primary-color);
+            margin-top: 2rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.5rem;
+        }
+
+        h1 { font-size: 2.5rem; margin-top: 0; }
+        h2 { font-size: 1.75rem; }
+
+        code {
+            background-color: var(--code-bg);
+            color: var(--code-color);
+            padding: 0.2em 0.4em;
+            border-radius: 4px;
+            font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+            font-size: 0.9em;
+        }
+
+        pre {
+            background-color: var(--code-bg);
+            padding: 1rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            border: 1px solid var(--border-color);
+        }
+
+        pre code {
+            background-color: transparent;
+            color: var(--text-color);
+            padding: 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background-color: var(--code-bg);
+            font-weight: 600;
+        }
+
+        ul {
+            padding-left: 1.5rem;
+        }
+
+        li {
+            margin-bottom: 1.5rem;
+        }
+
+        .alert-info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            padding: 1rem;
+            border-left: 4px solid #117a8b;
+            margin-bottom: 1rem;
+        }
+
+        .alert-warning {
+            background-color: #fff3cd;
+            color: #856404;
+            padding: 1rem;
+            border-left: 4px solid #ffeeba;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+
+    <main>
+        <article id="algol-switch-radio">
+            <h1><code>&lt;algol-switch-radio&gt;</code></h1>
+            
+            <section>
+                <h2>Visão Geral</h2>
+                <p>Componente de opção única com interface de interruptor (Toggle). Ele força o usuário a escolher <strong>apenas uma</strong> opção de um grupo, mas apresenta a escolha como chaves deslizantes, conferindo um aspecto mais tecnológico e imediato à interface.</p>
+                <pre><code>&lt;algol-switch-radio name="tema" value="claro" checked&gt;Modo Claro&lt;/algol-switch-radio&gt;
+&lt;algol-switch-radio name="tema" value="escuro"&gt;Modo Escuro&lt;/algol-switch-radio&gt;</code></pre>
+            </section>
+
+            <section>
+                <h2>Uso Semântico Recomendado</h2>
+                <div class="alert-info">
+                    <strong>Quando utilizar?</strong> Ao contrário de listas longas onde o <code>&lt;algol-radio&gt;</code> tradicional brilha, o <code>&lt;algol-switch-radio&gt;</code> é perfeito para <strong>escolhas binárias de interface</strong>. Exemplos clássicos: alternar entre visualização em "Lista" ou "Grade", Modo "Claro" ou "Escuro", Pagamento "Mensal" ou "Anual".
+                </div>
+            </section>
+
+            <section>
+                <h2>Agrupamento Obrigatório</h2>
+                <div class="alert-warning">
+                    <strong>A Regra do <code>name</code>:</strong> Assim como seu irmão padrão (<code>algol-radio</code>), este componente depende inteiramente do atributo <code>name</code> para funcionar. Todos os switches que pertencem à mesma escolha devem ter o exato mesmo <code>name</code> para que a Algol UI consiga desligar um quando o outro for ligado.
+                </div>
+            </section>
+
+            <section>
+                <h2>Atributos de Configuração</h2>
+                <p>Herdando as capacidades do <code>BaseCheckable</code>, ele suporta:</p>
+                <ul>
+                    <li><code>name</code>: <strong>Obrigatório</strong>. Agrupa os switches concorrentes.</li>
+                    <li><code>value</code>: O valor único que esta chave representa no formulário.</li>
+                    <li><code>checked</code>: Faz com que esta opção inicie ligada.</li>
+                    <li><code>disabled</code>: Bloqueia o clique, travando a chave na posição atual.</li>
+                    <li><code>required</code>: Exige validação de preenchimento para o grupo no formulário.</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Eventos Emitidos</h2>
+                <p>Para reagir instantaneamente à troca de visualização (por exemplo, aplicar o modo escuro na hora), escute o evento <code>algol-input</code> no grupo:</p>
+                
+                <ul>
+                    <li>
+                        <strong><code>algol-input</code></strong>: Disparado assim que a chave assume a posição "Ligado".
+                        <pre><code>document.querySelectorAll('algol-switch-radio[name="tema"]').forEach(switchRadio =&gt; {
+  switchRadio.addEventListener('algol-input', e =&gt; {
+      const { value } = e.detail;
+      console.log(`Tema alterado para: ${value}`);
+      // Lógica para aplicar o tema na tela
+  });
+});</code></pre>
+                    </li>
+                </ul>
+            </section>
+        </article>
+    </main>
+
+</body>
+</html>

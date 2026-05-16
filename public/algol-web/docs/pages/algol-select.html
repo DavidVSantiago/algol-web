@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentação Algol UI - Select</title>
+    <style>
+        :root {
+            --primary-color: #0056b3;
+            --text-color: #333;
+            --bg-color: #fff;
+            --border-color: #e0e0e0;
+            --code-bg: #f8f9fa;
+            --code-color: #d63384;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        h1, h2, h3 {
+            color: var(--primary-color);
+            margin-top: 2rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.5rem;
+        }
+
+        h1 { font-size: 2.5rem; margin-top: 0; }
+        h2 { font-size: 1.75rem; }
+
+        code {
+            background-color: var(--code-bg);
+            color: var(--code-color);
+            padding: 0.2em 0.4em;
+            border-radius: 4px;
+            font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+            font-size: 0.9em;
+        }
+
+        pre {
+            background-color: var(--code-bg);
+            padding: 1rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            border: 1px solid var(--border-color);
+        }
+
+        pre code {
+            background-color: transparent;
+            color: var(--text-color);
+            padding: 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background-color: var(--code-bg);
+            font-weight: 600;
+        }
+
+        ul {
+            padding-left: 1.5rem;
+        }
+
+        li {
+            margin-bottom: 1.5rem;
+        }
+
+        .alert-info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            padding: 1rem;
+            border-left: 4px solid #117a8b;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+
+    <main>
+        <article id="algol-select">
+            <h1><code>&lt;algol-select&gt;</code></h1>
+            
+            <section>
+                <h2>Visão Geral</h2>
+                <p>Componente de seleção suspensa (dropdown) customizado. Oferece estilo uniforme, seta personalizada e integração completa com a API de validação de formulários do navegador.</p>
+                <pre><code>&lt;algol-select label="Escolha um item" placeholder="Selecione..."&gt;
+    &lt;option value="1"&gt;Opção A&lt;/option&gt;
+    &lt;option value="2"&gt;Opção B&lt;/option&gt;
+&lt;/algol-select&gt;</code></pre>
+            </section>
+
+            <section>
+                <h2>Atributos de Configuração</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Atributo</th>
+                            <th>Descrição</th>
+                            <th>Valores Aceitos</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>label</code></td>
+                            <td>Texto descritivo exibido acima do campo.</td>
+                            <td><em>Texto</em></td>
+                        </tr>
+                        <tr>
+                            <td><code>value</code></td>
+                            <td>Define ou recupera o valor da opção atualmente selecionada.</td>
+                            <td><em>Texto</em> correspondente a um <code>value</code> de uma <code>&lt;option&gt;</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>placeholder</code></td>
+                            <td>Texto exibido como opção padrão desabilitada (ex: "Select...").</td>
+                            <td><em>Texto</em></td>
+                        </tr>
+                        <tr>
+                            <td><code>disabled</code></td>
+                            <td>Desabilita a interação com o menu suspenso.</td>
+                            <td><em>Booleano (presença do atributo)</em></td>
+                        </tr>
+                        <tr>
+                            <td><code>required</code></td>
+                            <td>Torna a seleção obrigatória. A validação falha se a opção placeholder estiver selecionada.</td>
+                            <td><em>Booleano (presença do atributo)</em></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p><em>Nota: Este componente utiliza as variáveis globais de tema da Algol UI e não possui atributos de estilização independentes (como <code>color</code>).</em></p>
+            </section>
+
+            <section>
+                <h2>Injeção de Opções (Slot)</h2>
+                <div class="alert-info">
+                    <strong>Sincronização Inteligente:</strong> Para popular o select, basta inserir tags <code>&lt;option&gt;</code> padrão dentro do componente. A Algol detecta essas opções via <code>slotchange</code>, clona-as para o select interno de forma segura e injeta automaticamente uma primeira opção invisível/desabilitada baseada no seu atributo <code>placeholder</code>.
+                </div>
+            </section>
+
+            <section>
+                <h2>Eventos Emitidos</h2>
+                <p>Assim como os demais componentes, ele herda o mapeamento do <strong><code>BaseComponent</code></strong> (focus, blur, etc.). Para capturar trocas de valor, utilize o evento <code>algol-change</code>:</p>
+                
+                <ul>
+                    <li>
+                        <strong><code>algol-change</code></strong>: Disparado no exato momento em que o usuário seleciona uma nova opção no menu suspenso (ignorado se o componente estiver <code>disabled</code>).
+                        <pre><code>document.querySelector('algol-select').addEventListener('algol-change', e =&gt; {
+  const { origin, oldValue, value } = e.detail;
+  console.log(`Valor alterado de [${oldValue}] para [${value}] no componente:`, origin);
+});</code></pre>
+                    </li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Validação de Formulário</h2>
+                <p>O componente suporta <code>formAssociated: true</code>. Se marcado como <code>required</code>, o formulário identificará uma falha de validação (<code>valueMissing</code>) caso o usuário tente submeter sem ter alterado o valor padrão do <code>placeholder</code>.</p>
+            </section>
+        </article>
+    </main>
+
+</body>
+</html>

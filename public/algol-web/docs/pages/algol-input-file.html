@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentação Algol UI - Input File</title>
+    <style>
+        :root {
+            --primary-color: #0056b3;
+            --text-color: #333;
+            --bg-color: #fff;
+            --border-color: #e0e0e0;
+            --code-bg: #f8f9fa;
+            --code-color: #d63384;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        h1, h2, h3 {
+            color: var(--primary-color);
+            margin-top: 2rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.5rem;
+        }
+
+        h1 { font-size: 2.5rem; margin-top: 0; }
+        h2 { font-size: 1.75rem; }
+
+        code {
+            background-color: var(--code-bg);
+            color: var(--code-color);
+            padding: 0.2em 0.4em;
+            border-radius: 4px;
+            font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+            font-size: 0.9em;
+        }
+
+        pre {
+            background-color: var(--code-bg);
+            padding: 1rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            border: 1px solid var(--border-color);
+        }
+
+        pre code {
+            background-color: transparent;
+            color: var(--text-color);
+            padding: 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background-color: var(--code-bg);
+            font-weight: 600;
+        }
+
+        ul {
+            padding-left: 1.5rem;
+        }
+
+        li {
+            margin-bottom: 1.5rem;
+        }
+
+        .alert-info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            padding: 1rem;
+            border-left: 4px solid #117a8b;
+            margin-bottom: 1rem;
+        }
+        
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            padding: 1rem;
+            border-left: 4px solid #c3e6cb;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+
+    <main>
+        <article id="algol-input-file">
+            <h1><code>&lt;algol-input-file&gt;</code></h1>
+            
+            <section>
+                <h2>Visão Geral</h2>
+                <p>Componente avançado para upload de arquivos. Substitui a interface truncada e não-estilizável do navegador por um design elegante composto de campo de leitura + botão de ação. Possui gestão automática de <i>FormData</i> e filtros de formato estritos.</p>
+                <pre><code>&lt;algol-input-file name="documento" label="Anexar RG" text="Procurar..." accept=".pdf, .jpg"&gt;&lt;/algol-input-file&gt;</code></pre>
+            </section>
+
+            <section>
+                <h2>Atributos de Configuração</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Atributo</th>
+                            <th>Descrição</th>
+                            <th>Valores Aceitos</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>text</code></td>
+                            <td>O texto exibido dentro do botão de ação.</td>
+                            <td><em>Texto</em> (Padrão: <code>Search</code>)</td>
+                        </tr>
+                        <tr>
+                            <td><code>accept</code></td>
+                            <td>Filtro de segurança que restringe os tipos de arquivos que o usuário pode selecionar.</td>
+                            <td><em>MIME types ou Extensões</em> (ex: <code>image/png, .pdf, video/*</code>)</td>
+                        </tr>
+                        <tr>
+                            <td><code>multiple</code></td>
+                            <td>Permite a seleção de múltiplos arquivos simultaneamente. Na interface, os nomes serão separados por " | ".</td>
+                            <td><em>Booleano (presença do atributo)</em></td>
+                        </tr>
+                        <tr>
+                            <td><code>name</code></td>
+                            <td>Nome da chave de envio do arquivo no formulário. Fundamental para o backend.</td>
+                            <td><em>Texto</em> (Padrão fallback: <code>file</code>)</td>
+                        </tr>
+                        <tr>
+                            <td><code>placeholder</code></td>
+                            <td>Texto de instrução no campo falso de texto.</td>
+                            <td><em>Texto</em> (Padrão: <code>Select file...</code>)</td>
+                        </tr>
+                        <tr>
+                            <td><code>disabled</code></td>
+                            <td>Desativa o botão, o campo de leitura e bloqueia a janela de seleção.</td>
+                            <td><em>Booleano (presença do atributo)</em></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section>
+                <h2>Motor de Dados e UX</h2>
+                <div class="alert-success">
+                    <strong>Auto-injeção de FormData:</strong> Em formulários tradicionais, o envio de arquivos requer codificação complexa (multipart/form-data). O <code>algol-input-file</code> resolve isso nos bastidores: ao selecionar os arquivos, ele os empacota nativamente em um objeto <code>FormData</code> usando a chave definida no atributo <code>name</code>. Se o componente estiver dentro de uma tag <code>&lt;form&gt;</code>, ele já envia os arquivos binários corretos automaticamente via <code>ElementInternals</code>.
+                </div>
+                <div class="alert-info">
+                    <strong>Validação Estrita (CustomError):</strong> Se o usuário arrastar um arquivo inválido (burlando a janela do sistema operacional) que não respeite a lista do <code>accept</code>, o componente rejeita a ação internamente, limpa a seleção e trava o formulário reportando um <code>customError</code>, impedindo uploads de arquivos indevidos no seu servidor.
+                </div>
+            </section>
+
+            <section>
+                <h2>Acesso aos Arquivos via JavaScript</h2>
+                <p>Caso você não esteja usando submissão nativa de formulários e precise acessar os arquivos binários (Blob/File) para fazer um upload via <code>fetch</code> ou <code>axios</code>, o componente expõe a propriedade <code>files</code>:</p>
+                <pre><code>const arquivos = document.querySelector('algol-input-file').files;
+console.log("Objeto FileList contendo os binários:", arquivos);</code></pre>
+            </section>
+
+            <section>
+                <h2>Eventos Emitidos</h2>
+                <ul>
+                    <li>
+                        <strong><code>algol-change</code></strong>: Disparado quando a janela do sistema operacional é fechada com uma seleção válida. O evento retorna <strong>os nomes</strong> dos arquivos em forma de texto (para uso em logs e interface). Para o binário, acesse a propriedade `.files` como mostrado acima.
+                        <pre><code>document.querySelector('algol-input-file').addEventListener('algol-change', e =&gt; {
+  const { oldValue, value } = e.detail;
+  console.log(`Arquivos anteriores: [${oldValue}]. Novos arquivos: [${value}]`);
+});</code></pre>
+                    </li>
+                </ul>
+            </section>
+        </article>
+    </main>
+
+</body>
+</html>

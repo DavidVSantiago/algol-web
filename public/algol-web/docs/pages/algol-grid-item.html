@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentação Algol UI - Grid Item</title>
+    <style>
+        :root {
+            --primary-color: #0056b3;
+            --text-color: #333;
+            --bg-color: #fff;
+            --border-color: #e0e0e0;
+            --code-bg: #f8f9fa;
+            --code-color: #d63384;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        h1, h2, h3 {
+            color: var(--primary-color);
+            margin-top: 2rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.5rem;
+        }
+
+        h1 { font-size: 2.5rem; margin-top: 0; }
+        h2 { font-size: 1.75rem; }
+
+        code {
+            background-color: var(--code-bg);
+            color: var(--code-color);
+            padding: 0.2em 0.4em;
+            border-radius: 4px;
+            font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+            font-size: 0.9em;
+        }
+
+        pre {
+            background-color: var(--code-bg);
+            padding: 1rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            border: 1px solid var(--border-color);
+        }
+
+        pre code {
+            background-color: transparent;
+            color: var(--text-color);
+            padding: 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background-color: var(--code-bg);
+            font-weight: 600;
+        }
+
+        ul {
+            padding-left: 1.5rem;
+        }
+
+        li {
+            margin-bottom: 1.5rem;
+        }
+
+        .alert-info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            padding: 1rem;
+            border-left: 4px solid #117a8b;
+            margin-bottom: 1rem;
+        }
+        
+        .alert-warning {
+            background-color: #fff3cd;
+            color: #856404;
+            padding: 1rem;
+            border-left: 4px solid #ffeeba;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+
+    <main>
+        <article id="algol-grid-item">
+            <h1><code>&lt;algol-grid-item&gt;</code></h1>
+            
+            <section>
+                <h2>Visão Geral</h2>
+                <p>O <code>algol-grid-item</code> é uma célula estrutural projetada para ser utilizada dentro do <code>&lt;algol-grid-layout&gt;</code>. Ele permite controle rápido de expansão (span), alinhamento isolado da célula, espaçamento interno responsivo e suporta um sistema avançado de imagem de fundo com overlay embutido.</p>
+                <p><strong>Nota interna:</strong> O próprio componente renderiza como <code>display: grid</code> com <code>gap: 0</code> por padrão, permitindo que seu conteúdo interno também seja alinhado facilmente.</p>
+                <pre><code>&lt;algol-grid-item colspan="2" posh="center" padding="2" color="#f0f0f0"&gt;
+    Conteúdo da Célula
+&lt;/algol-grid-item&gt;</code></pre>
+            </section>
+
+            <section>
+                <h2>Dimensão, Alinhamento e Espaçamento</h2>
+                <p>Estes atributos controlam a geometria do item na grade e como seu conteúdo respira:</p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Atributo</th>
+                            <th>Descrição / Regra Injetada</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>colspan</code></td>
+                            <td>Expansão horizontal (<code>grid-column-end: span [valor]</code>).</td>
+                        </tr>
+                        <tr>
+                            <td><code>rowspan</code></td>
+                            <td>Expansão vertical (<code>grid-row-end: span [valor]</code>).</td>
+                        </tr>
+                        <tr>
+                            <td><code>posh</code></td>
+                            <td>Alinhamento horizontal próprio (<code>justify-self</code>). Ex: <code>center</code>, <code>end</code>, <code>start</code>.</td>
+                        </tr>
+                        <tr>
+                            <td><code>posv</code></td>
+                            <td>Alinhamento vertical próprio (<code>align-self</code>). Ex: <code>center</code>, <code>end</code>, <code>start</code>.</td>
+                        </tr>
+                        <tr>
+                            <td><code>padding</code></td>
+                            <td>Espaçamento interno. Converte números soltos em <code>vw</code> automaticamente. (Ex: <code>"1 2"</code> vira <code>1vw 2vw</code>).</td>
+                        </tr>
+                        <tr>
+                            <td><code>color</code></td>
+                            <td>Define a cor de fundo (<code>background-color</code>) da célula.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section>
+                <h2>Controle Responsivo (Mobile)</h2>
+                <div class="alert-warning">
+                    <strong>Sufixo <code>break</code>:</strong> Todos os atributos listados acima possuem uma versão terminada em <code>break</code> (ex: <code>colspanbreak</code>, <code>poshbreak</code>, <code>paddingbreak</code>, <code>colorbreak</code>). Eles ativam Media Queries que sobrescrevem os valores nativos exclusivamente quando a tela atinge a largura mobile.
+                </div>
+            </section>
+
+            <section>
+                <h2>Sistema Avançado de Background (Imagem)</h2>
+                <div class="alert-info">
+                    <strong>Overlay Inteligente:</strong> Ao utilizar o atributo <code>imgoverlay</code> passando um valor entre <code>0</code> e <code>1</code>, o componente gera automaticamente um gradiente escuro por cima da imagem de fundo para garantir contraste do texto, sem necessidade de divs extras.
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Atributo</th>
+                            <th>Função (Mapeamento CSS)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>img</code></td>
+                            <td>URL da imagem de fundo (<code>background-image: url(...)</code>).</td>
+                        </tr>
+                        <tr>
+                            <td><code>imgoverlay</code></td>
+                            <td>Nível de escurecimento sobre a imagem (ex: <code>0.5</code> para 50% preto).</td>
+                        </tr>
+                        <tr>
+                            <td><code>imgsize</code></td>
+                            <td>Tamanho do fundo (ex: <code>cover</code>, <code>contain</code>).</td>
+                        </tr>
+                        <tr>
+                            <td><code>imgpos</code></td>
+                            <td>Posição da imagem (ex: <code>center</code>, <code>top right</code>).</td>
+                        </tr>
+                        <tr>
+                            <td><code>imgrepeat</code></td>
+                            <td>Repetição (ex: <code>no-repeat</code>, <code>repeat-x</code>).</td>
+                        </tr>
+                        <tr>
+                            <td><code>imgattach</code></td>
+                            <td>Fixação do fundo (ex: <code>fixed</code> para efeito parallax parallax simples).</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+        </article>
+    </main>
+
+</body>
+</html>

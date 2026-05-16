@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentação Algol UI - Input Range</title>
+    <style>
+        :root {
+            --primary-color: #0056b3;
+            --text-color: #333;
+            --bg-color: #fff;
+            --border-color: #e0e0e0;
+            --code-bg: #f8f9fa;
+            --code-color: #d63384;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        h1, h2, h3 {
+            color: var(--primary-color);
+            margin-top: 2rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.5rem;
+        }
+
+        h1 { font-size: 2.5rem; margin-top: 0; }
+        h2 { font-size: 1.75rem; }
+
+        code {
+            background-color: var(--code-bg);
+            color: var(--code-color);
+            padding: 0.2em 0.4em;
+            border-radius: 4px;
+            font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+            font-size: 0.9em;
+        }
+
+        pre {
+            background-color: var(--code-bg);
+            padding: 1rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            border: 1px solid var(--border-color);
+        }
+
+        pre code {
+            background-color: transparent;
+            color: var(--text-color);
+            padding: 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background-color: var(--code-bg);
+            font-weight: 600;
+        }
+
+        ul {
+            padding-left: 1.5rem;
+        }
+
+        li {
+            margin-bottom: 1.5rem;
+        }
+
+        .alert-info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            padding: 1rem;
+            border-left: 4px solid #117a8b;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+
+    <main>
+        <article id="algol-input-range">
+            <h1><code>&lt;algol-input-range&gt;</code></h1>
+            
+            <section>
+                <h2>Visão Geral</h2>
+                <p>Componente deslizante (slider) para seleção de valores numéricos contínuos ou em etapas. Ele fornece uma interface amigável e unificada, eliminando as inconsistências visuais drásticas que existem entre diferentes navegadores.</p>
+                <pre><code>&lt;algol-input-range label="Volume" min="0" max="100" step="10" value="50"&gt;&lt;/algol-input-range&gt;</code></pre>
+            </section>
+
+            <section>
+                <h2>Atributos de Configuração</h2>
+                <p>Herdando da classe base de Input, ele compartilha atributos como <code>label</code> e <code>disabled</code>, mas seu comportamento central é governado pelas propriedades matemáticas nativas do slider:</p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Atributo</th>
+                            <th>Descrição</th>
+                            <th>Valores Aceitos</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>value</code></td>
+                            <td>O valor numérico atual da posição da bolinha (thumb).</td>
+                            <td><em>Número</em> (Padrão nativo costuma ser o valor médio entre o min e o max)</td>
+                        </tr>
+                        <tr>
+                            <td><code>min</code></td>
+                            <td>O valor mínimo (extrema esquerda do trilho).</td>
+                            <td><em>Número</em> (Padrão: <code>0</code>)</td>
+                        </tr>
+                        <tr>
+                            <td><code>max</code></td>
+                            <td>O valor máximo (extrema direita do trilho).</td>
+                            <td><em>Número</em> (Padrão: <code>100</code>)</td>
+                        </tr>
+                        <tr>
+                            <td><code>step</code></td>
+                            <td>Granularidade do controle. Define de quanto em quanto o valor avança ou retrocede.</td>
+                            <td><em>Número</em> (Padrão: <code>1</code>)</td>
+                        </tr>
+                        <tr>
+                            <td><code>disabled</code></td>
+                            <td>Trava a bolinha e altera a cor do trilho para indicar inatividade.</td>
+                            <td><em>Booleano (presença do atributo)</em></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section>
+                <h2>Estilização Cross-Browser Unificada</h2>
+                <div class="alert-info">
+                    <strong>Engenharia Visual:</strong> Um dos maiores desafios do CSS web é o input range. A Algol UI contorna isso implementando estilizações diretas no Shadow DOM para as <i>shadow parts</i> nativas de diferentes motores: <code>::-webkit-slider-runnable-track</code> e <code>::-webkit-slider-thumb</code> (Chrome/Safari/Edge), e <code>::-moz-range-track</code> e <code>::-moz-range-thumb</code> (Firefox), garantindo que o componente pareça e se comporte exatamente igual em qualquer plataforma.
+                </div>
+            </section>
+
+            <section>
+                <h2>Eventos Emitidos</h2>
+                <p>Este componente tem uma dinâmica de eventos dividida entre interação em tempo real (arrastar) e a confirmação (soltar):</p>
+                
+                <ul>
+                    <li>
+                        <strong><code>algol-input</code></strong>: Disparado continuamente de forma ininterrupta enquanto o usuário mantém o clique pressionado e arrasta a bolinha. Excelente para atualizar visualizações em tempo real (como mostrar o número do volume mudando dinamicamente na tela).
+                        <pre><code>document.querySelector('algol-input-range').addEventListener('algol-input', e =&gt; {
+  console.log("Arrastando. Valor atual:", e.detail.value);
+});</code></pre>
+                    </li>
+                    <li>
+                        <strong><code>algol-change</code></strong>: Disparado exclusivamente quando o usuário encerra a interação (solta o clique do mouse ou levanta o dedo da tela em dispositivos <i>touch</i>), sinalizando que o valor final foi decidido.
+                        <pre><code>document.querySelector('algol-input-range').addEventListener('algol-change', e =&gt; {
+  const { oldValue, value } = e.detail;
+  console.log(`Seleção concluída. Movido de [${oldValue}] para [${value}]`);
+});</code></pre>
+                    </li>
+                </ul>
+            </section>
+            
+            <section>
+                <h2>Integração com Formulários</h2>
+                <p>Utiliza a validação interna do navegador para interceptar falhas lógicas, comunicando o estado <code>stepMismatch</code> (se o valor inserido via script não respeitar o intervalo) ou limites ultrapassados (<code>rangeUnderflow</code> e <code>rangeOverflow</code>).</p>
+            </section>
+        </article>
+    </main>
+
+</body>
+</html>

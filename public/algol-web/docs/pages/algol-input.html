@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentação Algol UI - Input</title>
+    <style>
+        :root {
+            --primary-color: #0056b3;
+            --text-color: #333;
+            --bg-color: #fff;
+            --border-color: #e0e0e0;
+            --code-bg: #f8f9fa;
+            --code-color: #d63384;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        h1, h2, h3 {
+            color: var(--primary-color);
+            margin-top: 2rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.5rem;
+        }
+
+        h1 { font-size: 2.5rem; margin-top: 0; }
+        h2 { font-size: 1.75rem; }
+
+        code {
+            background-color: var(--code-bg);
+            color: var(--code-color);
+            padding: 0.2em 0.4em;
+            border-radius: 4px;
+            font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+            font-size: 0.9em;
+        }
+
+        pre {
+            background-color: var(--code-bg);
+            padding: 1rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            border: 1px solid var(--border-color);
+        }
+
+        pre code {
+            background-color: transparent;
+            color: var(--text-color);
+            padding: 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background-color: var(--code-bg);
+            font-weight: 600;
+        }
+
+        ul {
+            padding-left: 1.5rem;
+        }
+
+        li {
+            margin-bottom: 1.5rem;
+        }
+
+        .alert-info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            padding: 1rem;
+            border-left: 4px solid #117a8b;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+
+    <main>
+        <article id="algol-input">
+            <h1><code>&lt;algol-input&gt;</code></h1>
+            
+            <section>
+                <h2>Visão Geral</h2>
+                <p>Componente fundamental de entrada de dados (texto). Fornece estilo consistente com estado de foco ("glow"), bloqueio interativo quando desativado e integração robusta com validações de formulário.</p>
+                <pre><code>&lt;algol-input type="email" label="E-mail" placeholder="usuario@email.com" required&gt;&lt;/algol-input&gt;</code></pre>
+            </section>
+
+            <section>
+                <h2>Atributos de Configuração</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Atributo</th>
+                            <th>Descrição</th>
+                            <th>Valores Aceitos</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>label</code></td>
+                            <td>Texto descritivo exibido acima do campo de entrada.</td>
+                            <td><em>Texto</em></td>
+                        </tr>
+                        <tr>
+                            <td><code>type</code></td>
+                            <td>Define a natureza dos dados e o tipo de teclado (mobile). Se um tipo inválido for passado, o componente reverte para texto simples.</td>
+                            <td><code>text</code> (padrão), <code>email</code>, <code>password</code>, <code>url</code>, <code>search</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>value</code></td>
+                            <td>Valor de texto atual do input.</td>
+                            <td><em>Texto</em></td>
+                        </tr>
+                        <tr>
+                            <td><code>placeholder</code></td>
+                            <td>Texto em tom menor exibido enquanto o campo está vazio.</td>
+                            <td><em>Texto</em></td>
+                        </tr>
+                        <tr>
+                            <td><code>minlength</code></td>
+                            <td>Quantidade mínima de caracteres exigida.</td>
+                            <td><em>Número inteiro</em></td>
+                        </tr>
+                        <tr>
+                            <td><code>maxlength</code></td>
+                            <td>Limite máximo de caracteres permitidos.</td>
+                            <td><em>Número inteiro</em></td>
+                        </tr>
+                        <tr>
+                            <td><code>pattern</code></td>
+                            <td>Expressão Regular (Regex) que o texto deve respeitar para ser considerado válido.</td>
+                            <td><em>Expressão Regular (Texto)</em></td>
+                        </tr>
+                        <tr>
+                            <td><code>disabled</code></td>
+                            <td>Bloqueia interações, altera o cursor e escurece o campo visualmente.</td>
+                            <td><em>Booleano (presença do atributo)</em></td>
+                        </tr>
+                        <tr>
+                            <td><code>required</code></td>
+                            <td>Invalida o componente se submetido em branco.</td>
+                            <td><em>Booleano (presença do atributo)</em></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p><em>Nota: Este componente utiliza as variáveis globais de tema e não possui atributos de estilo em linha mapeados.</em></p>
+            </section>
+
+            <section>
+                <h2>Eventos Emitidos</h2>
+                <p>Além dos eventos herdados do <strong><code>BaseComponent</code></strong>, o input emite eventos específicos para capturar a digitação do usuário:</p>
+                
+                <ul>
+                    <li>
+                        <strong><code>algol-input</code></strong>: Disparado em <strong>tempo real</strong> a cada tecla pressionada. Ideal para máscaras, buscas ao vivo ou contadores de caracteres.
+                        <pre><code>document.querySelector('algol-input').addEventListener('algol-input', e =&gt; {
+  console.log("Digitando agora:", e.detail.value);
+});</code></pre>
+                    </li>
+                    <li>
+                        <strong><code>algol-change</code></strong>: Disparado apenas quando o campo <strong>perde o foco (blur)</strong> e teve seu conteúdo alterado.
+                        <pre><code>document.querySelector('algol-input').addEventListener('algol-change', e =&gt; {
+  const { oldValue, value } = e.detail;
+  console.log(`Foco perdido. Mudou de [${oldValue}] para [${value}]`);
+});</code></pre>
+                    </li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Validação Interna e ElementInternals</h2>
+                <div class="alert-info">
+                    <strong>Integração com <code>&lt;form&gt;</code>:</strong> O <code>algol-input</code> é um cidadão nativo de formulários (<code>formAssociated: true</code>). Ele traduz as restrições inseridas (<code>required</code>, <code>minlength</code>, <code>pattern</code>, <code>type="email"</code>) para estados de erro internos (<code>valueMissing</code>, <code>typeMismatch</code>, <code>tooShort</code>, <code>patternMismatch</code>), bloqueando a submissão do formulário caso o texto esteja inválido.
+                </div>
+            </section>
+        </article>
+    </main>
+
+</body>
+</html>

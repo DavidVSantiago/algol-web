@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentação Algol UI - Input Date</title>
+    <style>
+        :root {
+            --primary-color: #0056b3;
+            --text-color: #333;
+            --bg-color: #fff;
+            --border-color: #e0e0e0;
+            --code-bg: #f8f9fa;
+            --code-color: #d63384;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        h1, h2, h3 {
+            color: var(--primary-color);
+            margin-top: 2rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.5rem;
+        }
+
+        h1 { font-size: 2.5rem; margin-top: 0; }
+        h2 { font-size: 1.75rem; }
+
+        code {
+            background-color: var(--code-bg);
+            color: var(--code-color);
+            padding: 0.2em 0.4em;
+            border-radius: 4px;
+            font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+            font-size: 0.9em;
+        }
+
+        pre {
+            background-color: var(--code-bg);
+            padding: 1rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            border: 1px solid var(--border-color);
+        }
+
+        pre code {
+            background-color: transparent;
+            color: var(--text-color);
+            padding: 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background-color: var(--code-bg);
+            font-weight: 600;
+        }
+
+        ul {
+            padding-left: 1.5rem;
+        }
+
+        li {
+            margin-bottom: 1.5rem;
+        }
+
+        .alert-info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            padding: 1rem;
+            border-left: 4px solid #117a8b;
+            margin-bottom: 1rem;
+        }
+        
+        .alert-warning {
+            background-color: #fff3cd;
+            color: #856404;
+            padding: 1rem;
+            border-left: 4px solid #ffeeba;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+
+    <main>
+        <article id="algol-input-date">
+            <h1><code>&lt;algol-input-date&gt;</code></h1>
+            
+            <section>
+                <h2>Visão Geral</h2>
+                <p>Componente estendido para seleção de datas. Ele aciona o seletor de calendário nativo do sistema operacional/navegador e possui validação inteligente de intervalos de tempo.</p>
+                <pre><code>&lt;algol-input-date label="Data de Nascimento" min="01/01/1900" max="31/12/2026"&gt;&lt;/algol-input-date&gt;</code></pre>
+            </section>
+
+            <section>
+                <h2>Atributos de Configuração</h2>
+                <p>Herda as propriedades base de inputs (<code>label</code>, <code>disabled</code>, <code>required</code>, <code>value</code>) e adiciona controle de limites de data:</p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Atributo</th>
+                            <th>Descrição</th>
+                            <th>Valores Aceitos</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>min</code></td>
+                            <td>A data mais antiga permitida para seleção.</td>
+                            <td><em>Data</em> (Aceita formato universal <code>YYYY-MM-DD</code> ou brasileiro <code>DD/MM/YYYY</code>)</td>
+                        </tr>
+                        <tr>
+                            <td><code>max</code></td>
+                            <td>A data limite no futuro permitida para seleção.</td>
+                            <td><em>Data</em> (Aceita formato universal <code>YYYY-MM-DD</code> ou brasileiro <code>DD/MM/YYYY</code>)</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section>
+                <h2>Mecânicas Específicas</h2>
+                <div class="alert-info">
+                    <strong>Conversor Automático de Formato:</strong> Os navegadores exigem estritamente o formato ISO (<code>YYYY-MM-DD</code>) para propriedades nativas de data. Para facilitar o uso no Brasil, a Algol UI intercepta valores em <code>DD/MM/YYYY</code> passados no <code>min</code> e <code>max</code> e faz a tradução interna automaticamente antes de repassar ao DOM.
+                </div>
+                <div class="alert-warning">
+                    <strong>Filtro de Evento (Otimização):</strong> Diferente do input de texto padrão, o <code>algol-input-date</code> tem a diretiva <code>_canEmitInput = false</code>. Isso significa que ele <strong>não emite o evento de tempo real</strong> a cada clique dentro do calendário nativo, garantindo que você só receba o dado quando a data estiver completamente selecionada.
+                </div>
+            </section>
+
+            <section>
+                <h2>Eventos Emitidos</h2>
+                <p>Devido à supressão intencional do evento em tempo real, o monitoramento deve ser feito exclusivamente através da confirmação do valor:</p>
+                
+                <ul>
+                    <li>
+                        <strong><code>algol-change</code></strong>: Disparado quando o usuário termina de escolher a data no calendário ou finaliza a digitação manual e o campo perde o foco.
+                        <pre><code>document.querySelector('algol-input-date').addEventListener('algol-change', e =&gt; {
+  const { oldValue, value } = e.detail;
+  // O value virá sempre no formato padrão AAAA-MM-DD
+  console.log(`Data confirmada: ${value}`); 
+});</code></pre>
+                    </li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Validação Interna</h2>
+                <p>Este componente trabalha de mãos dadas com a API <code>ElementInternals</code>. Se o usuário burlar o calendário (digitando manualmente) e inserir uma data menor que o <code>min</code>, o formulário identificará o erro <code>rangeUnderflow</code>. Se for maior que o <code>max</code>, acusará <code>rangeOverflow</code>, travando a submissão.</p>
+            </section>
+        </article>
+    </main>
+
+</body>
+</html>

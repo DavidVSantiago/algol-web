@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentação Algol UI - BaseLayout</title>
+    <style>
+        :root {
+            --primary-color: #0056b3;
+            --text-color: #333;
+            --bg-color: #fff;
+            --border-color: #e0e0e0;
+            --code-bg: #f8f9fa;
+            --code-color: #d63384;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        h1, h2, h3 {
+            color: var(--primary-color);
+            margin-top: 2rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.5rem;
+        }
+
+        h1 { font-size: 2.5rem; margin-top: 0; }
+        h2 { font-size: 1.75rem; }
+
+        code {
+            background-color: var(--code-bg);
+            color: var(--code-color);
+            padding: 0.2em 0.4em;
+            border-radius: 4px;
+            font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+            font-size: 0.9em;
+        }
+
+        pre {
+            background-color: var(--code-bg);
+            padding: 1rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            border: 1px solid var(--border-color);
+        }
+
+        pre code {
+            background-color: transparent;
+            color: var(--text-color);
+            padding: 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background-color: var(--code-bg);
+            font-weight: 600;
+        }
+
+        ul {
+            padding-left: 1.5rem;
+        }
+
+        li {
+            margin-bottom: 1.5rem;
+        }
+
+        .alert-info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            padding: 1rem;
+            border-left: 4px solid #117a8b;
+            margin-bottom: 1rem;
+        }
+        
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            padding: 1rem;
+            border-left: 4px solid #c3e6cb;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+
+    <main>
+        <article id="base-layout">
+            <h1><code>BaseLayout</code></h1>
+            
+            <section>
+                <h2>Visão Geral</h2>
+                <p>O <code>BaseLayout</code> é a classe abstrata (não instanciada diretamente) que serve de fundação para componentes voltados puramente para diagramação, espaçamento e fluxo da página (como <code>algol-grid-layout</code> e <code>algol-flex-item</code>).</p>
+                <p>Seu objetivo é ser extremamente leve e focado em traduzir atributos do HTML diretamente para estilos (variáveis CSS), além de monitorar alterações na árvore do DOM caso os nós filhos mudem dinamicamente.</p>
+            </section>
+
+            <section>
+                <h2>Tradução Avançada de CSS (ATTR_MAP)</h2>
+                <div class="alert-success">
+                    <strong>Injeção com Prefixos/Sufixos:</strong> Nos componentes visuais interativos, a propriedade <code>ATTR_MAP</code> costuma mapear um atributo HTML diretamente para uma variável CSS de forma simples (ex: <code>color="red"</code> vira <code>--color: red</code>). O <code>BaseLayout</code> eleva isso. Ele entende objetos complexos de mapeamento, permitindo concatenar regras CSS vitais.<br>
+                    Exemplo interno: Se o componente herdeiro mapear <code>colspan: { var: '--grid-col', prefix: 'span ' }</code>, escrever <code>colspan="2"</code> no HTML será traduzido automaticamente para <code>--grid-col: span 2</code> no CSS.
+                </div>
+            </section>
+
+            <section>
+                <h2>Eventos Emitidos (Mutation Observer)</h2>
+                <p>Componentes de layout geralmente contêm dezenas de outros elementos filhos (textos, imagens, inputs). O <code>BaseLayout</code> inicia um "olheiro" (<code>MutationObserver</code>) para avisar quando a estrutura interna dele (o <i>Light DOM</i>) sofre adições ou remoções de elementos (útil para recálculos matemáticos de grid ou renderizações de frameworks). Isso é encapsulado em um único evento:</p>
+                
+                <ul>
+                    <li>
+                        <strong><code>algol-light-dom-update</code></strong>: Disparado toda vez que um elemento "filho" é inserido ou deletado de dentro da tag do componente de layout.
+                        <pre><code>componenteDeLayout.addEventListener('algol-light-dom-update', e =&gt; {
+  const { origin, mutations } = e.detail;
+  console.log("Os filhos deste layout mudaram!", origin);
+  console.log("Detalhes da mutação do DOM:", mutations);
+});</code></pre>
+                    </li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Injeção de Estilos no Documento</h2>
+                <div class="alert-info">
+                    <strong>Desempenho:</strong> Esta classe possui o método estático <code>_injectStyleOnHead</code>. Como componentes de layout são muito replicados em uma página, eles costumam não usar Shadow DOM para não "esconder" os filhos do CSS global. Em vez disso, eles usam este método da <code>BaseLayout</code> para injetar suas regras CSS (medias queries e classes) apenas uma única vez na tag <code>&lt;head&gt;</code> do documento principal.
+                </div>
+            </section>
+        </article>
+    </main>
+
+</body>
+</html>

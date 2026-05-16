@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentação Algol UI - Input Color</title>
+    <style>
+        :root {
+            --primary-color: #0056b3;
+            --text-color: #333;
+            --bg-color: #fff;
+            --border-color: #e0e0e0;
+            --code-bg: #f8f9fa;
+            --code-color: #d63384;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        h1, h2, h3 {
+            color: var(--primary-color);
+            margin-top: 2rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.5rem;
+        }
+
+        h1 { font-size: 2.5rem; margin-top: 0; }
+        h2 { font-size: 1.75rem; }
+
+        code {
+            background-color: var(--code-bg);
+            color: var(--code-color);
+            padding: 0.2em 0.4em;
+            border-radius: 4px;
+            font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+            font-size: 0.9em;
+        }
+
+        pre {
+            background-color: var(--code-bg);
+            padding: 1rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            border: 1px solid var(--border-color);
+        }
+
+        pre code {
+            background-color: transparent;
+            color: var(--text-color);
+            padding: 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background-color: var(--code-bg);
+            font-weight: 600;
+        }
+
+        ul {
+            padding-left: 1.5rem;
+        }
+
+        li {
+            margin-bottom: 1.5rem;
+        }
+
+        .alert-info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            padding: 1rem;
+            border-left: 4px solid #117a8b;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+
+    <main>
+        <article id="algol-input-color">
+            <h1><code>&lt;algol-input-color&gt;</code></h1>
+            
+            <section>
+                <h2>Visão Geral</h2>
+                <p>Componente para seleção de cores. Ele oculta a interface nativa (e visualmente inconsistente) de escolha de cor dos navegadores, substituindo-a por um painel customizado elegante da Algol UI, mas ainda acionando o seletor de cores robusto do sistema operacional do usuário.</p>
+                <pre><code>&lt;algol-input-color label="Cor Principal" value="#ff0000"&gt;&lt;/algol-input-color&gt;</code></pre>
+            </section>
+
+            <section>
+                <h2>Atributos de Configuração</h2>
+                <p>Por ser focado em uma única tarefa visual, este componente possui um conjunto reduzido de configurações:</p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Atributo</th>
+                            <th>Descrição</th>
+                            <th>Valores Aceitos</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>label</code></td>
+                            <td>Texto descritivo exibido acima da caixa de cor.</td>
+                            <td><em>Texto</em></td>
+                        </tr>
+                        <tr>
+                            <td><code>value</code></td>
+                            <td>A cor atual selecionada. Se omitido, o padrão inicial será vermelho (<code>#f00</code>).</td>
+                            <td><em>Texto (Hexadecimal)</em> (ex: <code>#336699</code>)</td>
+                        </tr>
+                        <tr>
+                            <td><code>disabled</code></td>
+                            <td>Bloqueia a interação, aplica efeito escurecido e desabilita o foco via teclado.</td>
+                            <td><em>Booleano (presença do atributo)</em></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section>
+                <h2>Acessibilidade e Estrutura</h2>
+                <div class="alert-info">
+                    <strong>Navegação por Teclado:</strong> Apesar da tag <code>&lt;input&gt;</code> nativa estar oculta (<code>display: none</code>), a caixa customizada possui índice de tabulação (<code>tabindex="0"</code>). O componente intercepta o foco e aguarda o uso das teclas <strong>Espaço</strong> ou <strong>Enter</strong> para abrir a paleta de cores automaticamente, garantindo 100% de acessibilidade.
+                </div>
+            </section>
+
+            <section>
+                <h2>Eventos Emitidos</h2>
+                <p>O fluxo de eventos herdado do input padrão permite rastrear tanto a escolha em tempo real quanto a escolha final:</p>
+                
+                <ul>
+                    <li>
+                        <strong><code>algol-input</code></strong>: Disparado em tempo real enquanto o usuário arrasta o cursor pela paleta de cores do sistema operacional. Útil para "live previews".
+                        <pre><code>document.querySelector('algol-input-color').addEventListener('algol-input', e =&gt; {
+  console.log("Visualizando cor em tempo real:", e.detail.value);
+});</code></pre>
+                    </li>
+                    <li>
+                        <strong><code>algol-change</code></strong>: Disparado quando o usuário clica fora ou fecha a janela do seletor de cores, confirmando a seleção.
+                        <pre><code>document.querySelector('algol-input-color').addEventListener('algol-change', e =&gt; {
+  const { oldValue, value } = e.detail;
+  console.log(`Cor confirmada! Mudou de [${oldValue}] para [${value}]`);
+});</code></pre>
+                    </li>
+                </ul>
+            </section>
+        </article>
+    </main>
+
+</body>
+</html>

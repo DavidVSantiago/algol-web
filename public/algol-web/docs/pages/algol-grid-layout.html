@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentação Algol UI - Grid Layout</title>
+    <style>
+        :root {
+            --primary-color: #0056b3;
+            --text-color: #333;
+            --bg-color: #fff;
+            --border-color: #e0e0e0;
+            --code-bg: #f8f9fa;
+            --code-color: #d63384;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        h1, h2, h3 {
+            color: var(--primary-color);
+            margin-top: 2rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.5rem;
+        }
+
+        h1 { font-size: 2.5rem; margin-top: 0; }
+        h2 { font-size: 1.75rem; }
+
+        code {
+            background-color: var(--code-bg);
+            color: var(--code-color);
+            padding: 0.2em 0.4em;
+            border-radius: 4px;
+            font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+            font-size: 0.9em;
+        }
+
+        pre {
+            background-color: var(--code-bg);
+            padding: 1rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            border: 1px solid var(--border-color);
+        }
+
+        pre code {
+            background-color: transparent;
+            color: var(--text-color);
+            padding: 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background-color: var(--code-bg);
+            font-weight: 600;
+        }
+
+        .alert-info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            padding: 1rem;
+            border-left: 4px solid #117a8b;
+            margin-bottom: 1rem;
+        }
+
+        .alert-warning {
+            background-color: #fff3cd;
+            color: #856404;
+            padding: 1rem;
+            border-left: 4px solid #ffeeba;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+
+    <main>
+        <article id="algol-grid-layout">
+            <h1><code>&lt;algol-grid-layout&gt;</code></h1>
+            
+            <section>
+                <h2>Visão Geral</h2>
+                <p>O <code>algol-grid-layout</code> é o componente fundamental de diagramação da Algol UI. Ele estabelece uma malha bidimensional (CSS Grid) que gerencia o posicionamento, o espaçamento e o alinhamento de seus componentes filhos.</p>
+                
+                <div class="alert-warning">
+                    <strong>Regra de Composição:</strong> Para obter resultados previsíveis e suporte total às funcionalidades de <i>span</i> (expansão) e responsividade da biblioteca, este componente <strong>deve ser utilizado em conjunto</strong> com os elementos <code>&lt;algol-grid-item&gt;</code> e/ou <code>&lt;algol-flex-item&gt;</code> como seus filhos diretos.
+                </div>
+
+                <pre><code>&lt;!-- Exemplo de uso composto --&gt;
+&lt;algol-grid-layout cols="repeat(4, 1fr)" gap="1.5"&gt;
+    &lt;algol-grid-item colspan="3"&gt;Área Principal&lt;/algol-grid-item&gt;
+    &lt;algol-flex-item&gt;Barra Lateral&lt;/algol-flex-item&gt;
+&lt;/algol-grid-layout&gt;</code></pre>
+            </section>
+
+            <section>
+                <h2>Sinergia entre Componentes</h2>
+                <ul>
+                    <li><strong>Com <code>&lt;algol-grid-item&gt;</code>:</strong> Indicado para controle cirúrgico de posição e expansão na grade, além de suportar overlays de imagem e alinhamentos individuais.</li>
+                    <li><strong>Com <code>&lt;algol-flex-item&gt;</code>:</strong> Ideal quando o conteúdo dentro da célula da grade também precisa de comportamento flexível (<i>flex-wrap</i>, distribuição de espaço) ou quando atua como um contêiner simples de expansão.</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Configuração de Colunas e Espaçamento</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Atributo</th>
+                            <th>Mapeamento CSS</th>
+                            <th>Descrição</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>cols</code></td>
+                            <td><code>grid-template-columns</code></td>
+                            <td>Define a malha de colunas. Aceita valores CSS como <code>1fr 2fr</code> ou <code>repeat(3, 1fr)</code>.</td>
+                        </tr>
+                        <tr>
+                            <td><code>gap</code></td>
+                            <td><code>gap</code></td>
+                            <td>Espaçamento entre as linhas e colunas da grade.</td>
+                        </tr>
+                        <tr>
+                            <td><code>padding</code></td>
+                            <td><code>padding</code></td>
+                            <td>Espaçamento interno do contêiner. Números são convertidos automaticamente para <code>vw</code>.</td>
+                        </tr>
+                        <tr>
+                            <td><code>color</code></td>
+                            <td><code>background-color</code></td>
+                            <td>Define a cor de fundo do layout de grade.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section>
+                <h2>Alinhamento e Responsividade</h2>
+                <p>O layout centraliza os itens por padrão (<code>center</code>), mas permite customização total para os estados Desktop e Mobile:</p>
+                
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Propriedade</th>
+                            <th>Desktop/Tablet</th>
+                            <th>Mobile (Break)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Estrutura de Colunas</td>
+                            <td><code>cols</code></td>
+                            <td><code>colsbreak</code></td>
+                        </tr>
+                        <tr>
+                            <td>Espaçamento (Gap)</td>
+                            <td><code>gap</code></td>
+                            <td><code>gapbreak</code></td>
+                        </tr>
+                        <tr>
+                            <td>Alinhamento Horizontal</td>
+                            <td><code>posh</code></td>
+                            <td><code>poshbreak</code></td>
+                        </tr>
+                        <tr>
+                            <td>Alinhamento Vertical</td>
+                            <td><code>posv</code></td>
+                            <td><code>posvbreak</code></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section>
+                <h2>Comportamento Interno</h2>
+                <div class="alert-info">
+                    <strong>Desempenho:</strong> O <code>algol-grid-layout</code> utiliza o método estático <code>injectStyles()</code> para garantir que as regras CSS necessárias para a responsividade e variáveis sejam injetadas apenas uma vez no <code>&lt;head&gt;</code> do documento, otimizando a renderização.
+                </div>
+            </section>
+        </article>
+    </main>
+
+</body>
+</html>

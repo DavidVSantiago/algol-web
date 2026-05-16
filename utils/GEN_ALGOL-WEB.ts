@@ -1,46 +1,42 @@
-import { readdirSync, readFileSync, writeFileSync } from "fs";
-import { join, relative } from "path";
+import { join } from "path";
+import { readdir } from "node:fs/promises";
 
-const ROOT = "./public/algol-web/scripts";
-const OUTPUT = "algol-web-completo.txt";
+const BASE_DIR = "./public/algol-web/scripts"; // Caminho da sua pasta raiz de scripts
+const OUTPUT_FILE = "algol-web-completo.txt"; // Onde o arquivo final será salvo
 
-let output = "";
+async function bundleFiles() {
+  const contents: string[] = [];
 
-/** Percorre diretórios recursivamente */
-function walk(dir: string) {
+  // 1. Adiciona o variaveis.js primeiro (conforme solicitado)
+  console.log("Adicionando: variaveis.js");
+  const variaveis = await Bun.file(join(BASE_DIR, "variaveis.js")).text();
+  contents.push(`// --- variaveis.js ---\n${variaveis}\n`);
 
-    const entries = readdirSync(dir, { withFileTypes: true });
+  // 2. Define a ordem das pastas conforme a imagem
+  const folders = ["bases", "components", "layouts"];
 
-    for (const entry of entries) {
+  for (const folder of folders) {
+    const folderPath = join(BASE_DIR, folder);
+    
+    try {
+      // Lê os arquivos da pasta e ordena alfabeticamente para garantir a ordem de cima para baixo
+      const files = (await readdir(folderPath)).sort();
 
-        const fullPath = join(dir, entry.name);
-
-        // Ignora pastas proibidas
-        if (entry.isDirectory()) {
-            walk(fullPath);
-            continue;
+      for (const file of files) {
+        if (file.endsWith(".js")) {
+          console.log(`Adicionando: ${folder}/${file}`);
+          const content = await Bun.file(join(folderPath, file)).text();
+          contents.push(`// --- ${folder}/${file} ---\n${content}\n`);
         }
-
-        // Apenas .html e .js
-        if (
-            !entry.name.endsWith(".js")
-        ) {
-            continue;
-        }
-
-        const relPath = "./" + relative(".", fullPath);
-
-        output += "// ====================================\n";
-        output += `// 📁 ${relPath}\n`;
-        output += "// ====================================\n";
-
-        output += readFileSync(fullPath, "utf8");
-        output += "\n\n";
+      }
+    } catch (err) {
+      console.warn(`Aviso: Pasta ${folder} não encontrada ou vazia.`);
     }
+  }
+
+  // 3. Salva o arquivo final
+  await Bun.write(OUTPUT_FILE, contents.join("\n"));
+  console.log(`\nSucesso! Arquivo gerado em: ${OUTPUT_FILE}`);
 }
 
-walk(ROOT);
-
-writeFileSync(OUTPUT, output);
-
-console.log("Arquivo gerado:", OUTPUT);
+bundleFiles();

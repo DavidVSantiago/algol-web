@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentação Algol UI - Power Menu</title>
+    <style>
+        :root {
+            --primary-color: #0056b3;
+            --text-color: #333;
+            --bg-color: #fff;
+            --border-color: #e0e0e0;
+            --code-bg: #f8f9fa;
+            --code-color: #d63384;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        h1, h2, h3 {
+            color: var(--primary-color);
+            margin-top: 2rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.5rem;
+        }
+
+        h1 { font-size: 2.5rem; margin-top: 0; }
+        h2 { font-size: 1.75rem; }
+
+        code {
+            background-color: var(--code-bg);
+            color: var(--code-color);
+            padding: 0.2em 0.4em;
+            border-radius: 4px;
+            font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+            font-size: 0.9em;
+        }
+
+        pre {
+            background-color: var(--code-bg);
+            padding: 1rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            border: 1px solid var(--border-color);
+        }
+
+        pre code {
+            background-color: transparent;
+            color: var(--text-color);
+            padding: 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background-color: var(--code-bg);
+            font-weight: 600;
+        }
+
+        ul {
+            padding-left: 1.5rem;
+        }
+
+        li {
+            margin-bottom: 1.5rem;
+        }
+
+        .alert-info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            padding: 1rem;
+            border-left: 4px solid #117a8b;
+            margin-bottom: 1rem;
+        }
+        
+        .alert-warning {
+            background-color: #fff3cd;
+            color: #856404;
+            padding: 1rem;
+            border-left: 4px solid #ffeeba;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+
+    <main>
+        <article id="algol-power-menu">
+            <h1><code>&lt;algol-power-menu&gt;</code></h1>
+            
+            <section>
+                <h2>Visão Geral</h2>
+                <p>Componente de barra de navegação (Header) completo e responsivo. Ele gerencia automaticamente o logotipo, a distribuição dos links e converte-se nativamente em um menu "hambúrguer" com overlay em telas de dispositivos móveis.</p>
+                <pre><code>&lt;algol-power-menu logo="logo.png" logolink="/" logosize="4vw"&gt;
+    &lt;li&gt;&lt;a href="/home"&gt;Início&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a href="/sobre"&gt;Sobre&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;div&gt;Opção Customizada&lt;/div&gt;&lt;/li&gt;
+&lt;/algol-power-menu&gt;</code></pre>
+            </section>
+
+            <section>
+                <h2>Diferencial de Renderização (Sem Shadow DOM)</h2>
+                <div class="alert-warning">
+                    <strong><code>useShadow = false</code></strong>: Ao contrário da maioria dos componentes da Algol UI, o Power Menu desativa o Shadow DOM. Isso é intencional. Ao renderizar no <i>Light DOM</i>, as tags <code>&lt;a&gt;</code> de navegação inseridas no menu podem herdar facilmente regras de estilização globais e scripts de roteamento (routers) de frameworks externos sem sofrer bloqueios de escopo.
+                </div>
+            </section>
+
+            <section>
+                <h2>Atributos de Configuração (Logotipo)</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Atributo</th>
+                            <th>Descrição</th>
+                            <th>Valores Aceitos</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>logo</code></td>
+                            <td>URL ou caminho da imagem do logotipo.</td>
+                            <td><em>Texto (URL)</em></td>
+                        </tr>
+                        <tr>
+                            <td><code>logoalt</code></td>
+                            <td>Texto alternativo de acessibilidade para o logotipo.</td>
+                            <td><em>Texto</em></td>
+                        </tr>
+                        <tr>
+                            <td><code>logolink</code></td>
+                            <td>URL de destino ao clicar no logotipo (normalmente a home <code>"/"</code>).</td>
+                            <td><em>Texto (URL)</em></td>
+                        </tr>
+                        <tr>
+                            <td><code>logowidth</code></td>
+                            <td>Define a largura nativa da tag img do logotipo.</td>
+                            <td><em>Número/Texto</em></td>
+                        </tr>
+                        <tr>
+                            <td><code>logoheight</code></td>
+                            <td>Define a altura nativa da tag img do logotipo.</td>
+                            <td><em>Número/Texto</em></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section>
+                <h2>Atributos de Estilização</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Atributo</th>
+                            <th>Variável Injetada</th>
+                            <th>Efeito Visual</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>logosize</code></td>
+                            <td><code>--power-menu-logosize</code></td>
+                            <td>Força a largura CSS do logotipo em telas Desktop/Tablet.</td>
+                        </tr>
+                        <tr>
+                            <td><code>logosizebreak</code></td>
+                            <td><code>--power-menu-logosizebreak</code></td>
+                            <td>Força a largura CSS do logotipo exclusivamente em telas Mobile.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section>
+                <h2>Montagem Automática da Grade (Links)</h2>
+                <div class="alert-info">
+                    <strong>Sequestro de Filhos:</strong> Você não precisa se preocupar com o layout CSS dos botões. Escreva apenas tags <code>&lt;li&gt;</code> soltas dentro do componente. O Power Menu captura essas tags, aplica classes de interação (hover/active), conta quantos itens existem e calcula automaticamente o <code>grid-template-columns</code> para distribuir os links perfeitamente na barra superior.
+                </div>
+            </section>
+
+            <section>
+                <h2>Responsividade Integrada</h2>
+                <p>O componente reage à variável global <code>MOBILE_BREAKPOINT</code> (padrão <code>600px</code>). Ao atingir essa resolução:</p>
+                <ul>
+                    <li>A grade horizontal de botões é ocultada.</li>
+                    <li>Um ícone de menu (hambúrguer) aparece no lugar.</li>
+                    <li>Ao clicar no menu, os itens deslizam de cima para baixo acompanhados de um fundo escuro (<em>overlay</em>) que cobre a tela, impedindo cliques no restante da página.</li>
+                    <li>Clicar no <em>overlay</em> fecha o menu suavemente.</li>
+                </ul>
+            </section>
+        </article>
+    </main>
+
+</body>
+</html>

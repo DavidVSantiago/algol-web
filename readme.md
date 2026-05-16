@@ -15,3 +15,6 @@ redis-cli ping <!-- A resposta deve ser: PONG -->
 bun drizzle-kit push <!-- para recriar o banco -->
 bun run index.ts
 bun --watch index.ts <!-- para recarregar automaticamente -->
+
+
+

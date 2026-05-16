@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentação Algol UI - Input Time</title>
+    <style>
+        :root {
+            --primary-color: #0056b3;
+            --text-color: #333;
+            --bg-color: #fff;
+            --border-color: #e0e0e0;
+            --code-bg: #f8f9fa;
+            --code-color: #d63384;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        h1, h2, h3 {
+            color: var(--primary-color);
+            margin-top: 2rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.5rem;
+        }
+
+        h1 { font-size: 2.5rem; margin-top: 0; }
+        h2 { font-size: 1.75rem; }
+
+        code {
+            background-color: var(--code-bg);
+            color: var(--code-color);
+            padding: 0.2em 0.4em;
+            border-radius: 4px;
+            font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+            font-size: 0.9em;
+        }
+
+        pre {
+            background-color: var(--code-bg);
+            padding: 1rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            border: 1px solid var(--border-color);
+        }
+
+        pre code {
+            background-color: transparent;
+            color: var(--text-color);
+            padding: 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background-color: var(--code-bg);
+            font-weight: 600;
+        }
+
+        ul {
+            padding-left: 1.5rem;
+        }
+
+        li {
+            margin-bottom: 1.5rem;
+        }
+
+        .alert-warning {
+            background-color: #fff3cd;
+            color: #856404;
+            padding: 1rem;
+            border-left: 4px solid #ffeeba;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+
+    <main>
+        <article id="algol-input-time">
+            <h1><code>&lt;algol-input-time&gt;</code></h1>
+            
+            <section>
+                <h2>Visão Geral</h2>
+                <p>Componente especializado para seleção de horários. Aciona o relógio/seletor nativo do sistema operacional e possui suporte a limitação de horas (mínimo/máximo) e controle de intervalos de seleção.</p>
+                <pre><code>&lt;algol-input-time label="Horário da Reunião" min="08:00" max="18:00" step="900"&gt;&lt;/algol-input-time&gt;</code></pre>
+            </section>
+
+            <section>
+                <h2>Atributos de Configuração</h2>
+                <p>Herda as propriedades base (<code>label</code>, <code>disabled</code>, <code>required</code>, <code>value</code>) e adiciona os seguintes controles matemáticos e de tempo:</p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Atributo</th>
+                            <th>Descrição</th>
+                            <th>Valores Aceitos</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>min</code></td>
+                            <td>O horário mais cedo permitido.</td>
+                            <td><em>Texto</em> no formato <code>HH:MM</code> (ex: <code>08:30</code>)</td>
+                        </tr>
+                        <tr>
+                            <td><code>max</code></td>
+                            <td>O horário limite permitido.</td>
+                            <td><em>Texto</em> no formato <code>HH:MM</code> (ex: <code>18:00</code>)</td>
+                        </tr>
+                        <tr>
+                            <td><code>step</code></td>
+                            <td>Define o intervalo de precisão em <strong>segundos</strong>. Omitir este atributo limita a seleção apenas a horas e minutos. Se usar <code>step="1"</code>, o seletor exibirá a casa dos segundos. Para saltos de 15 minutos, use <code>900</code>.</td>
+                            <td><em>Número inteiro (Segundos)</em></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section>
+                <h2>Mecânicas Específicas</h2>
+                <div class="alert-warning">
+                    <strong>Filtro de Evento:</strong> Assim como o seletor de datas, o <code>algol-input-time</code> desativa a emissão do evento em tempo real (<code>_canEmitInput = false</code>). Isso evita disparos em massa na árvore do DOM enquanto o usuário está girando as roletas ou os ponteiros do relógio nativo do sistema. O valor só é despachado quando a escolha é concluída.
+                </div>
+            </section>
+
+            <section>
+                <h2>Eventos Emitidos</h2>
+                <p>O monitoramento deve ser feito capturando o evento de mudança consolidada:</p>
+                
+                <ul>
+                    <li>
+                        <strong><code>algol-change</code></strong>: Disparado apenas quando o usuário finaliza a escolha do horário e o componente perde o foco ou a janela do relógio é fechada.
+                        <pre><code>document.querySelector('algol-input-time').addEventListener('algol-change', e =&gt; {
+  const { oldValue, value } = e.detail;
+  // O value segue o formato de 24h (ex: "14:30" ou "14:30:15")
+  console.log(`Horário confirmado: ${value}`); 
+});</code></pre>
+                    </li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Validação Interna</h2>
+                <p>O <code>algol-input-time</code> é estritamente ligado à API <code>ElementInternals</code> do formulário. Ele bloqueará a submissão nativamente reportando:</p>
+                <ul>
+                    <li><code>rangeUnderflow</code>: Se o horário escolhido for menor que o <code>min</code>.</li>
+                    <li><code>rangeOverflow</code>: Se for maior que o <code>max</code>.</li>
+                    <li><code>stepMismatch</code>: Se o horário inserido não for um múltiplo válido do <code>step</code> configurado.</li>
+                </ul>
+            </section>
+        </article>
+    </main>
+
+</body>
+</html>

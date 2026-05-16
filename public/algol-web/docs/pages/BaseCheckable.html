@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentação Algol UI - BaseCheckable</title>
+    <style>
+        :root {
+            --primary-color: #0056b3;
+            --text-color: #333;
+            --bg-color: #fff;
+            --border-color: #e0e0e0;
+            --code-bg: #f8f9fa;
+            --code-color: #d63384;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        h1, h2, h3 {
+            color: var(--primary-color);
+            margin-top: 2rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.5rem;
+        }
+
+        h1 { font-size: 2.5rem; margin-top: 0; }
+        h2 { font-size: 1.75rem; }
+
+        code {
+            background-color: var(--code-bg);
+            color: var(--code-color);
+            padding: 0.2em 0.4em;
+            border-radius: 4px;
+            font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+            font-size: 0.9em;
+        }
+
+        pre {
+            background-color: var(--code-bg);
+            padding: 1rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            border: 1px solid var(--border-color);
+        }
+
+        pre code {
+            background-color: transparent;
+            color: var(--text-color);
+            padding: 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background-color: var(--code-bg);
+            font-weight: 600;
+        }
+
+        ul {
+            padding-left: 1.5rem;
+        }
+
+        li {
+            margin-bottom: 1.5rem;
+        }
+
+        .alert-info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            padding: 1rem;
+            border-left: 4px solid #117a8b;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+
+    <main>
+        <article id="base-checkable">
+            <h1><code>BaseCheckable</code></h1>
+            
+            <section>
+                <h2>Visão Geral</h2>
+                <p>A classe <code>BaseCheckable</code> é uma extensão do <code>BaseComponent</code>. <strong>Ela não é instanciada diretamente</strong>, servindo como a "espinha dorsal" lógica para componentes de seleção de estado duplo: <code>algol-checkbox</code>, <code>algol-radio</code> e suas respectivas versões <i>switch</i>.</p>
+                <p>Sua principal função é gerenciar a sincronização do estado <code>checked</code>, o vínculo com a API de validação nativa de formulários e emitir eventos de alteração padronizados para seus herdeiros.</p>
+            </section>
+
+            <section>
+                <h2>Atributos Padrão Herdados</h2>
+                <p>Qualquer componente que derive do <code>BaseCheckable</code> suportará nativamente os seguintes atributos:</p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Atributo</th>
+                            <th>Descrição</th>
+                            <th>Valores Aceitos</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>label</code></td>
+                            <td>Texto de clique exibido ao lado da caixa/botão de seleção.</td>
+                            <td><em>Texto</em></td>
+                        </tr>
+                        <tr>
+                            <td><code>checked</code></td>
+                            <td>Define se o componente inicia marcado.</td>
+                            <td><em>Booleano (presença do atributo)</em></td>
+                        </tr>
+                        <tr>
+                            <td><code>name</code></td>
+                            <td>Nome do campo usado no agrupamento (ex: Radios) e no envio de formulários.</td>
+                            <td><em>Texto</em></td>
+                        </tr>
+                        <tr>
+                            <td><code>value</code></td>
+                            <td>O valor que será enviado pelo formulário caso o componente esteja marcado.</td>
+                            <td><em>Texto</em> (Se omitido, envia <code>"on"</code> por padrão)</td>
+                        </tr>
+                        <tr>
+                            <td><code>disabled</code></td>
+                            <td>Desabilita a interação de clique e altera o cursor para bloqueado.</td>
+                            <td><em>Booleano (presença do atributo)</em></td>
+                        </tr>
+                        <tr>
+                            <td><code>required</code></td>
+                            <td>Exige que o componente seja marcado para que o formulário possa ser enviado (Útil para "Aceito os termos").</td>
+                            <td><em>Booleano (presença do atributo)</em></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section>
+                <h2>Motor de Formulário (ElementInternals)</h2>
+                <div class="alert-info">
+                    <strong>Gestão de Estado:</strong> A classe esconde um <code>&lt;input&gt;</code> nativo no Shadow DOM. Quando o usuário interage visualmente com o componente, o <code>BaseCheckable</code> altera o input escondido, recolhe seu estado e avisa ao formulário (via <code>setFormValue</code>) se deve enviar o <code>value</code> ou ignorá-lo (<code>null</code>). Se for <code>required</code> e não estiver marcado, ele emite o erro <code>valueMissing</code> internamente.
+                </div>
+            </section>
+
+            <section>
+                <h2>Eventos Emitidos</h2>
+                <p>Além dos eventos básicos (<code>algol-click</code>, <code>algol-focus</code>) injetados pelo <code>BaseComponent</code>, o <code>BaseCheckable</code> introduz o evento de troca de estado:</p>
+                
+                <ul>
+                    <li>
+                        <strong><code>algol-input</code></strong>: Disparado sempre que o estado <code>checked</code> muda via interação do usuário. Retorna o valor caso esteja marcado, ou <code>null</code> caso tenha sido desmarcado.
+                        <pre><code>componente.addEventListener('algol-input', e =&gt; {
+  const { origin, value } = e.detail;
+  const isChecked = origin.checked; // Acessando a propriedade booleana
+  
+  console.log(`Estado: ${isChecked ? 'Marcado' : 'Desmarcado'} | Valor: ${value}`);
+});</code></pre>
+                    </li>
+                </ul>
+            </section>
+        </article>
+    </main>
+
+</body>
+</html>

@@ -6,9 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     
-    <link id="theme-link" rel="stylesheet" href="algol-light.css">
+    <link id="theme-link" rel="stylesheet" href="algol-light-green.css">
     
-    <script src="scripts/variaveis.js" ></script>
+    <!-- <script src="scripts/variaveis.js" ></script>
     
     <script src="scripts/bases/base_component.js" ></script>
     <script src="scripts/bases/base_layout.js" ></script>
@@ -24,9 +24,9 @@
     
     <script src="scripts/layouts/grid-layout.js" ></script>
     <script src="scripts/layouts/grid-item.js" ></script>
-    <script src="scripts/layouts/flex-item.js" ></script>
+    <script src="scripts/layouts/flex-item.js" ></script> -->
 
-    <!-- <script src="min.js"></script> -->
+    <script src="min.js"></script>
 
     <script defer>
         // temporário. apenas para teste
@@ -53,6 +53,10 @@
             });
         })
     </script>
+
+    <style>
+    
+    </style>
 </head>
 
 <body id="corpo">
@@ -172,13 +176,14 @@
                 </algol-grid-item>
                 <algol-grid-item>
                     <algol-input-file name="input-file"
-                        id="input-file"
+                        id="input"
                         label="Texto"
                         text="Procurar"
                         placeholder="Selecione o arquivo..."
                         multiple
                         required
                         accept="image/*"
+                        color="#ffff00"
                     ></algol-input-file>
                     <algol-input-file name="input-file"
                         label="Texto"
@@ -227,7 +232,7 @@
 
                 </algol-grid-item>
                 <algol-grid-item posh="end">   
-                    <algol-input name="input" id="input" label="input" placeholder="Digite aqui..." ></algol-input>
+                    <algol-input name="input" id="input-file" label="input" placeholder="Digite aqui..." ></algol-input>
                     <algol-input disabled required label="input" placeholder="Digite aqui..." ></algol-input>
                 </algol-grid-item>
                 <algol-grid-item class="algol-bubble-02" posh="start" posv="start">   

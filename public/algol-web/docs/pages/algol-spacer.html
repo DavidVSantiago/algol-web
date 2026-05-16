@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentação Algol UI - Spacer</title>
+    <style>
+        :root {
+            --primary-color: #0056b3;
+            --text-color: #333;
+            --bg-color: #fff;
+            --border-color: #e0e0e0;
+            --code-bg: #f8f9fa;
+            --code-color: #d63384;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        h1, h2, h3 {
+            color: var(--primary-color);
+            margin-top: 2rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.5rem;
+        }
+
+        h1 { font-size: 2.5rem; margin-top: 0; }
+        h2 { font-size: 1.75rem; }
+
+        code {
+            background-color: var(--code-bg);
+            color: var(--code-color);
+            padding: 0.2em 0.4em;
+            border-radius: 4px;
+            font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+            font-size: 0.9em;
+        }
+
+        pre {
+            background-color: var(--code-bg);
+            padding: 1rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            border: 1px solid var(--border-color);
+        }
+
+        pre code {
+            background-color: transparent;
+            color: var(--text-color);
+            padding: 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background-color: var(--code-bg);
+            font-weight: 600;
+        }
+
+        .alert-info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            padding: 1rem;
+            border-left: 4px solid #117a8b;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+
+    <main>
+        <article id="algol-spacer">
+            <h1><code>&lt;algol-spacer&gt;</code></h1>
+            
+            <section>
+                <h2>Visão Geral</h2>
+                <p>Componente de layout invisível utilizado para criar espaçamentos verticais consistentes entre os elementos da página. Ele abstrai a necessidade de escrever CSS (margins/paddings) e aplica a altura matematicamente alinhada à escala global da biblioteca.</p>
+                <pre><code>&lt;!-- Cria um espaço de 2vw (multiplicado pelo scale-factor) --&gt;
+&lt;algol-spacer value="2"&gt;&lt;/algol-spacer&gt;
+
+&lt;!-- Espaçador responsivo (2vw no desktop, 1vw no mobile) --&gt;
+&lt;algol-spacer value="2" valuebreak="1"&gt;&lt;/algol-spacer&gt;</code></pre>
+            </section>
+
+            <section>
+                <h2>Atributos de Configuração</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Atributo</th>
+                            <th>Descrição</th>
+                            <th>Valores Aceitos</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>value</code></td>
+                            <td>Define a altura do espaçamento para telas normais (desktop/tablet).</td>
+                            <td><em>Número</em> (ex: <code>1.5</code>, <code>2</code>)</td>
+                        </tr>
+                        <tr>
+                            <td><code>valuebreak</code></td>
+                            <td>Define a altura exclusiva para telas menores que o <i>breakpoint</i> mobile.</td>
+                            <td><em>Número</em> (ex: <code>0.5</code>, <code>1</code>)</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section>
+                <h2>Motor de Cálculo Responsivo</h2>
+                <div class="alert-info">
+                    <strong>Cálculo Automático:</strong> Você não precisa digitar a unidade de medida. Ao fornecer um número (ex: <code>value="2"</code>), o componente processa a conversão internamente e injeta o seguinte cálculo CSS: <br>
+                    <code>height: calc(2vw * var(--scale-factor));</code>
+                </div>
+            </section>
+
+            <section>
+                <h2>Eventos Emitidos</h2>
+                <p>O <code>algol-spacer</code> herda todos os eventos do <strong><code>BaseComponent</code></strong> (como <code>algol-click</code>, <code>algol-mouseenter</code>). No entanto, por ser um elemento invisível focado puramente em afastar o conteúdo, a captura de eventos de interação raramente é necessária neste componente.</p>
+            </section>
+        </article>
+    </main>
+
+</body>
+</html>

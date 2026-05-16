@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentação Algol UI - Flex Item</title>
+    <style>
+        :root {
+            --primary-color: #0056b3;
+            --text-color: #333;
+            --bg-color: #fff;
+            --border-color: #e0e0e0;
+            --code-bg: #f8f9fa;
+            --code-color: #d63384;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        h1, h2, h3 {
+            color: var(--primary-color);
+            margin-top: 2rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.5rem;
+        }
+
+        h1 { font-size: 2.5rem; margin-top: 0; }
+        h2 { font-size: 1.75rem; }
+
+        code {
+            background-color: var(--code-bg);
+            color: var(--code-color);
+            padding: 0.2em 0.4em;
+            border-radius: 4px;
+            font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+            font-size: 0.9em;
+        }
+
+        pre {
+            background-color: var(--code-bg);
+            padding: 1rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            border: 1px solid var(--border-color);
+        }
+
+        pre code {
+            background-color: transparent;
+            color: var(--text-color);
+            padding: 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background-color: var(--code-bg);
+            font-weight: 600;
+        }
+
+        ul {
+            padding-left: 1.5rem;
+        }
+
+        li {
+            margin-bottom: 1.5rem;
+        }
+
+        .alert-info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            padding: 1rem;
+            border-left: 4px solid #117a8b;
+            margin-bottom: 1rem;
+        }
+        
+        .alert-warning {
+            background-color: #fff3cd;
+            color: #856404;
+            padding: 1rem;
+            border-left: 4px solid #ffeeba;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+
+    <main>
+        <article id="algol-flex-item">
+            <h1><code>&lt;algol-flex-item&gt;</code></h1>
+            
+            <section>
+                <h2>Visão Geral</h2>
+                <p>O <code>algol-flex-item</code> atua como um contêiner flexível padrão. Ao ser instanciado, ele assume nativamente <code>display: flex</code>, com quebra de linha ativada (<code>flex-wrap: wrap</code>) e <code>gap: 0</code>. É a ferramenta principal para agrupar elementos horizontalmente ou atuar como uma célula dentro de um layout de grade maior.</p>
+                <pre><code>&lt;algol-flex-item distrib="between" padding="2"&gt;
+    &lt;div&gt;Botão Voltar&lt;/div&gt;
+    &lt;div&gt;Botão Avançar&lt;/div&gt;
+&lt;/algol-flex-item&gt;</code></pre>
+            </section>
+
+            <section>
+                <h2>Atributos de Layout Flexbox</h2>
+                <div class="alert-info">
+                    <strong>Comportamento de Largura:</strong> Quando o atributo <code>distrib</code> é ativado, o componente automaticamente força seu tamanho para <code>width: 100%</code>, garantindo que a distribuição dos elementos ocupe todo o espaço horizontal disponível no elemento pai.
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Atributo</th>
+                            <th>Descrição / Regra Injetada</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>distrib</code></td>
+                            <td>Controla a distribuição dos filhos (<code>justify-content</code>). Valores aceitos: <code>start</code>, <code>center</code>, <code>end</code>, <code>between</code>, <code>around</code>, <code>evenly</code>.</td>
+                        </tr>
+                        <tr>
+                            <td><code>padding</code></td>
+                            <td>Espaçamento interno. Converte números soltos para <code>vw</code> automaticamente. (Ex: <code>"1 2"</code> vira <code>1vw 2vw</code>).</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section>
+                <h2>Integração Híbrida (Uso dentro de Grids)</h2>
+                <p>Se este componente for inserido como filho direto de um <code>&lt;algol-grid-layout&gt;</code>, ele suporta atributos de expansão de célula:</p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Atributo</th>
+                            <th>Regra CSS Injetada</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>colspan</code></td>
+                            <td><code>grid-column-end: span [valor]</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>rowspan</code></td>
+                            <td><code>grid-row-end: span [valor]</code></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section>
+                <h2>Controles Responsivos</h2>
+                <p>Os atributos abaixo ativam Media Queries que sobrescrevem os valores nativos exclusivamente quando a tela atinge a largura mobile estipulada pela engine:</p>
+                <ul>
+                    <li><code>colspanbreak</code>: Altera a expansão de colunas em telas pequenas.</li>
+                    <li><code>rowspanbreak</code>: Altera a expansão de linhas em telas pequenas.</li>
+                    <li><code>paddingbreak</code>: Redefine o espaçamento interno (padding) na versão mobile.</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Sistema de Background (Imagem)</h2>
+                <div class="alert-warning">
+                    <strong>Auto-Expansão de Imagem:</strong> Ao fornecer o atributo <code>img</code>, o componente não apenas aplica a imagem de fundo, mas também injeta obrigatoriamente <code>width: 100%</code> e <code>height: 100%</code> para garantir a renderização adequada do fundo dentro do contêiner pai.
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Atributo</th>
+                            <th>Função (Mapeamento CSS)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>img</code></td>
+                            <td>URL da imagem de fundo (<code>background-image: url(...)</code>).</td>
+                        </tr>
+                        <tr>
+                            <td><code>imgsize</code></td>
+                            <td>Tamanho do fundo (ex: <code>cover</code>, <code>contain</code>).</td>
+                        </tr>
+                        <tr>
+                            <td><code>imgpos</code></td>
+                            <td>Posição da imagem (ex: <code>center</code>, <code>top right</code>).</td>
+                        </tr>
+                        <tr>
+                            <td><code>imgrepeat</code></td>
+                            <td>Repetição (ex: <code>no-repeat</code>, <code>repeat-x</code>).</td>
+                        </tr>
+                        <tr>
+                            <td><code>imgattach</code></td>
+                            <td>Fixação do fundo (ex: <code>fixed</code>, <code>scroll</code>).</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+        </article>
+    </main>
+
+</body>
+</html>

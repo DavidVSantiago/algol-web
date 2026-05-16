@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentação Algol UI - BaseComponent</title>
+    <style>
+        :root {
+            --primary-color: #0056b3;
+            --text-color: #333;
+            --bg-color: #fff;
+            --border-color: #e0e0e0;
+            --code-bg: #f8f9fa;
+            --code-color: #d63384;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        h1, h2, h3 {
+            color: var(--primary-color);
+            margin-top: 2rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.5rem;
+        }
+
+        h1 { font-size: 2.5rem; margin-top: 0; }
+        h2 { font-size: 1.75rem; }
+
+        code {
+            background-color: var(--code-bg);
+            color: var(--code-color);
+            padding: 0.2em 0.4em;
+            border-radius: 4px;
+            font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+            font-size: 0.9em;
+        }
+
+        pre {
+            background-color: var(--code-bg);
+            padding: 1rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            border: 1px solid var(--border-color);
+        }
+
+        pre code {
+            background-color: transparent;
+            color: var(--text-color);
+            padding: 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background-color: var(--code-bg);
+            font-weight: 600;
+        }
+
+        ul {
+            padding-left: 1.5rem;
+        }
+
+        li {
+            margin-bottom: 1.5rem;
+        }
+        
+        .alert {
+            background-color: #fff3cd;
+            color: #856404;
+            padding: 1rem;
+            border-left: 4px solid #ffeeba;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+
+    <main>
+        <article id="base-component">
+            <h1><code>BaseComponent</code></h1>
+            
+            <section>
+                <h2>Visão Geral</h2>
+                <p>O <code>BaseComponent</code> é a classe abstrata fundamental da Algol UI. <strong>Ele não é instanciado diretamente no HTML</strong>, mas sim herdado por todos os outros componentes (como <code>&lt;algol-button&gt;</code>, <code>&lt;algol-input&gt;</code>, etc.).</p>
+                <p>A principal função desta classe é gerenciar o ciclo de vida, gerar <i>getters</i> e <i>setters</i> automáticos, gerenciar a transição de variáveis CSS e, mais importante, <strong>padronizar a emissão de eventos</strong>.</p>
+            </section>
+
+            <section>
+                <h2>O Comportamento <code>disabled</code></h2>
+                <div class="alert">
+                    <strong>Regra Global:</strong> Se qualquer componente herdeiro possuir o atributo <code>disabled</code>, o <code>BaseComponent</code> intercepta nativamente todas as interações de clique e foco, acionando <code>stopImmediatePropagation()</code>. Nenhum evento customizado será emitido caso o componente esteja desativado.
+                </div>
+            </section>
+
+            <section>
+                <h2>Eventos Padrão (Custom Events)</h2>
+                <p>Para garantir que os eventos atravessem o <i>Shadow DOM</i> com facilidade e entreguem dados estruturados e confiáveis, a biblioteca suprime os eventos nativos de mouse e foco, emitindo eventos customizados com o prefixo <code>algol-</code>.</p>
+                <p>Todos os eventos possuem <code>bubbles: true</code> e <code>composed: true</code>, e injetam seus dados na propriedade <code>event.detail</code>.</p>
+                
+                <ul>
+                    <li>
+                        <strong><code>algol-click</code></strong>: Disparado ao clicar sobre o componente.
+                        <pre><code>componente.addEventListener('algol-click', e =&gt; {
+  const { origin, mouse: { x, y, offsetX, offsetY } } = e.detail;
+  console.log("Clicado em:", origin, "Posição tela:", x, y, "Posição interna:", offsetX, offsetY);
+});</code></pre>
+                    </li>
+                    
+                    <li>
+                        <strong><code>algol-mousemove</code></strong>: Disparado durante a movimentação do cursor sobre o componente.
+                        <pre><code>componente.addEventListener('algol-mousemove', e =&gt; {
+  const { origin, mouse: { offsetX, offsetY } } = e.detail;
+  console.log("Cursor movendo em:", origin, "Coords relativas:", offsetX, offsetY);
+});</code></pre>
+                    </li>
+
+                    <li>
+                        <strong><code>algol-mouseenter</code></strong>: Disparado quando o ponteiro do mouse entra na área do componente.
+                        <pre><code>componente.addEventListener('algol-mouseenter', e =&gt; console.log("Mouse entrou:", e.detail.origin));</code></pre>
+                    </li>
+
+                    <li>
+                        <strong><code>algol-mouseleave</code></strong>: Disparado quando o ponteiro do mouse sai da área do componente.
+                        <pre><code>componente.addEventListener('algol-mouseleave', e =&gt; console.log("Mouse saiu:", e.detail.origin));</code></pre>
+                    </li>
+
+                    <li>
+                        <strong><code>algol-focus</code></strong>: Disparado quando o componente recebe o foco (navegação por teclado ou clique).
+                        <pre><code>componente.addEventListener('algol-focus', e =&gt; console.log("Foco ativado em:", e.detail.origin));</code></pre>
+                    </li>
+
+                    <li>
+                        <strong><code>algol-blur</code></strong>: Disparado quando o componente perde o foco.
+                        <pre><code>componente.addEventListener('algol-blur', e =&gt; console.log("Foco perdido em:", e.detail.origin));</code></pre>
+                    </li>
+                </ul>
+            </section>
+        </article>
+    </main>
+
+</body>
+</html>

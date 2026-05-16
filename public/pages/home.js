@@ -1,4 +1,4 @@
-class PageHome extends PageBase{
+class PageHome extends PageBase {
 
     constructor(container, params) {
         super(container, params);
@@ -8,11 +8,11 @@ class PageHome extends PageBase{
     /** MÉTODOS SOBRESCRITOS ********************************* */
     /** ****************************************************** */
 
-    /** @override apenas se houver tradução para as páginas */ 
+    /** @override apenas se houver tradução para as páginas */
     getTranslationPath() { return '/pages/home.json'; }
 
     /** @override */
-    async render() {        
+    async render() {
         this.container.innerHTML = /* html */ `
             <algol-grid-layout posh="stretch" cols="1fr">
                 <algol-grid-item
@@ -80,7 +80,7 @@ class PageHome extends PageBase{
         if (!div) return; // guard!
 
         try {
-            const htmlContent = await this.withCache(`${this.getDataCacheKey()}_${document.documentElement.lang}`, async ()=>{ // padrão CACHE-ASIDE
+            const htmlContent = await this.withCache(`${this.getDataCacheKey()}_${document.documentElement.lang}`, async () => { // padrão CACHE-ASIDE
                 div.innerHTML = `<h2 style="text-align: center;">${this.t.loading || 'Carregando...'}</h2>`;
                 const lang = document.documentElement.lang; // obtém o idioma atual da página
                 const response = await fetch(`/api/simple-posts?limit=${6}&lang=${lang}`); // vai buscar os dados no servidor
@@ -97,8 +97,8 @@ class PageHome extends PageBase{
                 `).join('');
                 stringHtml += `</algol-grid-layout>`
                 return stringHtml;
-            },false);
-            
+            }, false);
+
             div.innerHTML = htmlContent; // substitui a div pelo <algol-grid-layout>
         } catch (error) {
             console.error("Erro ao carregar artigos:", error);

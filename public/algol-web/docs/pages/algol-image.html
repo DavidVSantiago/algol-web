@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentação Algol UI - Image</title>
+    <style>
+        :root {
+            --primary-color: #0056b3;
+            --text-color: #333;
+            --bg-color: #fff;
+            --border-color: #e0e0e0;
+            --code-bg: #f8f9fa;
+            --code-color: #d63384;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        h1, h2, h3 {
+            color: var(--primary-color);
+            margin-top: 2rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.5rem;
+        }
+
+        h1 { font-size: 2.5rem; margin-top: 0; }
+        h2 { font-size: 1.75rem; }
+
+        code {
+            background-color: var(--code-bg);
+            color: var(--code-color);
+            padding: 0.2em 0.4em;
+            border-radius: 4px;
+            font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+            font-size: 0.9em;
+        }
+
+        pre {
+            background-color: var(--code-bg);
+            padding: 1rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            border: 1px solid var(--border-color);
+        }
+
+        pre code {
+            background-color: transparent;
+            color: var(--text-color);
+            padding: 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background-color: var(--code-bg);
+            font-weight: 600;
+        }
+
+        ul {
+            padding-left: 1.5rem;
+        }
+
+        li {
+            margin-bottom: 1.5rem;
+        }
+
+        .alert-info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            padding: 1rem;
+            border-left: 4px solid #117a8b;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+
+    <main>
+        <article id="algol-image">
+            <h1><code>&lt;algol-image&gt;</code></h1>
+            
+            <section>
+                <h2>Visão Geral</h2>
+                <p>Componente de imagem inteligente. Aplica <code>object-fit: cover</code> por padrão, gerencia falhas de carregamento automaticamente (exibindo um aviso visual) e suporta controle de estilização diferenciado para modo mobile.</p>
+                <pre><code>&lt;algol-image src="foto.jpg" alt="Descrição da foto" lazy radius="0.5vw"&gt;&lt;/algol-image&gt;</code></pre>
+            </section>
+
+            <section>
+                <h2>Atributos de Configuração</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Atributo</th>
+                            <th>Descrição</th>
+                            <th>Valores Aceitos</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>src</code></td>
+                            <td>URL ou caminho da imagem.</td>
+                            <td><em>Texto (URL)</em></td>
+                        </tr>
+                        <tr>
+                            <td><code>alt</code></td>
+                            <td>Texto alternativo de acessibilidade.</td>
+                            <td><em>Texto</em></td>
+                        </tr>
+                        <tr>
+                            <td><code>width</code></td>
+                            <td>Define o atributo nativo de largura da imagem.</td>
+                            <td><em>Número/Texto</em></td>
+                        </tr>
+                        <tr>
+                            <td><code>height</code></td>
+                            <td>Define o atributo nativo de altura da imagem.</td>
+                            <td><em>Número/Texto</em></td>
+                        </tr>
+                        <tr>
+                            <td><code>lazy</code></td>
+                            <td>Ativa o carregamento sob demanda (<code>loading="lazy"</code>). Sem ele, o padrão é <code>eager</code>.</td>
+                            <td><em>Booleano (presença do atributo)</em></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section>
+                <h2>Atributos de Estilização</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Atributo</th>
+                            <th>Variável Injetada</th>
+                            <th>Efeito Visual</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>radius</code></td>
+                            <td><code>--image-radius</code></td>
+                            <td>Define o arredondamento dos cantos (<code>border-radius</code>).</td>
+                        </tr>
+                        <tr>
+                            <td><code>radiusbreak</code></td>
+                            <td><code>--image-radiusbreak</code></td>
+                            <td>Define o arredondamento exclusivo para telas menores que o breakpoint mobile.</td>
+                        </tr>
+                        <tr>
+                            <td><code>size</code></td>
+                            <td><code>--image-size</code></td>
+                            <td>Define a largura CSS da imagem.</td>
+                        </tr>
+                        <tr>
+                            <td><code>sizebreak</code></td>
+                            <td><code>--image-sizebreak</code></td>
+                            <td>Define a largura CSS exclusiva para telas menores que o breakpoint mobile.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section>
+                <h2>Comportamento e Fallback</h2>
+                <div class="alert-info">
+                    Se o atributo <code>src</code> estiver quebrado ou a imagem não for encontrada, o componente oculta a tag <code>&lt;img&gt;</code> e exibe automaticamente a mensagem visual: <strong>⚠️ Image not loaded!</strong>, disparando também um erro de validação (<code>badInput</code>).
+                </div>
+            </section>
+
+            <section>
+                <h2>Eventos Emitidos</h2>
+                <p>Além dos eventos herdados do <strong><code>BaseComponent</code></strong> (como <code>algol-click</code>), a imagem emite eventos específicos de seu ciclo de vida:</p>
+                
+                <ul>
+                    <li>
+                        <strong><code>algol-image-load</code></strong>: Disparado assim que a imagem é carregada com sucesso.
+                        <pre><code>document.querySelector('algol-image').addEventListener('algol-image-load', e =&gt; {
+  console.log("Imagem carregada com sucesso:", e.target);
+});</code></pre>
+                    </li>
+                    <li>
+                        <strong><code>algol-image-error</code></strong>: Disparado se houver falha no carregamento do arquivo.
+                        <pre><code>document.querySelector('algol-image').addEventListener('algol-image-error', e =&gt; {
+  console.error("Falha ao carregar a imagem do componente:", e.target);
+});</code></pre>
+                    </li>
+                </ul>
+            </section>
+        </article>
+    </main>
+
+</body>
+</html>

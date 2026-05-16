@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentação Algol UI - Checkbox</title>
+    <style>
+        :root {
+            --primary-color: #0056b3;
+            --text-color: #333;
+            --bg-color: #fff;
+            --border-color: #e0e0e0;
+            --code-bg: #f8f9fa;
+            --code-color: #d63384;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        h1, h2, h3 {
+            color: var(--primary-color);
+            margin-top: 2rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.5rem;
+        }
+
+        h1 { font-size: 2.5rem; margin-top: 0; }
+        h2 { font-size: 1.75rem; }
+
+        code {
+            background-color: var(--code-bg);
+            color: var(--code-color);
+            padding: 0.2em 0.4em;
+            border-radius: 4px;
+            font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+            font-size: 0.9em;
+        }
+
+        pre {
+            background-color: var(--code-bg);
+            padding: 1rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            border: 1px solid var(--border-color);
+        }
+
+        pre code {
+            background-color: transparent;
+            color: var(--text-color);
+            padding: 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background-color: var(--code-bg);
+            font-weight: 600;
+        }
+
+        ul {
+            padding-left: 1.5rem;
+        }
+
+        li {
+            margin-bottom: 1.5rem;
+        }
+
+        .alert-info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            padding: 1rem;
+            border-left: 4px solid #117a8b;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+
+    <main>
+        <article id="algol-checkbox">
+            <h1><code>&lt;algol-checkbox&gt;</code></h1>
+            
+            <section>
+                <h2>Visão Geral</h2>
+                <p>Componente de caixa de seleção (checkbox) customizado. Ele herda toda a lógica de estado, validação e formulário da classe <strong><code>BaseCheckable</code></strong>, entregando uma interface limpa, animada e perfeitamente alinhada ao tema global da biblioteca.</p>
+                <pre><code>&lt;algol-checkbox name="termos" required checked&gt;Li e aceito os termos&lt;/algol-checkbox&gt;</code></pre>
+            </section>
+
+            <section>
+                <h2>Atributos de Configuração</h2>
+                <p>Graças à herança, o <code>algol-checkbox</code> possui suporte total aos seguintes atributos (detalhados na documentação do <code>BaseCheckable</code>):</p>
+                <ul>
+                    <li><code>checked</code>: Define o estado inicial da caixa.</li>
+                    <li><code>name</code>: Chave de envio no formulário.</li>
+                    <li><code>value</code>: O valor enviado quando marcado (padrão <code>"on"</code>).</li>
+                    <li><code>disabled</code>: Bloqueia a interação.</li>
+                    <li><code>required</code>: Impede o envio do formulário se desmarcado.</li>
+                    <li><code>label</code>: Texto embutido via atributo.</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Flexibilidade de Texto (Label vs Slot)</h2>
+                <div class="alert-info">
+                    <strong>Uso de Slot (Recomendado):</strong> Embora você possa usar o atributo <code>label="Texto"</code>, o checkbox foi projetado para suportar injeção de HTML no seu interior via <code>&lt;slot&gt;</code>. Isso permite criar textos ricos contendo links, negritos ou ícones clicáveis diretamente ao lado da caixa de seleção.<br><br>
+                    Exemplo: <code>&lt;algol-checkbox&gt;Aceito a &lt;a href="#"&gt;Política de Privacidade&lt;/a&gt;&lt;/algol-checkbox&gt;</code>
+                </div>
+            </section>
+
+            <section>
+                <h2>Eventos Emitidos</h2>
+                <p>O componente responde a cliques do mouse e barra de espaço (quando focado via Tab). O estado deve ser monitorado capturando o evento padronizado de troca:</p>
+                
+                <ul>
+                    <li>
+                        <strong><code>algol-input</code></strong>: Disparado a cada inversão de estado. Acessando <code>origin.checked</code> você descobre se o usuário marcou ou desmarcou a caixa.
+                        <pre><code>document.querySelector('algol-checkbox').addEventListener('algol-input', e =&gt; {
+  const { origin, value } = e.detail;
+  if (origin.checked) {
+      console.log(`Marcado! Valor a ser enviado: ${value}`);
+  } else {
+      console.log("Desmarcado.");
+  }
+});</code></pre>
+                    </li>
+                </ul>
+            </section>
+        </article>
+    </main>
+
+</body>
+</html>
