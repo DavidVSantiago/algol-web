@@ -9,6 +9,6 @@ export const app = new Elysia()
     // .decorate('IMAGE_BUCKET', IMAGE_BUCKET) // torna a variável global
     .use(apiRoutes)
     .use(siteRoutes)
-    .listen(8080);
+    .listen(3000);
 
 console.log(`🦊 Servidor modular rodando em ${app.server?.hostname}:${app.server?.port}`);
