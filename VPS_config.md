@@ -70,7 +70,8 @@ sudo nginx -t
 sudo systemctl restart nginx
 
 # ------------------------------------------------------
-# Criar o site algol.dev com o bun + elysia
+# Criar o site algol.dev do zero com o bun + elysia
+# pode ignorar essa etapa se fizer o git clone diretamente no pasta ~/apps/
 # ------------------------------------------------------
 
 
@@ -107,5 +108,61 @@ http://192.168.253.129:8001/
 
 
 # ------------------------------------------------------
-# Subindo a aplicação Bun+Elysia para o VPS local via SFTP
+# Agendar inicialização com Systemd
 # ------------------------------------------------------
+
+# 1 - Criar os serviços no systemd (um para cada aplicação)
+sudo nano /etc/systemd/system/algol-web.service
+
+[Unit]
+Description=Algol Web - Bun Application
+After=network.target
+
+[Service]
+Type=simple
+User=vps
+WorkingDirectory=/home/vps/apps/algol-web
+ExecStart=/home/vps/.bun/bin/bun run index.ts
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target
+
+# ------
+
+sudo nano /etc/systemd/system/cegesp.service
+
+[Unit]
+Description=CEGESP - Bun Application
+After=network.target
+
+[Service]
+Type=simple
+User=vps
+WorkingDirectory=/home/vps/apps/cegesp.algol.dev
+ExecStart=/home/vps/.bun/bin/bun run index.ts
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target
+
+# 2 - Recarrega o motor de serviços do Linux
+sudo systemctl daemon-reload
+
+# 3 - Ativa e inicia os seviços criados para as aplicações
+sudo systemctl enable --now algol-web.service
+sudo systemctl enable --now cegesp.service
+
+# 4 - Verifica o status
+sudo systemctl status algol-web
+sudo systemctl status cegesp
+
+# 5 - ver logs em tempo real
+sudo journalctl -u algol-web -f
+sudo journalctl -u cegesp -f
+
+# 6 - atualizar o serviço (apos atualizar o código)
+sudo systemctl restart algol-web
+sudo systemctl restart cegesp
