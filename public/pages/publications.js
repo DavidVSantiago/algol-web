@@ -1,20 +1,20 @@
 
-    class PagePublications extends PageBase{
+class PagePublications extends PageBase {
 
-        constructor(container, params) {
-            super(container, params);
-        }
+    constructor(container, params) {
+        super(container, params);
+    }
 
-        /** ****************************************************** */
-        /** MÉTODOS SOBRESCRITOS ********************************* */
-        /** ****************************************************** */
+    /** ****************************************************** */
+    /** MÉTODOS SOBRESCRITOS ********************************* */
+    /** ****************************************************** */
 
-        /** @override apenas se houver tradução para as páginas */ 
-        getTranslationPath() { return '/pages/publications.json'; }
+    /** @override apenas se houver tradução para as páginas */
+    getTranslationPath() { return '/pages/publications.json'; }
 
-        /** @override */
-        render() {
-            this.container.innerHTML = /* html */ `
+    /** @override */
+    render() {
+        this.container.innerHTML = /* html */ `
                 <algol-grid-layout posh="stretch" cols="1fr">
                     <algol-grid-item
                     img="${IMAGE_BUCKET}/imagens/structural-site/books-page-cover.webp"
@@ -44,7 +44,7 @@
                                 <algol-image
                                 size="30vw"
                                 sizebreak="100%"
-                                expand src="imagens/publications/gds1/book-gds1-java.webp" alt="landscape" width="500" height="483"
+                                expand src="${IMAGE_BUCKET}/imagens/publications/gds1/book-gds1-java.webp" alt="landscape" width="500" height="483"
                                 ></algol-image>
                             </algol-grid-item>
                             
@@ -84,7 +84,7 @@
                 <algol-spacer value="7" valuebreak="5"></algol-spacer>
             `;
 
-            this.injectStyle( /* css */`
+        this.injectStyle( /* css */`
                 @media (max-width: ${MOBILE_BREAKPOINT}) {
                     #btn-testar{
                         display: none;
@@ -92,21 +92,21 @@
                 }
             `);
 
-            // 💡 INJEÇÃO DE SEO ESTÁTICO AQUI!
-            this.setMetaTags({
-                title: `Algol.dev | Publications`,
-                description: this.t.book1_subtitle,
-                image: `${IMAGE_BUCKET}/imagens/structural-site/books-page-cover.webp`,
-                url: window.location.href
-            });
-        }
-
-        /** @override */
-        async loadData() {
-            // nada para carregar
-        }
-
-        /** ****************************************************** */
-        /** MÉTODOS ESPECÍFICOS ********************************** */
-        /** ****************************************************** */
+        // 💡 INJEÇÃO DE SEO ESTÁTICO AQUI!
+        this.setMetaTags({
+            title: `Algol.dev | Publications`,
+            description: this.t.book1_subtitle,
+            image: `${IMAGE_BUCKET}/imagens/structural-site/books-page-cover.webp`,
+            url: window.location.href
+        });
     }
+
+    /** @override */
+    async loadData() {
+        // nada para carregar
+    }
+
+    /** ****************************************************** */
+    /** MÉTODOS ESPECÍFICOS ********************************** */
+    /** ****************************************************** */
+}

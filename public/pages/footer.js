@@ -1,23 +1,23 @@
 
-    class ComponentFooter extends PageBase{
+class ComponentFooter extends PageBase {
 
-        constructor(container, params) {
-            super(container, params);
-        }
+    constructor(container, params) {
+        super(container, params);
+    }
 
-        /** ****************************************************** */
-        /** MÉTODOS SOBRESCRITOS ********************************* */
-        /** ****************************************************** */
+    /** ****************************************************** */
+    /** MÉTODOS SOBRESCRITOS ********************************* */
+    /** ****************************************************** */
 
-        /** @override apenas se houver tradução para as páginas */ 
-        getTranslationPath() { return '/pages/footer.json'; }
+    /** @override apenas se houver tradução para as páginas */
+    getTranslationPath() { return '/pages/footer.json'; }
 
-        /** @override */
-        render() {
-            const page_content = document.getElementById('app');
-            const currentYear = new Date().getFullYear(); // TODO Buscar do servidor
-            
-            this.container.innerHTML = /* html */ `
+    /** @override */
+    render() {
+        const page_content = document.getElementById('app');
+        const currentYear = new Date().getFullYear(); // TODO Buscar do servidor
+
+        this.container.innerHTML = /* html */ `
                 <algol-grid-layout cols="1fr" id="footer">
                     <algol-grid-item>
                         <algol-spacer value="1.2"></algol-spacer>
@@ -32,7 +32,7 @@
                             </a>
                             <a href="https://www.youtube.com/channel/UCVJGac_RO3I-yIM77xLYrdw" target="_blank">
                                 <algol-image size="2vw" sizebreak="7vw"
-                                    src="https://algol-bucket.b-cdn.net/imagens/structural-site/icon-youtube.svg" alt="logo" width="91" height="100">
+                                    src="${IMAGE_BUCKET}/imagens/structural-site/icon-youtube.svg" alt="logo" width="91" height="100">
                             </a>
                     </algol-flex-item>
                     <algol-flex-item>
@@ -48,7 +48,7 @@
                 </algol-grid-layout>
             `;
 
-            this.injectStyle(/* css */ `
+        this.injectStyle(/* css */ `
                 #footer{
                     background-color: #24272d;
                     color: white;
@@ -60,15 +60,15 @@
                     a:hover{color: rgb(172, 190, 255);}
                     a:active{color: rgb(97, 124, 222);}
                 }
-            `,"footer-style");
-        }
-
-        /** @override */
-        async loadData() {
-            // nada para carregar
-        }
-
-        /** ****************************************************** */
-        /** MÉTODOS ESPECÍFICOS ********************************** */
-        /** ****************************************************** */
+            `, "footer-style");
     }
+
+    /** @override */
+    async loadData() {
+        // nada para carregar
+    }
+
+    /** ****************************************************** */
+    /** MÉTODOS ESPECÍFICOS ********************************** */
+    /** ****************************************************** */
+}
