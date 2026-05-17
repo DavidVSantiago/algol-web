@@ -2,6 +2,9 @@
 import { Elysia, t } from 'elysia';
 
 export const siteRoutes = new Elysia()
+    .get('/tools/teethgram', ({ redirect }) => { // TODO temporário
+        return redirect('https://teethgram.algol.dev', 301);
+    })
     .get('/*', async ({ path }) => {
         // Tenta mapear a URL para um arquivo físico na pasta public
         const file = Bun.file(`public${path}`);
@@ -20,4 +23,4 @@ export const siteRoutes = new Elysia()
         // Então fazemos o fallback para o index.html
         return Bun.file('public/index.html');
     })
-;
+    ;

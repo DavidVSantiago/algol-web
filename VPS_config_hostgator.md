@@ -167,9 +167,9 @@ After=network.target
 
 [Service]
 Type=simple
-User=vps
-WorkingDirectory=/home/vps/apps/algol.dev
-ExecStart=/home/vps/.bun/bin/bun run index.ts
+User=root
+WorkingDirectory=/root/apps/algol.dev
+ExecStart=/root/.bun/bin/bun run index.ts
 Restart=always
 RestartSec=3
 
@@ -186,9 +186,9 @@ After=network.target
 
 [Service]
 Type=simple
-User=vps
-WorkingDirectory=/home/vps/apps/cegesp.algol.dev
-ExecStart=/home/vps/.bun/bin/bun run index.ts
+User=root
+WorkingDirectory=/root/apps/cegesp.algol.dev
+ExecStart=/root/.bun/bin/bun run index.ts
 Restart=always
 RestartSec=3
 
@@ -205,9 +205,9 @@ After=network.target
 
 [Service]
 Type=simple
-User=vps
-WorkingDirectory=/home/vps/apps/teethgram.algol.dev
-ExecStart=/home/vps/.bun/bin/bun run index.ts
+User=root
+WorkingDirectory=/root/apps/teethgram.algol.dev
+ExecStart=/root/.bun/bin/bun run index.ts
 Restart=always
 RestartSec=3
 
@@ -215,20 +215,24 @@ RestartSec=3
 WantedBy=multi-user.target
 
 # 2 - Recarrega o motor de serviços do Linux
-sudo systemctl daemon-reload
+systemctl daemon-reload
 
 # 3 - Ativa e inicia os seviços criados para as aplicações
-sudo systemctl enable --now algol-web.service
-sudo systemctl enable --now cegesp.service
+systemctl enable --now algol.dev.service
+systemctl enable --now cegesp.algol.dev.service
+systemctl enable --now teethgram.algol.dev.service
 
 # 4 - Verifica o status
-sudo systemctl status algol-web
-sudo systemctl status cegesp
+systemctl status algol.dev.service
+systemctl status cegesp.algol.dev.service
+systemctl status teethgram.algol.dev.service
 
 # 5 - ver logs em tempo real
-sudo journalctl -u algol-web -f
-sudo journalctl -u cegesp -f
+journalctl -u algol.dev.service -f
+journalctl -u cegesp.algol.dev.service -f
+journalctl -u teethgram.algol.dev.service   -f
 
 # 6 - atualizar o serviço (apos atualizar o código)
-sudo systemctl restart algol-web
-sudo systemctl restart cegesp
+systemctl restart algol.dev.service
+systemctl restart cegesp.algol.dev.service
+systemctl restart teethgram.algol.dev.service
