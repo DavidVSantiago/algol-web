@@ -172,3 +172,60 @@ systemctl restart nginx
 certbot --nginx -d services.algol.dev
 
 # 11 - reativar o cdn usar
+
+# ------------------------------------------------------
+# Nginx UI
+# ------------------------------------------------------
+
+# 01 - Baixar e executar o script oficial de instalação
+bash -c "$(curl -L https://cloud.nginxui.com/install.sh)" @ install
+
+# 02 - Verificar se o serviço iniciou corretamente
+systemctl status nginx-ui
+
+
+# 03 - Liberar a Porta 9000 no Firewall (Porta padrão do Nginx UI)
+
+# Liberação no Iptables
+iptables -I INPUT -p tcp --dport 9000 -j ACCEPT
+iptables-save | tee /etc/iptables/rules.v4
+
+# Liberação no UFW (apenas por garantia)
+ufw allow 9000/tcp
+ufw reload
+
+# 04 - Resgatar o "Install Secret" (Senha temporária crucial)
+# O sistema gera uma senha de uso único para você fazer o primeiro setup.
+# Geralmente ela aparece no final da instalação, mas caso passe rápido, leia o arquivo:
+cat /usr/local/etc/nginx-ui/.install_secret
+
+# Copie o código gerado na tela.
+2f2bed661252969ddda4d9ef673910145de1c0a894c4c3cea656dc483ee3bab0
+
+# 04 - O Primeiro Acesso (Configuração Inicial no Navegador)
+# Abra no navegador usando o IP da sua VPS e a porta 9000:
+http://129.121.50.211:9000
+
+# Passo a passo na tela:
+# 1. Cole o "Install Secret" que você copiou do terminal.
+# 2. Crie seu usuário de administrador e uma senha forte.
+# 3. Na etapa do Nginx, ele detectará automaticamente as pastas de configuração 
+#    (/etc/nginx/nginx.conf, sites-available, sites-enabled). Apenas confirme.
+
+# 05 - Criar o registro A na Bunny.net
+# Tipo: A
+# Nome: nginx (ficará nginx.algol.dev)
+# IP/Valor: 129.121.50.211
+# CDN Acceleration: Disabled (desative momentaneamente para o Certbot funcionar)
+
+# 06 - Criar a configuração do Nginx no terminal (Pela ÚLTIMA VEZ!)
+# A partir de hoje, você fará tudo isso visualmente pelo próprio painel.
+nano /etc/nginx/sites-available/nginx.algol.dev
+
+# 07 - Ativar o site e reiniciar o motor do Nginx
+ln -s /etc/nginx/sites-available/nginx.algol.dev /etc/nginx/sites-enabled/
+nginx -t
+systemctl restart nginx
+
+# 08 - Blindar com o Certbot (Gerar SSL)
+certbot --nginx -d nginx.algol.dev
