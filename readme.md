@@ -1,20 +1,15 @@
-# para instalar
-bun add elysia @elysiajs/static
-bun add -d @types/bun
-bun add ioredis
+# algol-web
 
-# configurar o redis no SO
-sudo apt update
-sudo apt install redis-server
-sudo systemctl start redis-server
-sudo systemctl enable redis-server
-redis-cli ping <!-- A resposta deve ser: PONG -->
+To install dependencies:
 
+```bash
+bun install
+```
 
-# para rodar
-bun drizzle-kit push <!-- para recriar o banco -->
+To run:
+
+```bash
 bun run index.ts
-bun --watch index.ts <!-- para recarregar automaticamente -->
+```
 
-
-
+This project was created using `bun init` in bun v1.3.14. [Bun](https://bun.com) is a fast all-in-one JavaScript runtime.

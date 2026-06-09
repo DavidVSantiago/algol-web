@@ -10,5 +10,12 @@
   "devDependencies": {
     "@types/bun": "^1.3.9",
     "drizzle-kit": "^0.31.9"
+  },
+  "name": "algol-web",
+  "module": "index.ts",
+  "type": "module",
+  "private": true,
+  "peerDependencies": {
+    "typescript": "^5"
   }
 }
